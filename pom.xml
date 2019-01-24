@@ -149,6 +149,7 @@
             <exclude>**/LICENSE</exclude>
             <exclude>**/NOTICE</exclude>
             <exclude>**/*.txt</exclude>
+            <exclude>src/test/resources/cii/*</exclude>
           </excludes>
         </configuration>
       </plugin>
