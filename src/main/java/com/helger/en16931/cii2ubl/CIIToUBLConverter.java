@@ -26,10 +26,12 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class CIIToUBLConverter
 {
@@ -74,6 +76,22 @@ public class CIIToUBLConverter
               break;
           }
       aUBLInvoice.setIssueDate (aIssueDate);
+    }
+    aUBLInvoice.setInvoiceTypeCode (aED.getTypeCodeValue ());
+    {
+      for (final NoteType aEDNote : aED.getIncludedNote ())
+      {
+        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType ();
+        final StringBuilder aSB = new StringBuilder ();
+        for (final TextType aText : aEDNote.getContent ())
+        {
+          if (aSB.length () > 0)
+            aSB.append ('\n');
+          aSB.append (aText.getValue ());
+        }
+        aUBLNote.setValue (aSB.toString ());
+        aUBLInvoice.addNote (aUBLNote);
+      }
     }
 
     // TODO
