@@ -1,5 +1,6 @@
 package com.helger.en16931.cii2ubl;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -33,8 +34,8 @@ public final class CIIToUBLConverterTest
     for (final String sFilename : TEST_FILES)
     {
       final ErrorList aErrorList = new ErrorList ();
-      assertTrue (new CIIToUBLConverter ().convertCIItoUBL (new File ("src/test/resources/cii", sFilename), aErrorList)
-                                          .isSuccess ());
+      assertNotNull (new CIIToUBLConverter ().convertCIItoUBL (new File ("src/test/resources/cii", sFilename),
+                                                               aErrorList));
       assertTrue (aErrorList.isEmpty ());
     }
   }
