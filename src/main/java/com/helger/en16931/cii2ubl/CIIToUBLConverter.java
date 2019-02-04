@@ -15,6 +15,7 @@ import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.math.MathHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
@@ -28,8 +29,10 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
@@ -63,6 +66,8 @@ public class CIIToUBLConverter
     aUBLInvoice.setCustomizationID ("urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0");
     aUBLInvoice.setProfileID ("urn:fdc:peppol.eu:2017:poacc:billing:01:1.0");
     aUBLInvoice.setID (aED.getIDValue ());
+
+    // IssueDate
     {
       XMLGregorianCalendar aIssueDate = null;
       if (aED.getIssueDateTime () != null)
@@ -77,7 +82,11 @@ public class CIIToUBLConverter
           }
       aUBLInvoice.setIssueDate (aIssueDate);
     }
+
+    // InvoiceTypeCode
     aUBLInvoice.setInvoiceTypeCode (aED.getTypeCodeValue ());
+
+    // Note
     {
       for (final NoteType aEDNote : aED.getIncludedNote ())
       {
@@ -93,6 +102,43 @@ public class CIIToUBLConverter
         aUBLInvoice.addNote (aUBLNote);
       }
     }
+
+    // TaxPointDate
+    for (final TradeTaxType aTradeTax : aSettlement.getApplicableTradeTax ())
+    {
+      if (aTradeTax.getTaxPointDate () != null)
+      {
+        final XMLGregorianCalendar aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ()
+                                                                                .getDateStringValue ());
+        if (aTaxPointDate != null)
+        {
+          // Use the first tax point date only
+          aUBLInvoice.setTaxPointDate (aTaxPointDate);
+          break;
+        }
+      }
+    }
+
+    // DocumentCurrencyCode
+    aUBLInvoice.setDocumentCurrencyCode (aSettlement.getInvoiceCurrencyCodeValue ());
+
+    // TaxCurrencyCode
+    aUBLInvoice.setTaxCurrencyCode (aSettlement.getTaxCurrencyCodeValue ());
+
+    // AccountingCost
+    for (final TradeAccountingAccountType aAccount : aSettlement.getReceivableSpecifiedTradeAccountingAccount ())
+    {
+      final String sID = aAccount.getIDValue ();
+      if (StringHelper.hasText (sID))
+      {
+        // Use the first ID
+        aUBLInvoice.setAccountingCost (sID);
+        break;
+      }
+    }
+
+    // BuyerReferences
+    aUBLInvoice.setBuyerReference (aAgreement.getBuyerReferenceValue ());
 
     // TODO
     return aUBLInvoice;
