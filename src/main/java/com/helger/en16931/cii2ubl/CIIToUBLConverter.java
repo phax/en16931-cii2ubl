@@ -19,21 +19,38 @@ import com.helger.commons.string.StringHelper;
 import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AttachmentType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.BillingReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.CustomerPartyType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.DocumentReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ExternalReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.OrderReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PeriodType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ProjectReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.SupplierPartyType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DocumentDescriptionType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EmbeddedDocumentBinaryObjectType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class CIIToUBLConverter
@@ -46,8 +63,61 @@ public class CIIToUBLConverter
   @Nullable
   private static XMLGregorianCalendar _parseDateDDMMYYYY (@Nullable final String s)
   {
-    final LocalDate aDate = PDTFromString.getLocalDateFromString (s, "uuMMdddd");
+    final LocalDate aDate = PDTFromString.getLocalDateFromString (s, "uuMMdd");
     return PDTXMLConverter.getXMLCalendarDate (aDate);
+  }
+
+  @Nullable
+  private static DocumentReferenceType _convertDocumentReference (@Nullable final ReferencedDocumentType aRD)
+  {
+    DocumentReferenceType ret = null;
+    if (aRD != null)
+    {
+      final String sID = aRD.getIssuerAssignedIDValue ();
+      if (StringHelper.hasText (sID))
+      {
+        ret = new DocumentReferenceType ();
+        // ID value is a mandatory field
+        ret.setID (sID).setSchemeID (aRD.getReferenceTypeCodeValue ());
+
+        // IssueDate is optional
+        final FormattedDateTimeType aFDT = aRD.getFormattedIssueDateTime ();
+        if (aFDT != null)
+          ret.setIssueDate (_parseDateDDMMYYYY (aFDT.getDateTimeStringValue ()));
+
+        // Name is optional
+        for (final TextType aItem : aRD.getName ())
+        {
+          final DocumentDescriptionType aUBLDocDesc = new DocumentDescriptionType ();
+          aUBLDocDesc.setValue (aItem.getValue ());
+          aUBLDocDesc.setLanguageID (aItem.getLanguageID ());
+          aUBLDocDesc.setLanguageLocaleID (aItem.getLanguageLocaleID ());
+          ret.addDocumentDescription (aUBLDocDesc);
+        }
+
+        // Attachment (0..1 for CII)
+        if (aRD.getAttachmentBinaryObjectCount () > 0)
+        {
+          final BinaryObjectType aBinObj = aRD.getAttachmentBinaryObjectAtIndex (0);
+
+          final AttachmentType aUBLAttachment = new AttachmentType ();
+          final EmbeddedDocumentBinaryObjectType aEmbeddedDoc = new EmbeddedDocumentBinaryObjectType ();
+          aEmbeddedDoc.setMimeCode (aBinObj.getMimeCode ());
+          aEmbeddedDoc.setFilename (aBinObj.getFilename ());
+          aUBLAttachment.setEmbeddedDocumentBinaryObject (aEmbeddedDoc);
+
+          final String sURI = aRD.getURIIDValue ();
+          if (StringHelper.hasText (sURI))
+          {
+            final ExternalReferenceType aUBLExtRef = new ExternalReferenceType ();
+            aUBLExtRef.setURI (sURI);
+            aUBLAttachment.setExternalReference (aUBLExtRef);
+          }
+          ret.setAttachment (aUBLAttachment);
+        }
+      }
+    }
+    return ret;
   }
 
   @Nonnull
@@ -66,6 +136,14 @@ public class CIIToUBLConverter
     aUBLInvoice.setCustomizationID ("urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0");
     aUBLInvoice.setProfileID ("urn:fdc:peppol.eu:2017:poacc:billing:01:1.0");
     aUBLInvoice.setID (aED.getIDValue ());
+
+    // Mandatory supplier
+    final SupplierPartyType aUBLSupplier = new SupplierPartyType ();
+    aUBLInvoice.setAccountingSupplierParty (aUBLSupplier);
+
+    // Mandatory customer
+    final CustomerPartyType aUBLCustomer = new CustomerPartyType ();
+    aUBLInvoice.setAccountingCustomerParty (aUBLCustomer);
 
     // IssueDate
     {
@@ -139,6 +217,114 @@ public class CIIToUBLConverter
 
     // BuyerReferences
     aUBLInvoice.setBuyerReference (aAgreement.getBuyerReferenceValue ());
+
+    // InvoicePeriod
+    {
+      final SpecifiedPeriodType aSPT = aSettlement.getBillingSpecifiedPeriod ();
+      if (aSPT != null)
+      {
+        final DateTimeType aStartDT = aSPT.getStartDateTime ();
+        final DateTimeType aEndDT = aSPT.getEndDateTime ();
+
+        if (aStartDT != null && aEndDT != null)
+        {
+          final PeriodType aUBLPeriod = new PeriodType ();
+          aUBLPeriod.setStartDate (_parseDateDDMMYYYY (aStartDT.getDateTimeStringValue ()));
+          aUBLPeriod.setEndDate (_parseDateDDMMYYYY (aEndDT.getDateTimeStringValue ()));
+          aUBLInvoice.addInvoicePeriod (aUBLPeriod);
+        }
+      }
+    }
+
+    // OrderReference
+    {
+      final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
+      final ReferencedDocumentType aBuyerOrderRef = aAgreement.getBuyerOrderReferencedDocument ();
+      if (aBuyerOrderRef != null)
+        aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
+      final ReferencedDocumentType aSellerOrderRef = aAgreement.getSellerOrderReferencedDocument ();
+      if (aSellerOrderRef != null)
+        aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
+
+      // Set if any field is set
+      if (aUBLOrderRef.getIDValue () != null || aUBLOrderRef.getSalesOrderIDValue () != null)
+        aUBLInvoice.setOrderReference (aUBLOrderRef);
+    }
+
+    // BillingReference
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aSettlement.getInvoiceReferencedDocument ());
+      if (aUBLDocRef != null)
+      {
+        final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
+        aUBLBillingRef.setInvoiceDocumentReference (aUBLDocRef);
+        aUBLInvoice.addBillingReference (aUBLBillingRef);
+      }
+    }
+
+    // DespatchDocumentReference
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aDelivery.getDespatchAdviceReferencedDocument ());
+      if (aUBLDocRef != null)
+        aUBLInvoice.addDespatchDocumentReference (aUBLDocRef);
+    }
+
+    // ReceiptDocumentReference
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aDelivery.getReceivingAdviceReferencedDocument ());
+      if (aUBLDocRef != null)
+        aUBLInvoice.addReceiptDocumentReference (aUBLDocRef);
+    }
+
+    // OriginatorDocumentReference
+    {
+      for (final ReferencedDocumentType aRD : aAgreement.getAdditionalReferencedDocument ())
+      {
+        // Use for "Tender or lot reference" with TypeCode "50"
+        if ("50".equals (aRD.getTypeCodeValue ()))
+        {
+          final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD);
+          if (aUBLDocRef != null)
+            aUBLInvoice.addOriginatorDocumentReference (aUBLDocRef);
+        }
+      }
+    }
+
+    // ContractDocumentReference
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aAgreement.getContractReferencedDocument ());
+      if (aUBLDocRef != null)
+        aUBLInvoice.addContractDocumentReference (aUBLDocRef);
+    }
+
+    // AdditionalDocumentReference
+    {
+      for (final ReferencedDocumentType aRD : aAgreement.getAdditionalReferencedDocument ())
+      {
+        // Except OriginatorDocumentReference
+        if (!"50".equals (aRD.getTypeCodeValue ()))
+        {
+          final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD);
+          if (aUBLDocRef != null)
+            aUBLInvoice.addAdditionalDocumentReference (aUBLDocRef);
+        }
+      }
+    }
+
+    // ProjectReference
+    {
+      final ProcuringProjectType aSpecifiedProcuring = aAgreement.getSpecifiedProcuringProject ();
+      if (aSpecifiedProcuring != null)
+      {
+        final String sID = aSpecifiedProcuring.getIDValue ();
+        if (StringHelper.hasText (sID))
+        {
+          final ProjectReferenceType aUBLProjectRef = new ProjectReferenceType ();
+          aUBLProjectRef.setID (sID);
+          aUBLInvoice.addProjectReference (aUBLProjectRef);
+        }
+      }
+    }
 
     // TODO
     return aUBLInvoice;
