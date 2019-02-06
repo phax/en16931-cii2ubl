@@ -25,11 +25,14 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.Cus
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ExternalReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.OrderReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyIdentificationType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PeriodType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ProjectReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.SupplierPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DocumentDescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EmbeddedDocumentBinaryObjectType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EndpointIDType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -45,12 +48,14 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class CIIToUBLConverter
@@ -59,6 +64,27 @@ public class CIIToUBLConverter
 
   public CIIToUBLConverter ()
   {}
+
+  @Nonnull
+  private static <T extends com.helger.xsds.ccts.cct.schemamodule.IdentifierType> T _copyID (@Nonnull final IDType aCIIID,
+                                                                                             @Nonnull final T aUBLID)
+  {
+    aUBLID.setValue (aCIIID.getValue ());
+    aUBLID.setSchemeID (aCIIID.getSchemeID ());
+    aUBLID.setSchemeName (aCIIID.getSchemeName ());
+    aUBLID.setSchemeAgencyID (aCIIID.getSchemeAgencyID ());
+    aUBLID.setSchemeAgencyName (aCIIID.getSchemeAgencyName ());
+    aUBLID.setSchemeVersionID (aCIIID.getSchemeVersionID ());
+    aUBLID.setSchemeDataURI (aCIIID.getSchemeDataURI ());
+    aUBLID.setSchemeURI (aCIIID.getSchemeURI ());
+    return aUBLID;
+  }
+
+  @Nonnull
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _getAsUBLID (@Nonnull final IDType aCIIID)
+  {
+    return _copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType ());
+  }
 
   @Nullable
   private static XMLGregorianCalendar _parseDateDDMMYYYY (@Nullable final String s)
@@ -117,6 +143,31 @@ public class CIIToUBLConverter
         }
       }
     }
+    return ret;
+  }
+
+  @Nonnull
+  private static PartyType _convertParty (@Nonnull final TradePartyType aParty)
+  {
+    final PartyType ret = new PartyType ();
+
+    if (aParty.getGlobalIDCount () > 0)
+    {
+      final IDType aGlobalID = aParty.getGlobalIDAtIndex (0);
+      final EndpointIDType aUBLEndpointID = _copyID (aGlobalID, new EndpointIDType ());
+      ret.setEndpointID (aUBLEndpointID);
+    }
+
+    if (aParty.getIDCount () > 0)
+    {
+      final IDType aID = aParty.getIDAtIndex (0);
+
+      final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
+      aUBLPartyIdentification.setID (_getAsUBLID (aID));
+      ret.addPartyIdentification (aUBLPartyIdentification);
+    }
+
+    // TODO
     return ret;
   }
 
@@ -323,6 +374,15 @@ public class CIIToUBLConverter
           aUBLProjectRef.setID (sID);
           aUBLInvoice.addProjectReference (aUBLProjectRef);
         }
+      }
+    }
+
+    // Supplier Party
+    {
+      final TradePartyType aSellerParty = aAgreement.getSellerTradeParty ();
+      if (aSellerParty != null)
+      {
+        aUBLSupplier.setParty (_convertParty (aSellerParty));
       }
     }
 
