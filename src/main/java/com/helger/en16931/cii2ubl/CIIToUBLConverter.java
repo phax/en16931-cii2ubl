@@ -19,13 +19,17 @@ import com.helger.commons.string.StringHelper;
 import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AddressLineType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.BillingReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.CountryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ExternalReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.OrderReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyIdentificationType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyNameType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PeriodType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ProjectReferenceType;
@@ -33,6 +37,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.Sup
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DocumentDescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EmbeddedDocumentBinaryObjectType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EndpointIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NameType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -48,6 +53,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
@@ -65,6 +71,15 @@ public class CIIToUBLConverter
   public CIIToUBLConverter ()
   {}
 
+  /**
+   * Copy all ID parts from a CII ID to a CCTS/UBL ID.
+   *
+   * @param aCIIID
+   *        CII ID
+   * @param aUBLID
+   *        UBL ID
+   * @return Created UBL ID
+   */
   @Nonnull
   private static <T extends com.helger.xsds.ccts.cct.schemamodule.IdentifierType> T _copyID (@Nonnull final IDType aCIIID,
                                                                                              @Nonnull final T aUBLID)
@@ -84,6 +99,16 @@ public class CIIToUBLConverter
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _getAsUBLID (@Nonnull final IDType aCIIID)
   {
     return _copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType ());
+  }
+
+  @Nonnull
+  private static NameType _copyName (@Nonnull final TextType aName)
+  {
+    final NameType ret = new NameType ();
+    ret.setValue (aName.getValue ());
+    ret.setLanguageID (aName.getLanguageID ());
+    ret.setLanguageLocaleID (aName.getLanguageLocaleID ());
+    return ret;
   }
 
   @Nullable
@@ -167,7 +192,45 @@ public class CIIToUBLConverter
       ret.addPartyIdentification (aUBLPartyIdentification);
     }
 
+    final TextType aName = aParty.getName ();
+    if (aName != null)
+    {
+      final PartyNameType aUBLPartyName = new PartyNameType ();
+      aUBLPartyName.setName (_copyName (aName));
+      ret.addPartyName (aUBLPartyName);
+    }
+
+    final TradeAddressType aPostalAddress = aParty.getPostalTradeAddress ();
+    if (aPostalAddress != null)
+    {
+      ret.setPostalAddress (_convertPostalAddress (aPostalAddress));
+    }
+
     // TODO
+    return ret;
+  }
+
+  private static AddressType _convertPostalAddress (final TradeAddressType aPostalAddress)
+  {
+    final AddressType ret = new AddressType ();
+    ret.setStreetName (aPostalAddress.getLineOneValue ());
+    ret.setAdditionalStreetName (aPostalAddress.getLineTwoValue ());
+    if (StringHelper.hasText (aPostalAddress.getLineThreeValue ()))
+    {
+      final AddressLineType aUBLAddressLine = new AddressLineType ();
+      aUBLAddressLine.setLine (aPostalAddress.getLineThreeValue ());
+      ret.addAddressLine (aUBLAddressLine);
+    }
+    ret.setCityName (aPostalAddress.getCityNameValue ());
+    ret.setPostalZone (aPostalAddress.getPostcodeCodeValue ());
+    if (aPostalAddress.hasCountrySubDivisionNameEntries ())
+      ret.setCountrySubentity (aPostalAddress.getCountrySubDivisionNameAtIndex (0).getValue ());
+    if (StringHelper.hasText (aPostalAddress.getCountryIDValue ()))
+    {
+      final CountryType aUBLCountry = new CountryType ();
+      aUBLCountry.setIdentificationCode (aPostalAddress.getCountryIDValue ());
+      ret.setCountry (aUBLCountry);
+    }
     return ret;
   }
 
