@@ -29,11 +29,15 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.Doc
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ExternalReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.OrderReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyIdentificationType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyLegalEntityType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyNameType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyTaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PeriodType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ProjectReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.SupplierPartyType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.TaxSchemeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DocumentDescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EmbeddedDocumentBinaryObjectType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EndpointIDType;
@@ -47,11 +51,13 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
@@ -445,7 +451,26 @@ public class CIIToUBLConverter
       final TradePartyType aSellerParty = aAgreement.getSellerTradeParty ();
       if (aSellerParty != null)
       {
-        aUBLSupplier.setParty (_convertParty (aSellerParty));
+        final PartyType aUBLParty = _convertParty (aSellerParty);
+        aUBLSupplier.setParty (aUBLParty);
+
+        for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = new PartyTaxSchemeType ();
+          aUBLPartyTaxScheme.setCompanyID (_copyID (aTaxRegistration.getID (), new CompanyIDType ()));
+          final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
+          aUBLTaxScheme.setID ("VAT");
+          aUBLPartyTaxScheme.setTaxScheme (aUBLTaxScheme);
+          aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
+
+        final PartyLegalEntityType aUBLPartyLegalEntity = new PartyLegalEntityType ();
+        final LegalOrganizationType aSLO = aSellerParty.getSpecifiedLegalOrganization ();
+        if (aSLO != null)
+        {
+          aUBLPartyLegalEntity.setRegistrationName (aSLO.getTradingBusinessNameValue ());
+        }
+        aUBLParty.getPartyLegalEntity ().add (aUBLPartyLegalEntity);
       }
     }
 
