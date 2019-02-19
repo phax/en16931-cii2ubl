@@ -19,30 +19,15 @@ import com.helger.commons.string.StringHelper;
 import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AddressLineType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AddressType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AttachmentType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.BillingReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ContactType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.CountryType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.CustomerPartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.DocumentReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ExternalReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.OrderReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyIdentificationType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyLegalEntityType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyNameType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyTaxSchemeType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PeriodType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ProjectReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.SupplierPartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.TaxSchemeType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.*;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DocumentDescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EmbeddedDocumentBinaryObjectType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EndpointIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NameType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.PaymentIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.PaymentMeansCodeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.PrimaryAccountNumberIDType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -88,7 +73,7 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _getAsUBLID (@Nullable final IDType aCIIID)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _copyID (@Nullable final IDType aCIIID)
   {
     return _copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType ());
   }
@@ -191,6 +176,21 @@ public class CIIToUBLConverter
     return ret;
   }
 
+  @Nullable
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _extractPartyID (@Nonnull final TradePartyType aParty)
+  {
+    IDType aID;
+    if (aParty.hasGlobalIDEntries ())
+      aID = aParty.getGlobalIDAtIndex (0);
+    else
+      if (aParty.hasIDEntries ())
+        aID = aParty.getIDAtIndex (0);
+      else
+        aID = null;
+
+    return aID == null ? null : _copyID (aID);
+  }
+
   @Nonnull
   private static PartyType _convertParty (@Nonnull final TradePartyType aParty)
   {
@@ -202,22 +202,12 @@ public class CIIToUBLConverter
       ret.setEndpointID (_copyID (UC.getURIID (), new EndpointIDType ()));
     }
 
+    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType aUBLID = _extractPartyID (aParty);
+    if (aUBLID != null)
     {
-      IDType aID;
-      if (aParty.hasGlobalIDEntries ())
-        aID = aParty.getGlobalIDAtIndex (0);
-      else
-        if (aParty.hasIDEntries ())
-          aID = aParty.getIDAtIndex (0);
-        else
-          aID = null;
-
-      if (aID != null)
-      {
-        final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
-        aUBLPartyIdentification.setID (_getAsUBLID (aID));
-        ret.addPartyIdentification (aUBLPartyIdentification);
-      }
+      final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
+      aUBLPartyIdentification.setID (aUBLID);
+      ret.addPartyIdentification (aUBLPartyIdentification);
     }
 
     final TextType aName = aParty.getName ();
@@ -588,6 +578,135 @@ public class CIIToUBLConverter
           aUBLParty.setContact (aUBLContact);
 
         aUBLInvoice.setTaxRepresentativeParty (aUBLParty);
+      }
+    }
+
+    // Delivery
+    {
+      final TradePartyType aShipToParty = aDelivery.getShipToTradeParty ();
+      if (aShipToParty != null)
+      {
+        final DeliveryType aUBLDelivery = new DeliveryType ();
+
+        final SupplyChainEventType aSCE = aDelivery.getActualDeliverySupplyChainEvent ();
+        if (aSCE != null)
+        {
+          final DateTimeType aODT = aSCE.getOccurrenceDateTime ();
+          if (aODT != null)
+            aUBLDelivery.setActualDeliveryDate (_parseDateDDMMYYYY (aODT.getDateTimeStringValue ()));
+        }
+
+        final LocationType aUBLDeliveryLocation = new LocationType ();
+        boolean bUseLocation = false;
+
+        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType aUBLID = _extractPartyID (aShipToParty);
+        if (aUBLID != null)
+        {
+          aUBLDeliveryLocation.setID (aUBLID);
+          bUseLocation = true;
+        }
+
+        final TradeAddressType aPostalAddress = aShipToParty.getPostalTradeAddress ();
+        if (aPostalAddress != null)
+        {
+          aUBLDeliveryLocation.setAddress (_convertPostalAddress (aPostalAddress));
+          bUseLocation = true;
+        }
+
+        if (bUseLocation)
+          aUBLDelivery.setDeliveryLocation (aUBLDeliveryLocation);
+
+        final TextType aName = aShipToParty.getName ();
+        if (aName != null)
+        {
+          final PartyType aUBLDeliveryParty = new PartyType ();
+          final PartyNameType aUBLPartyName = new PartyNameType ();
+          aUBLPartyName.setName (_copyName (aName));
+          aUBLDeliveryParty.addPartyName (aUBLPartyName);
+          aUBLDelivery.setDeliveryParty (aUBLDeliveryParty);
+        }
+
+        aUBLInvoice.addDelivery (aUBLDelivery);
+      }
+    }
+
+    // Payment means
+    {
+      for (final TradeSettlementPaymentMeansType aPaymentMeans : aSettlement.getSpecifiedTradeSettlementPaymentMeans ())
+      {
+        final PaymentMeansType aUBLPaymentMeans = new PaymentMeansType ();
+
+        final PaymentMeansCodeType aUBLPaymentMeansCode = new PaymentMeansCodeType ();
+        aUBLPaymentMeansCode.setValue (aPaymentMeans.getTypeCodeValue ());
+        if (aPaymentMeans.hasInformationEntries ())
+          aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
+        aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
+
+        for (final TextType aPaymentRef : aSettlement.getPaymentReference ())
+        {
+          final PaymentIDType aUBLPaymentID = new PaymentIDType ();
+          aUBLPaymentID.setValue (aPaymentRef.getValue ());
+          aUBLPaymentMeans.addPaymentID (aUBLPaymentID);
+        }
+
+        final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
+        if (aCard != null)
+        {
+          final CardAccountType aUBLCardAccount = new CardAccountType ();
+          aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
+          // No CII field present
+          aUBLCardAccount.setNetworkID ("mapped-from-cii");
+          aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
+          aUBLPaymentMeans.setCardAccount (aUBLCardAccount);
+        }
+
+        final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
+        final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
+        if (aAccount != null || aInstitution != null)
+        {
+          final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+          if (aAccount != null)
+          {
+            aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
+            aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName ()));
+          }
+          if (aInstitution != null)
+          {
+            final BranchType aUBLBranch = new BranchType ();
+            aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
+            aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
+          }
+          aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
+        }
+
+        {
+          boolean bUseMandate = false;
+          final PaymentMandateType aUBLPaymentMandate = new PaymentMandateType ();
+
+          for (final TradePaymentTermsType aPaymentTerms : aSettlement.getSpecifiedTradePaymentTerms ())
+          {
+            if (aPaymentTerms.hasDirectDebitMandateIDEntries ())
+            {
+              aUBLPaymentMandate.setID (_copyID (aPaymentTerms.getDirectDebitMandateIDAtIndex (0)));
+              bUseMandate = true;
+              break;
+            }
+          }
+
+          final IDType aCreditorRefID = aSettlement.getCreditorReferenceID ();
+          if (aCreditorRefID != null)
+          {
+            final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+            aUBLFinancialAccount.setID (_copyID (aCreditorRefID));
+            aUBLPaymentMandate.setPayerFinancialAccount (aUBLFinancialAccount);
+            bUseMandate = true;
+          }
+
+          if (bUseMandate)
+            aUBLPaymentMeans.setPaymentMandate (aUBLPaymentMandate);
+        }
+
+        aUBLInvoice.addPaymentMeans (aUBLPaymentMeans);
       }
     }
 
