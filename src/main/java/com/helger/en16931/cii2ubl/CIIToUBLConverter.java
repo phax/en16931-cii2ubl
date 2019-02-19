@@ -509,7 +509,6 @@ public class CIIToUBLConverter
       if (aSellerParty != null)
       {
         final PartyType aUBLParty = _convertParty (aSellerParty);
-        aUBLSupplier.setParty (aUBLParty);
 
         for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
           aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
@@ -521,6 +520,8 @@ public class CIIToUBLConverter
         final ContactType aUBLContact = _convertContact (aSellerParty);
         if (aUBLContact != null)
           aUBLParty.setContact (aUBLContact);
+
+        aUBLSupplier.setParty (aUBLParty);
       }
     }
 
@@ -530,7 +531,6 @@ public class CIIToUBLConverter
       if (aBuyerParty != null)
       {
         final PartyType aUBLParty = _convertParty (aBuyerParty);
-        aUBLSupplier.setParty (aUBLParty);
 
         for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
           aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
@@ -542,6 +542,52 @@ public class CIIToUBLConverter
         final ContactType aUBLContact = _convertContact (aBuyerParty);
         if (aUBLContact != null)
           aUBLParty.setContact (aUBLContact);
+
+        aUBLCustomer.setParty (aUBLParty);
+      }
+    }
+
+    // Payee Party
+    {
+      final TradePartyType aPayeeParty = aSettlement.getPayeeTradeParty ();
+      if (aPayeeParty != null)
+      {
+        final PartyType aUBLParty = _convertParty (aPayeeParty);
+
+        for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
+          aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
+
+        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aPayeeParty);
+        if (aUBLPartyLegalEntity != null)
+          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+
+        final ContactType aUBLContact = _convertContact (aPayeeParty);
+        if (aUBLContact != null)
+          aUBLParty.setContact (aUBLContact);
+
+        aUBLInvoice.setPayeeParty (aUBLParty);
+      }
+    }
+
+    // Tax Representative Party
+    {
+      final TradePartyType aTaxRepresentativeParty = aAgreement.getSellerTaxRepresentativeTradeParty ();
+      if (aTaxRepresentativeParty != null)
+      {
+        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty);
+
+        for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
+          aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
+
+        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aTaxRepresentativeParty);
+        if (aUBLPartyLegalEntity != null)
+          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+
+        final ContactType aUBLContact = _convertContact (aTaxRepresentativeParty);
+        if (aUBLContact != null)
+          aUBLParty.setContact (aUBLContact);
+
+        aUBLInvoice.setTaxRepresentativeParty (aUBLParty);
       }
     }
 
