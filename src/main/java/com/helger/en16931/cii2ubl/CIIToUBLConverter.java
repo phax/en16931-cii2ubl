@@ -23,6 +23,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.Add
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.BillingReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.ContactType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.CountryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.DocumentReferenceType;
@@ -46,24 +47,7 @@ import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.*;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
@@ -86,10 +70,12 @@ public class CIIToUBLConverter
    *        UBL ID
    * @return Created UBL ID
    */
-  @Nonnull
-  private static <T extends com.helger.xsds.ccts.cct.schemamodule.IdentifierType> T _copyID (@Nonnull final IDType aCIIID,
+  @Nullable
+  private static <T extends com.helger.xsds.ccts.cct.schemamodule.IdentifierType> T _copyID (@Nullable final IDType aCIIID,
                                                                                              @Nonnull final T aUBLID)
   {
+    if (aCIIID == null)
+      return null;
     aUBLID.setValue (aCIIID.getValue ());
     aUBLID.setSchemeID (aCIIID.getSchemeID ());
     aUBLID.setSchemeName (aCIIID.getSchemeName ());
@@ -101,15 +87,18 @@ public class CIIToUBLConverter
     return aUBLID;
   }
 
-  @Nonnull
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _getAsUBLID (@Nonnull final IDType aCIIID)
+  @Nullable
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _getAsUBLID (@Nullable final IDType aCIIID)
   {
     return _copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType ());
   }
 
-  @Nonnull
-  private static NameType _copyName (@Nonnull final TextType aName)
+  @Nullable
+  private static NameType _copyName (@Nullable final TextType aName)
   {
+    if (aName == null)
+      return null;
+
     final NameType ret = new NameType ();
     ret.setValue (aName.getValue ());
     ret.setLanguageID (aName.getLanguageID ());
@@ -178,45 +167,7 @@ public class CIIToUBLConverter
   }
 
   @Nonnull
-  private static PartyType _convertParty (@Nonnull final TradePartyType aParty)
-  {
-    final PartyType ret = new PartyType ();
-
-    if (aParty.getGlobalIDCount () > 0)
-    {
-      final IDType aGlobalID = aParty.getGlobalIDAtIndex (0);
-      final EndpointIDType aUBLEndpointID = _copyID (aGlobalID, new EndpointIDType ());
-      ret.setEndpointID (aUBLEndpointID);
-    }
-
-    if (aParty.getIDCount () > 0)
-    {
-      final IDType aID = aParty.getIDAtIndex (0);
-
-      final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
-      aUBLPartyIdentification.setID (_getAsUBLID (aID));
-      ret.addPartyIdentification (aUBLPartyIdentification);
-    }
-
-    final TextType aName = aParty.getName ();
-    if (aName != null)
-    {
-      final PartyNameType aUBLPartyName = new PartyNameType ();
-      aUBLPartyName.setName (_copyName (aName));
-      ret.addPartyName (aUBLPartyName);
-    }
-
-    final TradeAddressType aPostalAddress = aParty.getPostalTradeAddress ();
-    if (aPostalAddress != null)
-    {
-      ret.setPostalAddress (_convertPostalAddress (aPostalAddress));
-    }
-
-    // TODO
-    return ret;
-  }
-
-  private static AddressType _convertPostalAddress (final TradeAddressType aPostalAddress)
+  private static AddressType _convertPostalAddress (@Nonnull final TradeAddressType aPostalAddress)
   {
     final AddressType ret = new AddressType ();
     ret.setStreetName (aPostalAddress.getLineOneValue ());
@@ -238,6 +189,112 @@ public class CIIToUBLConverter
       ret.setCountry (aUBLCountry);
     }
     return ret;
+  }
+
+  @Nonnull
+  private static PartyType _convertParty (@Nonnull final TradePartyType aParty)
+  {
+    final PartyType ret = new PartyType ();
+
+    if (aParty.hasURIUniversalCommunicationEntries ())
+    {
+      final UniversalCommunicationType UC = aParty.getURIUniversalCommunicationAtIndex (0);
+      ret.setEndpointID (_copyID (UC.getURIID (), new EndpointIDType ()));
+    }
+
+    {
+      IDType aID;
+      if (aParty.hasGlobalIDEntries ())
+        aID = aParty.getGlobalIDAtIndex (0);
+      else
+        if (aParty.hasIDEntries ())
+          aID = aParty.getIDAtIndex (0);
+        else
+          aID = null;
+
+      if (aID != null)
+      {
+        final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
+        aUBLPartyIdentification.setID (_getAsUBLID (aID));
+        ret.addPartyIdentification (aUBLPartyIdentification);
+      }
+    }
+
+    final TextType aName = aParty.getName ();
+    if (aName != null)
+    {
+      final PartyNameType aUBLPartyName = new PartyNameType ();
+      aUBLPartyName.setName (_copyName (aName));
+      ret.addPartyName (aUBLPartyName);
+    }
+
+    final TradeAddressType aPostalAddress = aParty.getPostalTradeAddress ();
+    if (aPostalAddress != null)
+    {
+      ret.setPostalAddress (_convertPostalAddress (aPostalAddress));
+    }
+
+    return ret;
+  }
+
+  @Nonnull
+  private static PartyTaxSchemeType _convertPartyTaxScheme (@Nonnull final TaxRegistrationType aTaxRegistration)
+  {
+    final PartyTaxSchemeType aUBLPartyTaxScheme = new PartyTaxSchemeType ();
+    aUBLPartyTaxScheme.setCompanyID (_copyID (aTaxRegistration.getID (), new CompanyIDType ()));
+    final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
+    aUBLTaxScheme.setID ("VAT");
+    aUBLPartyTaxScheme.setTaxScheme (aUBLTaxScheme);
+    return aUBLPartyTaxScheme;
+  }
+
+  @Nullable
+  private static PartyLegalEntityType _convertPartyLegalEntity (@Nonnull final TradePartyType aTradeParty)
+  {
+    final PartyLegalEntityType aUBLPartyLegalEntity = new PartyLegalEntityType ();
+    boolean bAnyValueSet = false;
+
+    final LegalOrganizationType aSLO = aTradeParty.getSpecifiedLegalOrganization ();
+    if (aSLO != null)
+    {
+      aUBLPartyLegalEntity.setRegistrationName (aSLO.getTradingBusinessNameValue ());
+      aUBLPartyLegalEntity.setCompanyID (_copyID (aSLO.getID (), new CompanyIDType ()));
+      bAnyValueSet = true;
+    }
+
+    for (final TextType aDesc : aTradeParty.getDescription ())
+      if (StringHelper.hasText (aDesc.getValue ()))
+      {
+        // Use the first only
+        aUBLPartyLegalEntity.setCompanyLegalForm (aDesc.getValue ());
+        bAnyValueSet = true;
+        break;
+      }
+
+    if (!bAnyValueSet)
+      return null;
+    return aUBLPartyLegalEntity;
+  }
+
+  @Nullable
+  private static ContactType _convertContact (@Nonnull final TradePartyType aTradeParty)
+  {
+    if (!aTradeParty.hasDefinedTradeContactEntries ())
+      return null;
+
+    final TradeContactType aDTC = aTradeParty.getDefinedTradeContactAtIndex (0);
+    final ContactType aUBLContact = new ContactType ();
+    aUBLContact.setName (_copyName (aDTC.getPersonName ()));
+
+    final UniversalCommunicationType aTel = aDTC.getTelephoneUniversalCommunication ();
+    if (aTel != null)
+      aUBLContact.setTelephone (aTel.getCompleteNumberValue ());
+
+    final UniversalCommunicationType aEmail = aDTC.getEmailURIUniversalCommunication ();
+    if (aEmail != null)
+      aUBLContact.setElectronicMail (aEmail.getURIIDValue ());
+
+    return aUBLContact;
   }
 
   @Nonnull
@@ -455,22 +512,36 @@ public class CIIToUBLConverter
         aUBLSupplier.setParty (aUBLParty);
 
         for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
-        {
-          final PartyTaxSchemeType aUBLPartyTaxScheme = new PartyTaxSchemeType ();
-          aUBLPartyTaxScheme.setCompanyID (_copyID (aTaxRegistration.getID (), new CompanyIDType ()));
-          final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-          aUBLTaxScheme.setID ("VAT");
-          aUBLPartyTaxScheme.setTaxScheme (aUBLTaxScheme);
-          aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
-        }
+          aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
 
-        final PartyLegalEntityType aUBLPartyLegalEntity = new PartyLegalEntityType ();
-        final LegalOrganizationType aSLO = aSellerParty.getSpecifiedLegalOrganization ();
-        if (aSLO != null)
-        {
-          aUBLPartyLegalEntity.setRegistrationName (aSLO.getTradingBusinessNameValue ());
-        }
-        aUBLParty.getPartyLegalEntity ().add (aUBLPartyLegalEntity);
+        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aSellerParty);
+        if (aUBLPartyLegalEntity != null)
+          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+
+        final ContactType aUBLContact = _convertContact (aSellerParty);
+        if (aUBLContact != null)
+          aUBLParty.setContact (aUBLContact);
+      }
+    }
+
+    // Customer Party
+    {
+      final TradePartyType aBuyerParty = aAgreement.getBuyerTradeParty ();
+      if (aBuyerParty != null)
+      {
+        final PartyType aUBLParty = _convertParty (aBuyerParty);
+        aUBLSupplier.setParty (aUBLParty);
+
+        for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
+          aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
+
+        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aBuyerParty);
+        if (aUBLPartyLegalEntity != null)
+          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+
+        final ContactType aUBLContact = _convertContact (aBuyerParty);
+        if (aUBLContact != null)
+          aUBLParty.setContact (aUBLContact);
       }
     }
 
