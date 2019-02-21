@@ -12,14 +12,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.cii.d16b.CIID16BReader;
+import com.helger.commons.CGlobal;
 import com.helger.commons.datetime.PDTFromString;
+import com.helger.commons.error.IError;
+import com.helger.commons.error.SingleError;
 import com.helger.commons.error.list.ErrorList;
+import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.math.MathHelper;
+import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.*;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AllowanceChargeReasonType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.BaseAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DocumentDescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EmbeddedDocumentBinaryObjectType;
@@ -45,6 +52,43 @@ public class CIIToUBLConverter
 
   public CIIToUBLConverter ()
   {}
+
+  @Nonnull
+  private static IError _buildError (@Nullable final String [] aPath, final String sErrorMsg)
+  {
+    return SingleError.builderError ()
+                      .setErrorText (sErrorMsg)
+                      .setErrorFieldName (aPath == null ? null : StringHelper.getImploded ('/', aPath))
+                      .build ();
+  }
+
+  @Nullable
+  private static XMLGregorianCalendar _parseDateDDMMYYYY (@Nullable final String sDate,
+                                                          @Nonnull final IErrorList aErrorList)
+  {
+    if (StringHelper.hasNoText (sDate))
+      return null;
+
+    final LocalDate aDate = PDTFromString.getLocalDateFromString (sDate, "uuuuMMdd");
+    if (aDate == null)
+      aErrorList.add (_buildError (null, "Failed to parse the date '" + sDate + "'"));
+
+    return PDTXMLConverter.getXMLCalendarDate (aDate);
+  }
+
+  @Nonnull
+  private static ETriState _parseIndicator (@Nullable final String sIndicator, @Nonnull final IErrorList aErrorList)
+  {
+    if (sIndicator == null)
+      return ETriState.UNDEFINED;
+    if ("true".equals (sIndicator))
+      return ETriState.TRUE;
+    if ("false".equals (sIndicator))
+      return ETriState.FALSE;
+
+    aErrorList.add (_buildError (null, "Failed to parse the indicator value '" + sIndicator + "' to a boolean value."));
+    return ETriState.UNDEFINED;
+  }
 
   /**
    * Copy all ID parts from a CII ID to a CCTS/UBL ID.
@@ -92,14 +136,39 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static XMLGregorianCalendar _parseDateDDMMYYYY (@Nullable final String s)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType _copyNote (@Nullable final NoteType aNote)
   {
-    final LocalDate aDate = PDTFromString.getLocalDateFromString (s, "uuMMdd");
-    return PDTXMLConverter.getXMLCalendarDate (aDate);
+    if (aNote == null)
+      return null;
+
+    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType ();
+    final StringBuilder aSB = new StringBuilder ();
+    for (final TextType aText : aNote.getContent ())
+    {
+      if (aSB.length () > 0)
+        aSB.append ('\n');
+      aSB.append (aText.getValue ());
+    }
+    aUBLNote.setValue (aSB.toString ());
+    return aUBLNote;
   }
 
   @Nullable
-  private static DocumentReferenceType _convertDocumentReference (@Nullable final ReferencedDocumentType aRD)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType _copyNote (@Nullable final TextType aText)
+  {
+    if (aText == null)
+      return null;
+
+    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType ();
+    aUBLNote.setValue (aText.getValue ());
+    aUBLNote.setLanguageID (aText.getLanguageID ());
+    aUBLNote.setLanguageLocaleID (aText.getLanguageLocaleID ());
+    return aUBLNote;
+  }
+
+  @Nullable
+  private static DocumentReferenceType _convertDocumentReference (@Nullable final ReferencedDocumentType aRD,
+                                                                  @Nonnull final IErrorList aErrorList)
   {
     DocumentReferenceType ret = null;
     if (aRD != null)
@@ -114,7 +183,7 @@ public class CIIToUBLConverter
         // IssueDate is optional
         final FormattedDateTimeType aFDT = aRD.getFormattedIssueDateTime ();
         if (aFDT != null)
-          ret.setIssueDate (_parseDateDDMMYYYY (aFDT.getDateTimeStringValue ()));
+          ret.setIssueDate (_parseDateDDMMYYYY (aFDT.getDateTimeStringValue (), aErrorList));
 
         // Name is optional
         for (final TextType aItem : aRD.getName ())
@@ -287,6 +356,25 @@ public class CIIToUBLConverter
     return aUBLContact;
   }
 
+  @Nullable
+  private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_21.AmountType> T _copyAmount (@Nullable final AmountType aAmount,
+                                                                                                                        @Nonnull final T ret)
+  {
+    if (aAmount == null)
+      return null;
+
+    ret.setValue (aAmount.getValue ());
+    ret.setCurrencyID (aAmount.getCurrencyID ());
+    ret.setCurrencyCodeListVersionID (aAmount.getCurrencyCodeListVersionID ());
+    return ret;
+  }
+
+  @Nullable
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType _copyAmount (@Nullable final AmountType aAmount)
+  {
+    return _copyAmount (aAmount, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType ());
+  }
+
   @Nonnull
   private InvoiceType _convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
                                          @Nonnull final ErrorList aErrorList)
@@ -316,12 +404,12 @@ public class CIIToUBLConverter
     {
       XMLGregorianCalendar aIssueDate = null;
       if (aED.getIssueDateTime () != null)
-        aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue ());
+        aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue (), aErrorList);
       if (aIssueDate == null)
         for (final TradePaymentTermsType aPaymentTerms : aSettlement.getSpecifiedTradePaymentTerms ())
           if (aPaymentTerms.getDueDateDateTime () != null)
           {
-            aIssueDate = _parseDateDDMMYYYY (aPaymentTerms.getDueDateDateTime ().getDateTimeStringValue ());
+            aIssueDate = _parseDateDDMMYYYY (aPaymentTerms.getDueDateDateTime ().getDateTimeStringValue (), aErrorList);
             if (aIssueDate != null)
               break;
           }
@@ -334,18 +422,7 @@ public class CIIToUBLConverter
     // Note
     {
       for (final NoteType aEDNote : aED.getIncludedNote ())
-      {
-        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType ();
-        final StringBuilder aSB = new StringBuilder ();
-        for (final TextType aText : aEDNote.getContent ())
-        {
-          if (aSB.length () > 0)
-            aSB.append ('\n');
-          aSB.append (aText.getValue ());
-        }
-        aUBLNote.setValue (aSB.toString ());
-        aUBLInvoice.addNote (aUBLNote);
-      }
+        aUBLInvoice.addNote (_copyNote (aEDNote));
     }
 
     // TaxPointDate
@@ -354,7 +431,8 @@ public class CIIToUBLConverter
       if (aTradeTax.getTaxPointDate () != null)
       {
         final XMLGregorianCalendar aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ()
-                                                                                .getDateStringValue ());
+                                                                                .getDateStringValue (),
+                                                                       aErrorList);
         if (aTaxPointDate != null)
         {
           // Use the first tax point date only
@@ -396,8 +474,8 @@ public class CIIToUBLConverter
         if (aStartDT != null && aEndDT != null)
         {
           final PeriodType aUBLPeriod = new PeriodType ();
-          aUBLPeriod.setStartDate (_parseDateDDMMYYYY (aStartDT.getDateTimeStringValue ()));
-          aUBLPeriod.setEndDate (_parseDateDDMMYYYY (aEndDT.getDateTimeStringValue ()));
+          aUBLPeriod.setStartDate (_parseDateDDMMYYYY (aStartDT.getDateTimeStringValue (), aErrorList));
+          aUBLPeriod.setEndDate (_parseDateDDMMYYYY (aEndDT.getDateTimeStringValue (), aErrorList));
           aUBLInvoice.addInvoicePeriod (aUBLPeriod);
         }
       }
@@ -420,7 +498,8 @@ public class CIIToUBLConverter
 
     // BillingReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aSettlement.getInvoiceReferencedDocument ());
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aSettlement.getInvoiceReferencedDocument (),
+                                                                          aErrorList);
       if (aUBLDocRef != null)
       {
         final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
@@ -431,14 +510,16 @@ public class CIIToUBLConverter
 
     // DespatchDocumentReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aDelivery.getDespatchAdviceReferencedDocument ());
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aDelivery.getDespatchAdviceReferencedDocument (),
+                                                                          aErrorList);
       if (aUBLDocRef != null)
         aUBLInvoice.addDespatchDocumentReference (aUBLDocRef);
     }
 
     // ReceiptDocumentReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aDelivery.getReceivingAdviceReferencedDocument ());
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aDelivery.getReceivingAdviceReferencedDocument (),
+                                                                          aErrorList);
       if (aUBLDocRef != null)
         aUBLInvoice.addReceiptDocumentReference (aUBLDocRef);
     }
@@ -450,7 +531,7 @@ public class CIIToUBLConverter
         // Use for "Tender or lot reference" with TypeCode "50"
         if ("50".equals (aRD.getTypeCodeValue ()))
         {
-          final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD);
+          final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
             aUBLInvoice.addOriginatorDocumentReference (aUBLDocRef);
         }
@@ -459,7 +540,8 @@ public class CIIToUBLConverter
 
     // ContractDocumentReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aAgreement.getContractReferencedDocument ());
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aAgreement.getContractReferencedDocument (),
+                                                                          aErrorList);
       if (aUBLDocRef != null)
         aUBLInvoice.addContractDocumentReference (aUBLDocRef);
     }
@@ -471,7 +553,7 @@ public class CIIToUBLConverter
         // Except OriginatorDocumentReference
         if (!"50".equals (aRD.getTypeCodeValue ()))
         {
-          final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD);
+          final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
             aUBLInvoice.addAdditionalDocumentReference (aUBLDocRef);
         }
@@ -593,7 +675,7 @@ public class CIIToUBLConverter
         {
           final DateTimeType aODT = aSCE.getOccurrenceDateTime ();
           if (aODT != null)
-            aUBLDelivery.setActualDeliveryDate (_parseDateDDMMYYYY (aODT.getDateTimeStringValue ()));
+            aUBLDelivery.setActualDeliveryDate (_parseDateDDMMYYYY (aODT.getDateTimeStringValue (), aErrorList));
         }
 
         final LocationType aUBLDeliveryLocation = new LocationType ();
@@ -707,6 +789,67 @@ public class CIIToUBLConverter
         }
 
         aUBLInvoice.addPaymentMeans (aUBLPaymentMeans);
+      }
+    }
+
+    // Payment Terms
+    {
+      for (final TradePaymentTermsType aPaymentTerms : aSettlement.getSpecifiedTradePaymentTerms ())
+      {
+        boolean bUsePaymenTerms = false;
+        final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
+
+        for (final TextType aDesc : aPaymentTerms.getDescription ())
+        {
+          aUBLPaymenTerms.addNote (_copyNote (aDesc));
+          bUsePaymenTerms = true;
+        }
+
+        if (bUsePaymenTerms)
+          aUBLInvoice.addPaymentTerms (aUBLPaymenTerms);
+      }
+    }
+
+    // Allowance Charge
+    {
+      for (final TradeAllowanceChargeType aAllowanceCharge : aSettlement.getSpecifiedTradeAllowanceCharge ())
+      {
+        ETriState eIsCharge = ETriState.UNDEFINED;
+        if (aAllowanceCharge.getChargeIndicator () != null)
+          eIsCharge = _parseIndicator (aAllowanceCharge.getChargeIndicator ().getIndicatorStringValue (), aErrorList);
+        else
+          aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
+                                                       "SupplyChainTradeTransaction",
+                                                       "ApplicableHeaderTradeSettlement",
+                                                       "SpecifiedTradeAllowanceCharge" },
+                                       "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
+        if (eIsCharge.isDefined ())
+        {
+          final AllowanceChargeType aUBLAllowanceCharge = new AllowanceChargeType ();
+          aUBLAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
+          aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
+          if (aAllowanceCharge.getReason () != null)
+          {
+            final AllowanceChargeReasonType aUBLReason = new AllowanceChargeReasonType ();
+            aUBLReason.setValue (aAllowanceCharge.getReasonValue ());
+            aUBLAllowanceCharge.addAllowanceChargeReason (aUBLReason);
+          }
+          if (aAllowanceCharge.getCalculationPercent () != null)
+          {
+            // TODO calc is correct?
+            aUBLAllowanceCharge.setMultiplierFactorNumeric (aAllowanceCharge.getCalculationPercentValue ()
+                                                                            .divide (CGlobal.BIGDEC_100));
+          }
+          if (aAllowanceCharge.hasActualAmountEntries ())
+          {
+            aUBLAllowanceCharge.setAmount (_copyAmount (aAllowanceCharge.getActualAmountAtIndex (0)));
+          }
+
+          aUBLAllowanceCharge.setBaseAmount (_copyAmount (aAllowanceCharge.getBasisAmount (), new BaseAmountType ()));
+
+          aUBLInvoice.addAllowanceCharge (aUBLAllowanceCharge);
+        }
+
       }
     }
 

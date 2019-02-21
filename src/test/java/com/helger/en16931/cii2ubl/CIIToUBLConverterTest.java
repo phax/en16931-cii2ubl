@@ -36,7 +36,7 @@ public final class CIIToUBLConverterTest
       final ErrorList aErrorList = new ErrorList ();
       assertNotNull (new CIIToUBLConverter ().convertCIItoUBL (new File ("src/test/resources/cii", sFilename),
                                                                aErrorList));
-      assertTrue (aErrorList.isEmpty ());
+      assertTrue ("Errors: " + aErrorList.toString (), aErrorList.isEmpty ());
     }
   }
 }
