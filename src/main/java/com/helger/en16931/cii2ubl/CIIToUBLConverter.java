@@ -25,16 +25,7 @@ import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.*;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AllowanceChargeReasonType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.BaseAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.CompanyIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DocumentDescriptionType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EmbeddedDocumentBinaryObjectType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.EndpointIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NameType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.PaymentIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.PaymentMeansCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.PrimaryAccountNumberIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.*;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -136,7 +127,7 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType _copyNote (@Nullable final NoteType aNote)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType _copyNote (@Nullable final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aNote)
   {
     if (aNote == null)
       return null;
@@ -358,21 +349,27 @@ public class CIIToUBLConverter
 
   @Nullable
   private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_21.AmountType> T _copyAmount (@Nullable final AmountType aAmount,
-                                                                                                                        @Nonnull final T ret)
+                                                                                                                        @Nonnull final T ret,
+                                                                                                                        @Nullable final String sDefaultCurrencyID)
   {
     if (aAmount == null)
       return null;
 
     ret.setValue (aAmount.getValue ());
     ret.setCurrencyID (aAmount.getCurrencyID ());
+    if (StringHelper.hasNoText (ret.getCurrencyID ()))
+      ret.setCurrencyID (sDefaultCurrencyID);
     ret.setCurrencyCodeListVersionID (aAmount.getCurrencyCodeListVersionID ());
     return ret;
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType _copyAmount (@Nullable final AmountType aAmount)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType _copyAmount (@Nullable final AmountType aAmount,
+                                                                                                           @Nullable final String sDefaultCurrencyID)
   {
-    return _copyAmount (aAmount, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType ());
+    return _copyAmount (aAmount,
+                        new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType (),
+                        sDefaultCurrencyID);
   }
 
   @Nonnull
@@ -421,7 +418,7 @@ public class CIIToUBLConverter
 
     // Note
     {
-      for (final NoteType aEDNote : aED.getIncludedNote ())
+      for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
         aUBLInvoice.addNote (_copyNote (aEDNote));
     }
 
@@ -443,7 +440,8 @@ public class CIIToUBLConverter
     }
 
     // DocumentCurrencyCode
-    aUBLInvoice.setDocumentCurrencyCode (aSettlement.getInvoiceCurrencyCodeValue ());
+    final String sDefaultCurrencyCode = aSettlement.getInvoiceCurrencyCodeValue ();
+    aUBLInvoice.setDocumentCurrencyCode (sDefaultCurrencyCode);
 
     // TaxCurrencyCode
     aUBLInvoice.setTaxCurrencyCode (aSettlement.getTaxCurrencyCodeValue ());
@@ -678,7 +676,7 @@ public class CIIToUBLConverter
             aUBLDelivery.setActualDeliveryDate (_parseDateDDMMYYYY (aODT.getDateTimeStringValue (), aErrorList));
         }
 
-        final LocationType aUBLDeliveryLocation = new LocationType ();
+        final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.LocationType ();
         boolean bUseLocation = false;
 
         final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType aUBLID = _extractPartyID (aShipToParty);
@@ -842,15 +840,123 @@ public class CIIToUBLConverter
           }
           if (aAllowanceCharge.hasActualAmountEntries ())
           {
-            aUBLAllowanceCharge.setAmount (_copyAmount (aAllowanceCharge.getActualAmountAtIndex (0)));
+            aUBLAllowanceCharge.setAmount (_copyAmount (aAllowanceCharge.getActualAmountAtIndex (0),
+                                                        sDefaultCurrencyCode));
           }
 
-          aUBLAllowanceCharge.setBaseAmount (_copyAmount (aAllowanceCharge.getBasisAmount (), new BaseAmountType ()));
+          aUBLAllowanceCharge.setBaseAmount (_copyAmount (aAllowanceCharge.getBasisAmount (),
+                                                          new BaseAmountType (),
+                                                          sDefaultCurrencyCode));
+
+          // TaxCategory
+          for (final TradeTaxType aTradeTax : aAllowanceCharge.getCategoryTradeTax ())
+          {
+            final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
+            aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
+            aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+            final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
+            aUBLTaxScheme.setID ("VAT");
+            aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
+            aUBLAllowanceCharge.addTaxCategory (aUBLTaxCategory);
+          }
 
           aUBLInvoice.addAllowanceCharge (aUBLAllowanceCharge);
         }
-
       }
+    }
+
+    final TradeSettlementHeaderMonetarySummationType aSTSHMS = aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
+
+    // TaxTotal
+    {
+      final TaxTotalType aUBLTaxTotal = new TaxTotalType ();
+      if (aSTSHMS != null && aSTSHMS.hasTaxTotalAmountEntries ())
+      {
+        aUBLTaxTotal.setTaxAmount (_copyAmount (aSTSHMS.getTaxTotalAmountAtIndex (0),
+                                                new TaxAmountType (),
+                                                sDefaultCurrencyCode));
+      }
+
+      for (final TradeTaxType aTradeTax : aSettlement.getApplicableTradeTax ())
+      {
+        final TaxSubtotalType aUBLTaxSubtotal = new TaxSubtotalType ();
+
+        if (aTradeTax.hasBasisAmountEntries ())
+        {
+          aUBLTaxSubtotal.setTaxableAmount (_copyAmount (aTradeTax.getBasisAmountAtIndex (0),
+                                                         new TaxableAmountType (),
+                                                         sDefaultCurrencyCode));
+        }
+
+        if (aTradeTax.hasCalculatedAmountEntries ())
+        {
+          aUBLTaxSubtotal.setTaxAmount (_copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
+                                                     new TaxAmountType (),
+                                                     sDefaultCurrencyCode));
+        }
+
+        final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
+        aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
+        aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+        aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
+        if (aTradeTax.getExemptionReason () != null)
+        {
+          final TaxExemptionReasonType aUBLTaxExemptionReason = new TaxExemptionReasonType ();
+          aUBLTaxExemptionReason.setValue (aTradeTax.getExemptionReason ().getValue ());
+          aUBLTaxExemptionReason.setLanguageID (aTradeTax.getExemptionReason ().getLanguageID ());
+          aUBLTaxExemptionReason.setLanguageLocaleID (aTradeTax.getExemptionReason ().getLanguageLocaleID ());
+          aUBLTaxCategory.addTaxExemptionReason (aUBLTaxExemptionReason);
+        }
+        final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
+        aUBLTaxScheme.setID ("VAT");
+        aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
+        aUBLTaxSubtotal.setTaxCategory (aUBLTaxCategory);
+
+        aUBLTaxTotal.addTaxSubtotal (aUBLTaxSubtotal);
+      }
+
+      aUBLInvoice.addTaxTotal (aUBLTaxTotal);
+    }
+
+    // LegalMonetaryTotal
+    {
+      final MonetaryTotalType aUBLMonetaryTotal = new MonetaryTotalType ();
+      if (aSTSHMS != null)
+      {
+        if (aSTSHMS.hasLineTotalAmountEntries ())
+          aUBLMonetaryTotal.setLineExtensionAmount (_copyAmount (aSTSHMS.getLineTotalAmountAtIndex (0),
+                                                                 new LineExtensionAmountType (),
+                                                                 sDefaultCurrencyCode));
+        if (aSTSHMS.hasTaxBasisTotalAmountEntries ())
+          aUBLMonetaryTotal.setTaxExclusiveAmount (_copyAmount (aSTSHMS.getTaxBasisTotalAmountAtIndex (0),
+                                                                new TaxExclusiveAmountType (),
+                                                                sDefaultCurrencyCode));
+        if (aSTSHMS.hasGrandTotalAmountEntries ())
+          aUBLMonetaryTotal.setTaxInclusiveAmount (_copyAmount (aSTSHMS.getGrandTotalAmountAtIndex (0),
+                                                                new TaxInclusiveAmountType (),
+                                                                sDefaultCurrencyCode));
+        if (aSTSHMS.hasAllowanceTotalAmountEntries ())
+          aUBLMonetaryTotal.setAllowanceTotalAmount (_copyAmount (aSTSHMS.getAllowanceTotalAmountAtIndex (0),
+                                                                  new AllowanceTotalAmountType (),
+                                                                  sDefaultCurrencyCode));
+        if (aSTSHMS.hasChargeTotalAmountEntries ())
+          aUBLMonetaryTotal.setChargeTotalAmount (_copyAmount (aSTSHMS.getChargeTotalAmountAtIndex (0),
+                                                               new ChargeTotalAmountType (),
+                                                               sDefaultCurrencyCode));
+        if (aSTSHMS.hasTotalPrepaidAmountEntries ())
+          aUBLMonetaryTotal.setPrepaidAmount (_copyAmount (aSTSHMS.getTotalPrepaidAmountAtIndex (0),
+                                                           new PrepaidAmountType (),
+                                                           sDefaultCurrencyCode));
+        if (aSTSHMS.hasRoundingAmountEntries ())
+          aUBLMonetaryTotal.setPayableRoundingAmount (_copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
+                                                                   new PayableRoundingAmountType (),
+                                                                   sDefaultCurrencyCode));
+        if (aSTSHMS.hasDuePayableAmountEntries ())
+          aUBLMonetaryTotal.setPayableAmount (_copyAmount (aSTSHMS.getDuePayableAmountAtIndex (0),
+                                                           new PayableAmountType (),
+                                                           sDefaultCurrencyCode));
+      }
+      aUBLInvoice.setLegalMonetaryTotal (aUBLMonetaryTotal);
     }
 
     // TODO
