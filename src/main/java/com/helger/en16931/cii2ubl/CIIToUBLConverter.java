@@ -33,6 +33,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeT
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.*;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
@@ -115,12 +116,12 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static NameType _copyName (@Nullable final TextType aName)
+  private static <T extends com.helger.xsds.ccts.cct.schemamodule.TextType> T _copyName (@Nullable final TextType aName,
+                                                                                         @Nonnull final T ret)
   {
     if (aName == null)
       return null;
 
-    final NameType ret = new NameType ();
     ret.setValue (aName.getValue ());
     ret.setLanguageID (aName.getLanguageID ());
     ret.setLanguageLocaleID (aName.getLanguageLocaleID ());
@@ -274,7 +275,7 @@ public class CIIToUBLConverter
     if (aName != null)
     {
       final PartyNameType aUBLPartyName = new PartyNameType ();
-      aUBLPartyName.setName (_copyName (aName));
+      aUBLPartyName.setName (_copyName (aName, new NameType ()));
       ret.addPartyName (aUBLPartyName);
     }
 
@@ -334,7 +335,7 @@ public class CIIToUBLConverter
 
     final TradeContactType aDTC = aTradeParty.getDefinedTradeContactAtIndex (0);
     final ContactType aUBLContact = new ContactType ();
-    aUBLContact.setName (_copyName (aDTC.getPersonName ()));
+    aUBLContact.setName (_copyName (aDTC.getPersonName (), new NameType ()));
 
     final UniversalCommunicationType aTel = aDTC.getTelephoneUniversalCommunication ();
     if (aTel != null)
@@ -385,6 +386,26 @@ public class CIIToUBLConverter
     return _copyAmount (aAmount,
                         new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType (),
                         sDefaultCurrencyCode);
+  }
+
+  @Nullable
+  private static <T extends com.helger.xsds.ccts.cct.schemamodule.CodeType> T _copyCode (@Nullable final CodeType aCode,
+                                                                                         @Nonnull final T ret)
+  {
+    if (aCode == null)
+      return null;
+
+    ret.setValue (aCode.getValue ());
+    ret.setListID (aCode.getListID ());
+    ret.setListAgencyID (aCode.getListAgencyID ());
+    ret.setListAgencyName (aCode.getListAgencyName ());
+    ret.setListName (aCode.getListName ());
+    ret.setListVersionID (aCode.getListVersionID ());
+    ret.setName (aCode.getName ());
+    ret.setLanguageID (aCode.getLanguageID ());
+    ret.setListURI (aCode.getListURI ());
+    ret.setListSchemeURI (aCode.getListSchemeURI ());
+    return ret;
   }
 
   private static void _copyAllowanceCharge (@Nonnull final TradeAllowanceChargeType aAllowanceCharge,
@@ -755,7 +776,7 @@ public class CIIToUBLConverter
         {
           final PartyType aUBLDeliveryParty = new PartyType ();
           final PartyNameType aUBLPartyName = new PartyNameType ();
-          aUBLPartyName.setName (_copyName (aName));
+          aUBLPartyName.setName (_copyName (aName, new NameType ()));
           aUBLDeliveryParty.addPartyName (aUBLPartyName);
           aUBLDelivery.setDeliveryParty (aUBLDeliveryParty);
         }
@@ -802,7 +823,7 @@ public class CIIToUBLConverter
           if (aAccount != null)
           {
             aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
-            aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName ()));
+            aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName (), new NameType ()));
           }
           if (aInstitution != null)
           {
@@ -1077,6 +1098,68 @@ public class CIIToUBLConverter
           _copyAllowanceCharge (aLineAllowanceCharge, aUBLLineAllowanceCharge, sDefaultCurrencyCode);
           aUBLInvoice.addAllowanceCharge (aUBLLineAllowanceCharge);
         }
+      }
+
+      // Item
+      final TradeProductType aLineProduct = aLineItem.getSpecifiedTradeProduct ();
+      if (aLineProduct != null)
+      {
+        final ItemType aUBLItem = new ItemType ();
+        final TextType aDescription = aLineProduct.getDescription ();
+        if (aDescription != null)
+          aUBLItem.addDescription (_copyName (aDescription, new DescriptionType ()));
+
+        if (aLineProduct.hasNameEntries ())
+          aUBLItem.setName (_copyName (aLineProduct.getNameAtIndex (0), new NameType ()));
+
+        final IDType aBuyerAssignedID = aLineProduct.getBuyerAssignedID ();
+        if (aBuyerAssignedID != null)
+        {
+          final ItemIdentificationType aUBLID = new ItemIdentificationType ();
+          aUBLID.setID (_copyID (aBuyerAssignedID));
+          aUBLItem.setBuyersItemIdentification (aUBLID);
+        }
+
+        final IDType aSellerAssignedID = aLineProduct.getSellerAssignedID ();
+        if (aSellerAssignedID != null)
+        {
+          final ItemIdentificationType aUBLID = new ItemIdentificationType ();
+          aUBLID.setID (_copyID (aSellerAssignedID));
+          aUBLItem.setSellersItemIdentification (aUBLID);
+        }
+
+        final IDType aGlobalID = aLineProduct.getGlobalID ();
+        if (aGlobalID != null)
+        {
+          final ItemIdentificationType aUBLID = new ItemIdentificationType ();
+          aUBLID.setID (_copyID (aGlobalID));
+          aUBLItem.setStandardItemIdentification (aUBLID);
+        }
+
+        final TradeCountryType aOriginCountry = aLineProduct.getOriginTradeCountry ();
+        if (aOriginCountry != null)
+        {
+          final CountryType aUBLCountry = new CountryType ();
+          aUBLCountry.setIdentificationCode (aOriginCountry.getIDValue ());
+          if (aOriginCountry.hasNameEntries ())
+            aUBLCountry.setName (_copyName (aOriginCountry.getNameAtIndex (0), new NameType ()));
+          aUBLItem.setOriginCountry (aUBLCountry);
+        }
+
+        // Commodity Classification
+        for (final ProductClassificationType aLineProductClassification : aLineProduct.getDesignatedProductClassification ())
+        {
+          final CodeType aClassCode = aLineProductClassification.getClassCode ();
+          if (aClassCode != null)
+          {
+            final CommodityClassificationType aUBLCommodityClassification = new CommodityClassificationType ();
+            aUBLCommodityClassification.setItemClassificationCode (_copyCode (aClassCode,
+                                                                              new ItemClassificationCodeType ()));
+            aUBLItem.addCommodityClassification (aUBLCommodityClassification);
+          }
+        }
+
+        aUBLInvoiceLine.setItem (aUBLItem);
       }
 
       aUBLInvoice.addInvoiceLine (aUBLInvoiceLine);
