@@ -35,6 +35,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class CIIToUBLConverter
@@ -360,6 +361,21 @@ public class CIIToUBLConverter
     if (StringHelper.hasNoText (ret.getCurrencyID ()))
       ret.setCurrencyID (sDefaultCurrencyID);
     ret.setCurrencyCodeListVersionID (aAmount.getCurrencyCodeListVersionID ());
+    return ret;
+  }
+
+  @Nullable
+  private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_21.QuantityType> T _copyQuantity (@Nullable final QuantityType aQuantity,
+                                                                                                                            @Nonnull final T ret)
+  {
+    if (aQuantity == null)
+      return null;
+
+    ret.setValue (aQuantity.getValue ());
+    ret.setUnitCode (aQuantity.getUnitCode ());
+    ret.setUnitCodeListID (aQuantity.getUnitCodeListID ());
+    ret.setUnitCodeListAgencyID (aQuantity.getUnitCodeListAgencyID ());
+    ret.setUnitCodeListAgencyName (aQuantity.getUnitCodeListAgencyName ());
     return ret;
   }
 
@@ -957,6 +973,46 @@ public class CIIToUBLConverter
                                                            sDefaultCurrencyCode));
       }
       aUBLInvoice.setLegalMonetaryTotal (aUBLMonetaryTotal);
+    }
+
+    // All invoice lines
+    for (final SupplyChainTradeLineItemType aLineItem : aSCTT.getIncludedSupplyChainTradeLineItem ())
+    {
+      final InvoiceLineType aUBLLine = new InvoiceLineType ();
+
+      final DocumentLineDocumentType aDLD = aLineItem.getAssociatedDocumentLineDocument ();
+      aUBLLine.setID (_copyID (aDLD.getLineID ()));
+
+      for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
+        aUBLLine.addNote (_copyNote (aLineNote));
+
+      final LineTradeDeliveryType aLineDelivery = aLineItem.getSpecifiedLineTradeDelivery ();
+      if (aLineDelivery != null)
+      {
+        final QuantityType aBilledQuantity = aLineDelivery.getBilledQuantity ();
+        if (aBilledQuantity != null)
+        {
+          aUBLLine.setInvoicedQuantity (_copyQuantity (aBilledQuantity, new InvoicedQuantityType ()));
+        }
+      }
+
+      final LineTradeSettlementType aLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
+      final TradeSettlementLineMonetarySummationType aSTSLMS = aLineSettlement.getSpecifiedTradeSettlementLineMonetarySummation ();
+      if (aSTSLMS != null)
+      {
+        if (aSTSLMS.hasLineTotalAmountEntries ())
+          aUBLLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
+                                                        new LineExtensionAmountType (),
+                                                        sDefaultCurrencyCode));
+      }
+
+      if (aLineSettlement.hasReceivableSpecifiedTradeAccountingAccountEntries ())
+      {
+        final TradeAccountingAccountType aLineAA = aLineSettlement.getReceivableSpecifiedTradeAccountingAccountAtIndex (0);
+        aUBLLine.setAccountingCost (aLineAA.getIDValue ());
+      }
+
+      aUBLInvoice.addInvoiceLine (aUBLLine);
     }
 
     // TODO
