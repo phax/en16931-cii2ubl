@@ -162,52 +162,51 @@ public class CIIToUBLConverter
   private static DocumentReferenceType _convertDocumentReference (@Nullable final ReferencedDocumentType aRD,
                                                                   @Nonnull final IErrorList aErrorList)
   {
-    DocumentReferenceType ret = null;
-    if (aRD != null)
+    if (aRD == null)
+      return null;
+
+    final String sID = aRD.getIssuerAssignedIDValue ();
+    if (StringHelper.hasNoText (sID))
+      return null;
+
+    final DocumentReferenceType ret = new DocumentReferenceType ();
+    // ID value is a mandatory field
+    ret.setID (sID).setSchemeID (aRD.getReferenceTypeCodeValue ());
+
+    // IssueDate is optional
+    final FormattedDateTimeType aFDT = aRD.getFormattedIssueDateTime ();
+    if (aFDT != null)
+      ret.setIssueDate (_parseDateDDMMYYYY (aFDT.getDateTimeStringValue (), aErrorList));
+
+    // Name is optional
+    for (final TextType aItem : aRD.getName ())
     {
-      final String sID = aRD.getIssuerAssignedIDValue ();
-      if (StringHelper.hasText (sID))
+      final DocumentDescriptionType aUBLDocDesc = new DocumentDescriptionType ();
+      aUBLDocDesc.setValue (aItem.getValue ());
+      aUBLDocDesc.setLanguageID (aItem.getLanguageID ());
+      aUBLDocDesc.setLanguageLocaleID (aItem.getLanguageLocaleID ());
+      ret.addDocumentDescription (aUBLDocDesc);
+    }
+
+    // Attachment (0..1 for CII)
+    if (aRD.getAttachmentBinaryObjectCount () > 0)
+    {
+      final BinaryObjectType aBinObj = aRD.getAttachmentBinaryObjectAtIndex (0);
+
+      final AttachmentType aUBLAttachment = new AttachmentType ();
+      final EmbeddedDocumentBinaryObjectType aEmbeddedDoc = new EmbeddedDocumentBinaryObjectType ();
+      aEmbeddedDoc.setMimeCode (aBinObj.getMimeCode ());
+      aEmbeddedDoc.setFilename (aBinObj.getFilename ());
+      aUBLAttachment.setEmbeddedDocumentBinaryObject (aEmbeddedDoc);
+
+      final String sURI = aRD.getURIIDValue ();
+      if (StringHelper.hasText (sURI))
       {
-        ret = new DocumentReferenceType ();
-        // ID value is a mandatory field
-        ret.setID (sID).setSchemeID (aRD.getReferenceTypeCodeValue ());
-
-        // IssueDate is optional
-        final FormattedDateTimeType aFDT = aRD.getFormattedIssueDateTime ();
-        if (aFDT != null)
-          ret.setIssueDate (_parseDateDDMMYYYY (aFDT.getDateTimeStringValue (), aErrorList));
-
-        // Name is optional
-        for (final TextType aItem : aRD.getName ())
-        {
-          final DocumentDescriptionType aUBLDocDesc = new DocumentDescriptionType ();
-          aUBLDocDesc.setValue (aItem.getValue ());
-          aUBLDocDesc.setLanguageID (aItem.getLanguageID ());
-          aUBLDocDesc.setLanguageLocaleID (aItem.getLanguageLocaleID ());
-          ret.addDocumentDescription (aUBLDocDesc);
-        }
-
-        // Attachment (0..1 for CII)
-        if (aRD.getAttachmentBinaryObjectCount () > 0)
-        {
-          final BinaryObjectType aBinObj = aRD.getAttachmentBinaryObjectAtIndex (0);
-
-          final AttachmentType aUBLAttachment = new AttachmentType ();
-          final EmbeddedDocumentBinaryObjectType aEmbeddedDoc = new EmbeddedDocumentBinaryObjectType ();
-          aEmbeddedDoc.setMimeCode (aBinObj.getMimeCode ());
-          aEmbeddedDoc.setFilename (aBinObj.getFilename ());
-          aUBLAttachment.setEmbeddedDocumentBinaryObject (aEmbeddedDoc);
-
-          final String sURI = aRD.getURIIDValue ();
-          if (StringHelper.hasText (sURI))
-          {
-            final ExternalReferenceType aUBLExtRef = new ExternalReferenceType ();
-            aUBLExtRef.setURI (sURI);
-            aUBLAttachment.setExternalReference (aUBLExtRef);
-          }
-          ret.setAttachment (aUBLAttachment);
-        }
+        final ExternalReferenceType aUBLExtRef = new ExternalReferenceType ();
+        aUBLExtRef.setURI (sURI);
+        aUBLAttachment.setExternalReference (aUBLExtRef);
       }
+      ret.setAttachment (aUBLAttachment);
     }
     return ret;
   }
@@ -351,7 +350,7 @@ public class CIIToUBLConverter
   @Nullable
   private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_21.AmountType> T _copyAmount (@Nullable final AmountType aAmount,
                                                                                                                         @Nonnull final T ret,
-                                                                                                                        @Nullable final String sDefaultCurrencyID)
+                                                                                                                        @Nullable final String sDefaultCurrencyCode)
   {
     if (aAmount == null)
       return null;
@@ -359,7 +358,7 @@ public class CIIToUBLConverter
     ret.setValue (aAmount.getValue ());
     ret.setCurrencyID (aAmount.getCurrencyID ());
     if (StringHelper.hasNoText (ret.getCurrencyID ()))
-      ret.setCurrencyID (sDefaultCurrencyID);
+      ret.setCurrencyID (sDefaultCurrencyCode);
     ret.setCurrencyCodeListVersionID (aAmount.getCurrencyCodeListVersionID ());
     return ret;
   }
@@ -381,11 +380,50 @@ public class CIIToUBLConverter
 
   @Nullable
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType _copyAmount (@Nullable final AmountType aAmount,
-                                                                                                           @Nullable final String sDefaultCurrencyID)
+                                                                                                           @Nullable final String sDefaultCurrencyCode)
   {
     return _copyAmount (aAmount,
                         new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType (),
-                        sDefaultCurrencyID);
+                        sDefaultCurrencyCode);
+  }
+
+  private static void _copyAllowanceCharge (@Nonnull final TradeAllowanceChargeType aAllowanceCharge,
+                                            @Nonnull final AllowanceChargeType aUBLAllowanceCharge,
+                                            @Nullable final String sDefaultCurrencyCode)
+  {
+    aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
+    if (aAllowanceCharge.getReason () != null)
+    {
+      final AllowanceChargeReasonType aUBLReason = new AllowanceChargeReasonType ();
+      aUBLReason.setValue (aAllowanceCharge.getReasonValue ());
+      aUBLAllowanceCharge.addAllowanceChargeReason (aUBLReason);
+    }
+    if (aAllowanceCharge.getCalculationPercent () != null)
+    {
+      // TODO calc is correct?
+      aUBLAllowanceCharge.setMultiplierFactorNumeric (aAllowanceCharge.getCalculationPercentValue ()
+                                                                      .divide (CGlobal.BIGDEC_100));
+    }
+    if (aAllowanceCharge.hasActualAmountEntries ())
+    {
+      aUBLAllowanceCharge.setAmount (_copyAmount (aAllowanceCharge.getActualAmountAtIndex (0), sDefaultCurrencyCode));
+    }
+
+    aUBLAllowanceCharge.setBaseAmount (_copyAmount (aAllowanceCharge.getBasisAmount (),
+                                                    new BaseAmountType (),
+                                                    sDefaultCurrencyCode));
+
+    // TaxCategory
+    for (final TradeTaxType aTradeTax : aAllowanceCharge.getCategoryTradeTax ())
+    {
+      final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
+      aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
+      aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+      final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
+      aUBLTaxScheme.setID ("VAT");
+      aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
+      aUBLAllowanceCharge.addTaxCategory (aUBLTaxCategory);
+    }
   }
 
   @Nonnull
@@ -841,41 +879,7 @@ public class CIIToUBLConverter
         {
           final AllowanceChargeType aUBLAllowanceCharge = new AllowanceChargeType ();
           aUBLAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
-          aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
-          if (aAllowanceCharge.getReason () != null)
-          {
-            final AllowanceChargeReasonType aUBLReason = new AllowanceChargeReasonType ();
-            aUBLReason.setValue (aAllowanceCharge.getReasonValue ());
-            aUBLAllowanceCharge.addAllowanceChargeReason (aUBLReason);
-          }
-          if (aAllowanceCharge.getCalculationPercent () != null)
-          {
-            // TODO calc is correct?
-            aUBLAllowanceCharge.setMultiplierFactorNumeric (aAllowanceCharge.getCalculationPercentValue ()
-                                                                            .divide (CGlobal.BIGDEC_100));
-          }
-          if (aAllowanceCharge.hasActualAmountEntries ())
-          {
-            aUBLAllowanceCharge.setAmount (_copyAmount (aAllowanceCharge.getActualAmountAtIndex (0),
-                                                        sDefaultCurrencyCode));
-          }
-
-          aUBLAllowanceCharge.setBaseAmount (_copyAmount (aAllowanceCharge.getBasisAmount (),
-                                                          new BaseAmountType (),
-                                                          sDefaultCurrencyCode));
-
-          // TaxCategory
-          for (final TradeTaxType aTradeTax : aAllowanceCharge.getCategoryTradeTax ())
-          {
-            final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
-            aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
-            aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
-            final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-            aUBLTaxScheme.setID ("VAT");
-            aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
-            aUBLAllowanceCharge.addTaxCategory (aUBLTaxCategory);
-          }
-
+          _copyAllowanceCharge (aAllowanceCharge, aUBLAllowanceCharge, sDefaultCurrencyCode);
           aUBLInvoice.addAllowanceCharge (aUBLAllowanceCharge);
         }
       }
@@ -978,41 +982,104 @@ public class CIIToUBLConverter
     // All invoice lines
     for (final SupplyChainTradeLineItemType aLineItem : aSCTT.getIncludedSupplyChainTradeLineItem ())
     {
-      final InvoiceLineType aUBLLine = new InvoiceLineType ();
+      final InvoiceLineType aUBLInvoiceLine = new InvoiceLineType ();
 
       final DocumentLineDocumentType aDLD = aLineItem.getAssociatedDocumentLineDocument ();
-      aUBLLine.setID (_copyID (aDLD.getLineID ()));
+      aUBLInvoiceLine.setID (_copyID (aDLD.getLineID ()));
 
+      // Note
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
-        aUBLLine.addNote (_copyNote (aLineNote));
+        aUBLInvoiceLine.addNote (_copyNote (aLineNote));
 
+      // Invoiced quantity
       final LineTradeDeliveryType aLineDelivery = aLineItem.getSpecifiedLineTradeDelivery ();
       if (aLineDelivery != null)
       {
         final QuantityType aBilledQuantity = aLineDelivery.getBilledQuantity ();
         if (aBilledQuantity != null)
         {
-          aUBLLine.setInvoicedQuantity (_copyQuantity (aBilledQuantity, new InvoicedQuantityType ()));
+          aUBLInvoiceLine.setInvoicedQuantity (_copyQuantity (aBilledQuantity, new InvoicedQuantityType ()));
         }
       }
 
+      // Line extension amount
       final LineTradeSettlementType aLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
       final TradeSettlementLineMonetarySummationType aSTSLMS = aLineSettlement.getSpecifiedTradeSettlementLineMonetarySummation ();
       if (aSTSLMS != null)
       {
         if (aSTSLMS.hasLineTotalAmountEntries ())
-          aUBLLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
-                                                        new LineExtensionAmountType (),
-                                                        sDefaultCurrencyCode));
+          aUBLInvoiceLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
+                                                               new LineExtensionAmountType (),
+                                                               sDefaultCurrencyCode));
       }
 
+      // Accounting cost
       if (aLineSettlement.hasReceivableSpecifiedTradeAccountingAccountEntries ())
       {
         final TradeAccountingAccountType aLineAA = aLineSettlement.getReceivableSpecifiedTradeAccountingAccountAtIndex (0);
-        aUBLLine.setAccountingCost (aLineAA.getIDValue ());
+        aUBLInvoiceLine.setAccountingCost (aLineAA.getIDValue ());
       }
 
-      aUBLInvoice.addInvoiceLine (aUBLLine);
+      // Invoice period
+      final SpecifiedPeriodType aLineBillingPeriod = aLineSettlement.getBillingSpecifiedPeriod ();
+      if (aLineBillingPeriod != null)
+      {
+        final PeriodType aUBLLinePeriod = new PeriodType ();
+        if (aLineBillingPeriod.getStartDateTime () != null)
+          aUBLLinePeriod.setStartDate (_parseDateDDMMYYYY (aLineBillingPeriod.getStartDateTime ()
+                                                                             .getDateTimeStringValue (),
+                                                           aErrorList));
+        if (aLineBillingPeriod.getEndDateTime () != null)
+          aUBLLinePeriod.setEndDate (_parseDateDDMMYYYY (aLineBillingPeriod.getEndDateTime ().getDateTimeStringValue (),
+                                                         aErrorList));
+        aUBLInvoiceLine.addInvoicePeriod (aUBLLinePeriod);
+      }
+
+      // Order line reference
+      final LineTradeAgreementType aLineAgreement = aLineItem.getSpecifiedLineTradeAgreement ();
+      if (aLineAgreement != null)
+      {
+        final ReferencedDocumentType aOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
+        if (aOrderReference != null)
+        {
+          final OrderLineReferenceType aUBLOrderLineReference = new OrderLineReferenceType ();
+          aUBLOrderLineReference.setLineID (_copyID (aOrderReference.getLineID (), new LineIDType ()));
+          aUBLInvoiceLine.addOrderLineReference (aUBLOrderLineReference);
+        }
+      }
+
+      // Document reference
+      for (final ReferencedDocumentType aLineReferencedDocument : aLineSettlement.getAdditionalReferencedDocument ())
+      {
+        final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aLineReferencedDocument, aErrorList);
+        if (aUBLDocRef != null)
+          aUBLInvoiceLine.addDocumentReference (aUBLDocRef);
+      }
+
+      // Allowance charge
+      for (final TradeAllowanceChargeType aLineAllowanceCharge : aLineSettlement.getSpecifiedTradeAllowanceCharge ())
+      {
+        ETriState eIsCharge = ETriState.UNDEFINED;
+        if (aLineAllowanceCharge.getChargeIndicator () != null)
+          eIsCharge = _parseIndicator (aLineAllowanceCharge.getChargeIndicator ().getIndicatorStringValue (),
+                                       aErrorList);
+        else
+          aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
+                                                       "SupplyChainTradeTransaction",
+                                                       "IncludedSupplyChainTradeLineItem",
+                                                       "SpecifiedLineTradeSettlement",
+                                                       "SpecifiedTradeAllowanceCharge" },
+                                       "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
+        if (eIsCharge.isDefined ())
+        {
+          final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
+          aUBLLineAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
+          _copyAllowanceCharge (aLineAllowanceCharge, aUBLLineAllowanceCharge, sDefaultCurrencyCode);
+          aUBLInvoice.addAllowanceCharge (aUBLLineAllowanceCharge);
+        }
+      }
+
+      aUBLInvoice.addInvoiceLine (aUBLInvoiceLine);
     }
 
     // TODO
