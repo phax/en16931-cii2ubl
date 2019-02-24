@@ -1096,15 +1096,15 @@ public class CIIToUBLConverter
           final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
           aUBLLineAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
           _copyAllowanceCharge (aLineAllowanceCharge, aUBLLineAllowanceCharge, sDefaultCurrencyCode);
-          aUBLInvoice.addAllowanceCharge (aUBLLineAllowanceCharge);
+          aUBLInvoiceLine.addAllowanceCharge (aUBLLineAllowanceCharge);
         }
       }
 
       // Item
+      final ItemType aUBLItem = new ItemType ();
       final TradeProductType aLineProduct = aLineItem.getSpecifiedTradeProduct ();
       if (aLineProduct != null)
       {
-        final ItemType aUBLItem = new ItemType ();
         final TextType aDescription = aLineProduct.getDescription ();
         if (aDescription != null)
           aUBLItem.addDescription (_copyName (aDescription, new DescriptionType ()));
@@ -1158,9 +1158,90 @@ public class CIIToUBLConverter
             aUBLItem.addCommodityClassification (aUBLCommodityClassification);
           }
         }
-
-        aUBLInvoiceLine.setItem (aUBLItem);
       }
+
+      for (final TradeTaxType aTradeTax : aLineSettlement.getApplicableTradeTax ())
+      {
+        final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
+        aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
+        aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+        final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
+        aUBLTaxScheme.setID ("VAT");
+        aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
+        aUBLItem.addClassifiedTaxCategory (aUBLTaxCategory);
+      }
+
+      if (aLineProduct != null)
+      {
+        for (final ProductCharacteristicType aAPC : aLineProduct.getApplicableProductCharacteristic ())
+          if (aAPC.hasDescriptionEntries ())
+          {
+            final ItemPropertyType aUBLAdditionalItem = new ItemPropertyType ();
+            aUBLAdditionalItem.setName (_copyName (aAPC.getDescriptionAtIndex (0), new NameType ()));
+            if (aAPC.hasValueEntries ())
+              aUBLAdditionalItem.setValue (aAPC.getValueAtIndex (0).getValue ());
+            aUBLItem.addAdditionalItemProperty (aUBLAdditionalItem);
+          }
+      }
+
+      final PriceType aUBLPrice = new PriceType ();
+      boolean bUsePrice = false;
+      if (aLineAgreement != null)
+      {
+
+        final TradePriceType aNPPTP = aLineAgreement.getNetPriceProductTradePrice ();
+        if (aNPPTP != null)
+        {
+          if (aNPPTP.hasChargeAmountEntries ())
+          {
+            aUBLPrice.setPriceAmount (_copyAmount (aNPPTP.getChargeAmountAtIndex (0),
+                                                   new PriceAmountType (),
+                                                   sDefaultCurrencyCode));
+            bUsePrice = true;
+          }
+        }
+
+        final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
+        if (aGPPTP != null)
+        {
+          if (aGPPTP.getBasisQuantity () != null)
+          {
+            aUBLPrice.setBaseQuantity (_copyQuantity (aGPPTP.getBasisQuantity (), new BaseQuantityType ()));
+            bUsePrice = true;
+          }
+        }
+      }
+
+      // Allowance charge
+      final TradePriceType aTradePrice = aLineAgreement.getNetPriceProductTradePrice ();
+      if (aTradePrice != null)
+        for (final TradeAllowanceChargeType aPriceAllowanceCharge : aTradePrice.getAppliedTradeAllowanceCharge ())
+        {
+          ETriState eIsCharge = ETriState.UNDEFINED;
+          if (aPriceAllowanceCharge.getChargeIndicator () != null)
+            eIsCharge = _parseIndicator (aPriceAllowanceCharge.getChargeIndicator ().getIndicatorStringValue (),
+                                         aErrorList);
+          else
+            aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
+                                                         "SupplyChainTradeTransaction",
+                                                         "IncludedSupplyChainTradeLineItem",
+                                                         "SpecifiedLineTradeAgreement",
+                                                         "NetPriceProductTradePrice",
+                                                         "AppliedTradeAllowanceCharge" },
+                                         "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
+          if (eIsCharge.isDefined ())
+          {
+            final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
+            aUBLLineAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
+            _copyAllowanceCharge (aPriceAllowanceCharge, aUBLLineAllowanceCharge, sDefaultCurrencyCode);
+            aUBLPrice.addAllowanceCharge (aUBLLineAllowanceCharge);
+          }
+        }
+
+      if (bUsePrice)
+        aUBLInvoiceLine.setPrice (aUBLPrice);
+
+      aUBLInvoiceLine.setItem (aUBLItem);
 
       aUBLInvoice.addInvoiceLine (aUBLInvoiceLine);
     }
