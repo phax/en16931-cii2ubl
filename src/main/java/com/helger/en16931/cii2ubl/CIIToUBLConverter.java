@@ -451,7 +451,6 @@ public class CIIToUBLConverter
   private InvoiceType _convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
                                          @Nonnull final ErrorList aErrorList)
   {
-    final ExchangedDocumentContextType aEDC = aCIIInvoice.getExchangedDocumentContext ();
     final ExchangedDocumentType aED = aCIIInvoice.getExchangedDocument ();
     final SupplyChainTradeTransactionType aSCTT = aCIIInvoice.getSupplyChainTradeTransaction ();
     final HeaderTradeAgreementType aAgreement = aSCTT.getApplicableHeaderTradeAgreement ();
