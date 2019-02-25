@@ -493,15 +493,23 @@ public class CIIToUBLConverter
       XMLGregorianCalendar aIssueDate = null;
       if (aED.getIssueDateTime () != null)
         aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue (), aErrorList);
-      if (aIssueDate == null)
-        for (final TradePaymentTermsType aPaymentTerms : aSettlement.getSpecifiedTradePaymentTerms ())
-          if (aPaymentTerms.getDueDateDateTime () != null)
-          {
-            aIssueDate = _parseDateDDMMYYYY (aPaymentTerms.getDueDateDateTime ().getDateTimeStringValue (), aErrorList);
-            if (aIssueDate != null)
-              break;
-          }
-      aUBLInvoice.setIssueDate (aIssueDate);
+
+      if (aIssueDate != null)
+        aUBLInvoice.setIssueDate (aIssueDate);
+    }
+
+    // DueDate
+    {
+      XMLGregorianCalendar aDueDate = null;
+      for (final TradePaymentTermsType aPaymentTerms : aSettlement.getSpecifiedTradePaymentTerms ())
+        if (aPaymentTerms.getDueDateDateTime () != null)
+        {
+          aDueDate = _parseDateDDMMYYYY (aPaymentTerms.getDueDateDateTime ().getDateTimeStringValue (), aErrorList);
+          if (aDueDate != null)
+            break;
+        }
+      if (aDueDate != null)
+        aUBLInvoice.setDueDate (aDueDate);
     }
 
     // InvoiceTypeCode
