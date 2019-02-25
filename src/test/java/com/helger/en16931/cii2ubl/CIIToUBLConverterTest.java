@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.error.list.ErrorList;
+import com.helger.commons.io.file.FilenameHelper;
 import com.helger.ubl21.UBL21Writer;
+import com.helger.ubl21.UBL21WriterBuilder;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 
@@ -38,9 +40,10 @@ public final class CIIToUBLConverterTest
   @Test
   public void testConvertAll ()
   {
+    final UBL21WriterBuilder <InvoiceType> aWriter = UBL21Writer.invoice ().setFormattedOutput (true);
     for (final String sFilename : TEST_FILES)
     {
-      LOGGER.info (sFilename);
+      LOGGER.info ("Converting " + sFilename + " to UBL");
 
       final ErrorList aErrorList = new ErrorList ();
       final Serializable aInvoice = new CIIToUBLConverter ().convertCIItoUBL (new File ("src/test/resources/cii",
@@ -50,9 +53,8 @@ public final class CIIToUBLConverterTest
       assertNotNull (aInvoice);
       assertTrue (aInvoice instanceof InvoiceType);
       final InvoiceType aUBLInvoice = (InvoiceType) aInvoice;
-      final String s = UBL21Writer.invoice ().getAsString (aUBLInvoice);
-      assertNotNull (s);
-      LOGGER.info ("  UBL:\n" + s);
+
+      aWriter.write (aUBLInvoice, new File ("toubl", FilenameHelper.getBaseName (sFilename) + "-ubl.xml"));
     }
   }
 }

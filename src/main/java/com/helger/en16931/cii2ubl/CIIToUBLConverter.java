@@ -218,7 +218,8 @@ public class CIIToUBLConverter
   {
     final AddressType ret = new AddressType ();
     ret.setStreetName (aPostalAddress.getLineOneValue ());
-    ret.setAdditionalStreetName (aPostalAddress.getLineTwoValue ());
+    if (StringHelper.hasText (aPostalAddress.getLineTwoValue ()))
+      ret.setAdditionalStreetName (aPostalAddress.getLineTwoValue ());
     if (StringHelper.hasText (aPostalAddress.getLineThreeValue ()))
     {
       final AddressLineType aUBLAddressLine = new AddressLineType ();
@@ -309,7 +310,8 @@ public class CIIToUBLConverter
     final LegalOrganizationType aSLO = aTradeParty.getSpecifiedLegalOrganization ();
     if (aSLO != null)
     {
-      aUBLPartyLegalEntity.setRegistrationName (aSLO.getTradingBusinessNameValue ());
+      if (StringHelper.hasText (aSLO.getTradingBusinessNameValue ()))
+        aUBLPartyLegalEntity.setRegistrationName (aSLO.getTradingBusinessNameValue ());
       aUBLPartyLegalEntity.setCompanyID (_copyID (aSLO.getID (), new CompanyIDType ()));
       bAnyValueSet = true;
     }
@@ -336,17 +338,28 @@ public class CIIToUBLConverter
 
     final TradeContactType aDTC = aTradeParty.getDefinedTradeContactAtIndex (0);
     final ContactType aUBLContact = new ContactType ();
-    aUBLContact.setName (_copyName (aDTC.getPersonName (), new NameType ()));
+    boolean bUseContact = false;
+    if (aDTC.getPersonName () != null)
+    {
+      aUBLContact.setName (_copyName (aDTC.getPersonName (), new NameType ()));
+      bUseContact = true;
+    }
 
     final UniversalCommunicationType aTel = aDTC.getTelephoneUniversalCommunication ();
     if (aTel != null)
+    {
       aUBLContact.setTelephone (aTel.getCompleteNumberValue ());
+      bUseContact = true;
+    }
 
     final UniversalCommunicationType aEmail = aDTC.getEmailURIUniversalCommunication ();
     if (aEmail != null)
+    {
       aUBLContact.setElectronicMail (aEmail.getURIIDValue ());
+      bUseContact = true;
+    }
 
-    return aUBLContact;
+    return bUseContact ? aUBLContact : null;
   }
 
   @Nullable
@@ -520,7 +533,10 @@ public class CIIToUBLConverter
     aUBLInvoice.setDocumentCurrencyCode (sDefaultCurrencyCode);
 
     // TaxCurrencyCode
-    aUBLInvoice.setTaxCurrencyCode (aSettlement.getTaxCurrencyCodeValue ());
+    if (aSettlement.getTaxCurrencyCodeValue () != null)
+    {
+      aUBLInvoice.setTaxCurrencyCode (aSettlement.getTaxCurrencyCodeValue ());
+    }
 
     // AccountingCost
     for (final TradeAccountingAccountType aAccount : aSettlement.getReceivableSpecifiedTradeAccountingAccount ())
@@ -535,7 +551,10 @@ public class CIIToUBLConverter
     }
 
     // BuyerReferences
-    aUBLInvoice.setBuyerReference (aAgreement.getBuyerReferenceValue ());
+    if (aAgreement.getBuyerReferenceValue () != null)
+    {
+      aUBLInvoice.setBuyerReference (aAgreement.getBuyerReferenceValue ());
+    }
 
     // InvoicePeriod
     {
@@ -949,7 +968,8 @@ public class CIIToUBLConverter
         aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
-        aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
+        if (StringHelper.hasText (aTradeTax.getExemptionReasonCodeValue ()))
+          aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
         if (aTradeTax.getExemptionReason () != null)
         {
           final TaxExemptionReasonType aUBLTaxExemptionReason = new TaxExemptionReasonType ();
