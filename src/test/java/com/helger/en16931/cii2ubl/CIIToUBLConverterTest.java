@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.Serializable;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +49,7 @@ public final class CIIToUBLConverterTest
   }
 
   @Test
-  @Ignore
+  // @Ignore
   public void testConvertAll ()
   {
     final UBL21WriterBuilder <InvoiceType> aWriter = UBL21Writer.invoice ().setFormattedOutput (true);

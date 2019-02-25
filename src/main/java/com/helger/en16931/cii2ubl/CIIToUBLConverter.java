@@ -305,15 +305,14 @@ public class CIIToUBLConverter
   private static PartyLegalEntityType _convertPartyLegalEntity (@Nonnull final TradePartyType aTradeParty)
   {
     final PartyLegalEntityType aUBLPartyLegalEntity = new PartyLegalEntityType ();
-    boolean bAnyValueSet = false;
 
     final LegalOrganizationType aSLO = aTradeParty.getSpecifiedLegalOrganization ();
     if (aSLO != null)
     {
       if (StringHelper.hasText (aSLO.getTradingBusinessNameValue ()))
         aUBLPartyLegalEntity.setRegistrationName (aSLO.getTradingBusinessNameValue ());
+
       aUBLPartyLegalEntity.setCompanyID (_copyID (aSLO.getID (), new CompanyIDType ()));
-      bAnyValueSet = true;
     }
 
     for (final TextType aDesc : aTradeParty.getDescription ())
@@ -321,12 +320,15 @@ public class CIIToUBLConverter
       {
         // Use the first only
         aUBLPartyLegalEntity.setCompanyLegalForm (aDesc.getValue ());
-        bAnyValueSet = true;
         break;
       }
 
-    if (!bAnyValueSet)
-      return null;
+    if (aUBLPartyLegalEntity.getRegistrationName () == null)
+    {
+      // Mandatory field according to Schematron
+      aUBLPartyLegalEntity.setRegistrationName (aTradeParty.getNameValue ());
+    }
+
     return aUBLPartyLegalEntity;
   }
 
