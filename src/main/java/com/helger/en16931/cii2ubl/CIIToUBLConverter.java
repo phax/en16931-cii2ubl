@@ -313,10 +313,18 @@ public class CIIToUBLConverter
   @Nonnull
   private static PartyTaxSchemeType _convertPartyTaxScheme (@Nonnull final TaxRegistrationType aTaxRegistration)
   {
+    if (aTaxRegistration.getID () == null)
+      return null;
+
     final PartyTaxSchemeType aUBLPartyTaxScheme = new PartyTaxSchemeType ();
-    aUBLPartyTaxScheme.setCompanyID (_copyID (aTaxRegistration.getID (), new CompanyIDType ()));
+    aUBLPartyTaxScheme.setCompanyID (aTaxRegistration.getIDValue ());
+
+    String sSchemeID = aTaxRegistration.getID ().getSchemeID ();
+    if (StringHelper.hasNoText (sSchemeID))
+      sSchemeID = "VAT";
+
     final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-    aUBLTaxScheme.setID ("VAT");
+    aUBLTaxScheme.setID (sSchemeID);
     aUBLPartyTaxScheme.setTaxScheme (aUBLTaxScheme);
     return aUBLPartyTaxScheme;
   }
@@ -708,7 +716,11 @@ public class CIIToUBLConverter
         final PartyType aUBLParty = _convertParty (aSellerParty);
 
         for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
-          aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
+          if (aUBLPartyTaxScheme != null)
+            aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
 
         final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aSellerParty);
         if (aUBLPartyLegalEntity != null)
@@ -730,7 +742,11 @@ public class CIIToUBLConverter
         final PartyType aUBLParty = _convertParty (aBuyerParty);
 
         for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
-          aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
+          if (aUBLPartyTaxScheme != null)
+            aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
 
         final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aBuyerParty);
         if (aUBLPartyLegalEntity != null)
@@ -752,7 +768,11 @@ public class CIIToUBLConverter
         final PartyType aUBLParty = _convertParty (aPayeeParty);
 
         for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
-          aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
+          if (aUBLPartyTaxScheme != null)
+            aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
 
         // validation rules warning
         if (false)
@@ -778,7 +798,11 @@ public class CIIToUBLConverter
         final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty);
 
         for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
-          aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
+          if (aUBLPartyTaxScheme != null)
+            aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
 
         // validation rules warning
         if (false)
@@ -857,6 +881,9 @@ public class CIIToUBLConverter
           aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
         aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
 
+        final boolean bRequiresPayeeFinancialAccountID = "30".equals (aUBLPaymentMeansCode.getValue ()) ||
+                                                         "58".equals (aUBLPaymentMeansCode.getValue ());
+
         for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
         {
           final PaymentIDType aUBLPaymentID = new PaymentIDType ();
@@ -877,11 +904,28 @@ public class CIIToUBLConverter
 
         {
           final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+
           final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
           if (aAccount != null)
           {
             aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
             aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName (), new NameType ()));
+          }
+          else
+          {
+            // For PaymentMeansCode 58
+            final DebtorFinancialAccountType aAccount2 = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
+            if (aAccount2 != null)
+            {
+              aUBLFinancialAccount.setID (_copyID (aAccount2.getIBANID ()));
+              aUBLFinancialAccount.setName (_copyName (aAccount2.getAccountName (), new NameType ()));
+            }
+          }
+
+          if (bRequiresPayeeFinancialAccountID && aUBLFinancialAccount.getID () == null)
+          {
+            // Ignore PaymentMeans because required IBAN is missing
+            continue;
           }
 
           final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();

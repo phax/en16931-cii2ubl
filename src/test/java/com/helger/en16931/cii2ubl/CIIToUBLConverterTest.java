@@ -49,8 +49,7 @@ public final class CIIToUBLConverterTest
   }
 
   @Test
-  // @Ignore
-  public void testConvertAll ()
+  public void testConvertAndValidateAll ()
   {
     final UBL21WriterBuilder <InvoiceType> aWriter = UBL21Writer.invoice ().setFormattedOutput (true);
     for (final String sFilename : TEST_FILES)
@@ -70,17 +69,6 @@ public final class CIIToUBLConverterTest
       final InvoiceType aUBLInvoice = (InvoiceType) aInvoice;
       final File aDestFile = new File ("toubl", FilenameHelper.getBaseName (sFilename) + "-ubl.xml");
       aWriter.write (aUBLInvoice, aDestFile);
-    }
-  }
-
-  @Test
-  public void testValidateAll ()
-  {
-    for (final String sFilename : TEST_FILES)
-    {
-      LOGGER.info ("Validating " + sFilename);
-
-      final File aDestFile = new File ("toubl", FilenameHelper.getBaseName (sFilename) + "-ubl.xml");
 
       // Validate against EN16931 validation rules
       final ValidationResultList aResultList = VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_110)
