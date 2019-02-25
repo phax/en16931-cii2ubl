@@ -37,6 +37,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.IndicatorType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
@@ -71,17 +72,33 @@ public class CIIToUBLConverter
   }
 
   @Nonnull
-  private static ETriState _parseIndicator (@Nullable final String sIndicator, @Nonnull final IErrorList aErrorList)
+  private static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator,
+                                            @Nonnull final IErrorList aErrorList)
   {
-    if (sIndicator == null)
+    if (aIndicator == null)
       return ETriState.UNDEFINED;
-    if ("true".equals (sIndicator))
-      return ETriState.TRUE;
-    if ("false".equals (sIndicator))
-      return ETriState.FALSE;
 
-    aErrorList.add (_buildError (null, "Failed to parse the indicator value '" + sIndicator + "' to a boolean value."));
-    return ETriState.UNDEFINED;
+    // Choice
+    if (aIndicator.isIndicator () != null)
+      return ETriState.valueOf (aIndicator.isIndicator ().booleanValue ());
+
+    if (aIndicator.getIndicatorString () != null)
+    {
+      final String sIndicator = aIndicator.getIndicatorStringValue ();
+      // Parse string
+      if (sIndicator == null)
+        return ETriState.UNDEFINED;
+      if ("true".equals (sIndicator))
+        return ETriState.TRUE;
+      if ("false".equals (sIndicator))
+        return ETriState.FALSE;
+
+      aErrorList.add (_buildError (null,
+                                   "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
+      return ETriState.UNDEFINED;
+    }
+
+    throw new IllegalStateException ("Indicator has neither string nor boolen");
   }
 
   /**
@@ -428,7 +445,9 @@ public class CIIToUBLConverter
                                             @Nonnull final AllowanceChargeType aUBLAllowanceCharge,
                                             @Nullable final String sDefaultCurrencyCode)
   {
-    aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
+    if (StringHelper.hasText (aAllowanceCharge.getReasonCodeValue ()))
+      aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
+
     if (aAllowanceCharge.getReason () != null)
     {
       final AllowanceChargeReasonType aUBLReason = new AllowanceChargeReasonType ();
@@ -470,9 +489,9 @@ public class CIIToUBLConverter
   {
     final ExchangedDocumentType aED = aCIIInvoice.getExchangedDocument ();
     final SupplyChainTradeTransactionType aSCTT = aCIIInvoice.getSupplyChainTradeTransaction ();
-    final HeaderTradeAgreementType aAgreement = aSCTT.getApplicableHeaderTradeAgreement ();
-    final HeaderTradeDeliveryType aDelivery = aSCTT.getApplicableHeaderTradeDelivery ();
-    final HeaderTradeSettlementType aSettlement = aSCTT.getApplicableHeaderTradeSettlement ();
+    final HeaderTradeAgreementType aHeaderAgreement = aSCTT.getApplicableHeaderTradeAgreement ();
+    final HeaderTradeDeliveryType aHeaderDelivery = aSCTT.getApplicableHeaderTradeDelivery ();
+    final HeaderTradeSettlementType aHeaderSettlement = aSCTT.getApplicableHeaderTradeSettlement ();
 
     final InvoiceType aUBLInvoice = new InvoiceType ();
     aUBLInvoice.setUBLVersionID ("2.1");
@@ -501,7 +520,7 @@ public class CIIToUBLConverter
     // DueDate
     {
       XMLGregorianCalendar aDueDate = null;
-      for (final TradePaymentTermsType aPaymentTerms : aSettlement.getSpecifiedTradePaymentTerms ())
+      for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
         if (aPaymentTerms.getDueDateDateTime () != null)
         {
           aDueDate = _parseDateDDMMYYYY (aPaymentTerms.getDueDateDateTime ().getDateTimeStringValue (), aErrorList);
@@ -522,7 +541,7 @@ public class CIIToUBLConverter
     }
 
     // TaxPointDate
-    for (final TradeTaxType aTradeTax : aSettlement.getApplicableTradeTax ())
+    for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
     {
       if (aTradeTax.getTaxPointDate () != null)
       {
@@ -539,17 +558,17 @@ public class CIIToUBLConverter
     }
 
     // DocumentCurrencyCode
-    final String sDefaultCurrencyCode = aSettlement.getInvoiceCurrencyCodeValue ();
+    final String sDefaultCurrencyCode = aHeaderSettlement.getInvoiceCurrencyCodeValue ();
     aUBLInvoice.setDocumentCurrencyCode (sDefaultCurrencyCode);
 
     // TaxCurrencyCode
-    if (aSettlement.getTaxCurrencyCodeValue () != null)
+    if (aHeaderSettlement.getTaxCurrencyCodeValue () != null)
     {
-      aUBLInvoice.setTaxCurrencyCode (aSettlement.getTaxCurrencyCodeValue ());
+      aUBLInvoice.setTaxCurrencyCode (aHeaderSettlement.getTaxCurrencyCodeValue ());
     }
 
     // AccountingCost
-    for (final TradeAccountingAccountType aAccount : aSettlement.getReceivableSpecifiedTradeAccountingAccount ())
+    for (final TradeAccountingAccountType aAccount : aHeaderSettlement.getReceivableSpecifiedTradeAccountingAccount ())
     {
       final String sID = aAccount.getIDValue ();
       if (StringHelper.hasText (sID))
@@ -561,14 +580,14 @@ public class CIIToUBLConverter
     }
 
     // BuyerReferences
-    if (aAgreement.getBuyerReferenceValue () != null)
+    if (aHeaderAgreement.getBuyerReferenceValue () != null)
     {
-      aUBLInvoice.setBuyerReference (aAgreement.getBuyerReferenceValue ());
+      aUBLInvoice.setBuyerReference (aHeaderAgreement.getBuyerReferenceValue ());
     }
 
     // InvoicePeriod
     {
-      final SpecifiedPeriodType aSPT = aSettlement.getBillingSpecifiedPeriod ();
+      final SpecifiedPeriodType aSPT = aHeaderSettlement.getBillingSpecifiedPeriod ();
       if (aSPT != null)
       {
         final DateTimeType aStartDT = aSPT.getStartDateTime ();
@@ -587,10 +606,10 @@ public class CIIToUBLConverter
     // OrderReference
     {
       final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
-      final ReferencedDocumentType aBuyerOrderRef = aAgreement.getBuyerOrderReferencedDocument ();
+      final ReferencedDocumentType aBuyerOrderRef = aHeaderAgreement.getBuyerOrderReferencedDocument ();
       if (aBuyerOrderRef != null)
         aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
-      final ReferencedDocumentType aSellerOrderRef = aAgreement.getSellerOrderReferencedDocument ();
+      final ReferencedDocumentType aSellerOrderRef = aHeaderAgreement.getSellerOrderReferencedDocument ();
       if (aSellerOrderRef != null)
         aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
 
@@ -601,7 +620,7 @@ public class CIIToUBLConverter
 
     // BillingReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aSettlement.getInvoiceReferencedDocument (),
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderSettlement.getInvoiceReferencedDocument (),
                                                                           aErrorList);
       if (aUBLDocRef != null)
       {
@@ -613,7 +632,7 @@ public class CIIToUBLConverter
 
     // DespatchDocumentReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aDelivery.getDespatchAdviceReferencedDocument (),
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getDespatchAdviceReferencedDocument (),
                                                                           aErrorList);
       if (aUBLDocRef != null)
         aUBLInvoice.addDespatchDocumentReference (aUBLDocRef);
@@ -621,7 +640,7 @@ public class CIIToUBLConverter
 
     // ReceiptDocumentReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aDelivery.getReceivingAdviceReferencedDocument (),
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getReceivingAdviceReferencedDocument (),
                                                                           aErrorList);
       if (aUBLDocRef != null)
         aUBLInvoice.addReceiptDocumentReference (aUBLDocRef);
@@ -629,7 +648,7 @@ public class CIIToUBLConverter
 
     // OriginatorDocumentReference
     {
-      for (final ReferencedDocumentType aRD : aAgreement.getAdditionalReferencedDocument ())
+      for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Use for "Tender or lot reference" with TypeCode "50"
         if ("50".equals (aRD.getTypeCodeValue ()))
@@ -643,7 +662,7 @@ public class CIIToUBLConverter
 
     // ContractDocumentReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aAgreement.getContractReferencedDocument (),
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderAgreement.getContractReferencedDocument (),
                                                                           aErrorList);
       if (aUBLDocRef != null)
         aUBLInvoice.addContractDocumentReference (aUBLDocRef);
@@ -651,7 +670,7 @@ public class CIIToUBLConverter
 
     // AdditionalDocumentReference
     {
-      for (final ReferencedDocumentType aRD : aAgreement.getAdditionalReferencedDocument ())
+      for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Except OriginatorDocumentReference
         if (!"50".equals (aRD.getTypeCodeValue ()))
@@ -665,7 +684,7 @@ public class CIIToUBLConverter
 
     // ProjectReference
     {
-      final ProcuringProjectType aSpecifiedProcuring = aAgreement.getSpecifiedProcuringProject ();
+      final ProcuringProjectType aSpecifiedProcuring = aHeaderAgreement.getSpecifiedProcuringProject ();
       if (aSpecifiedProcuring != null)
       {
         final String sID = aSpecifiedProcuring.getIDValue ();
@@ -680,7 +699,7 @@ public class CIIToUBLConverter
 
     // Supplier Party
     {
-      final TradePartyType aSellerParty = aAgreement.getSellerTradeParty ();
+      final TradePartyType aSellerParty = aHeaderAgreement.getSellerTradeParty ();
       if (aSellerParty != null)
       {
         final PartyType aUBLParty = _convertParty (aSellerParty);
@@ -702,7 +721,7 @@ public class CIIToUBLConverter
 
     // Customer Party
     {
-      final TradePartyType aBuyerParty = aAgreement.getBuyerTradeParty ();
+      final TradePartyType aBuyerParty = aHeaderAgreement.getBuyerTradeParty ();
       if (aBuyerParty != null)
       {
         final PartyType aUBLParty = _convertParty (aBuyerParty);
@@ -724,7 +743,7 @@ public class CIIToUBLConverter
 
     // Payee Party
     {
-      final TradePartyType aPayeeParty = aSettlement.getPayeeTradeParty ();
+      final TradePartyType aPayeeParty = aHeaderSettlement.getPayeeTradeParty ();
       if (aPayeeParty != null)
       {
         final PartyType aUBLParty = _convertParty (aPayeeParty);
@@ -732,9 +751,13 @@ public class CIIToUBLConverter
         for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
           aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
 
-        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aPayeeParty);
-        if (aUBLPartyLegalEntity != null)
-          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        // validation rules warning
+        if (false)
+        {
+          final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aPayeeParty);
+          if (aUBLPartyLegalEntity != null)
+            aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        }
 
         final ContactType aUBLContact = _convertContact (aPayeeParty);
         if (aUBLContact != null)
@@ -746,7 +769,7 @@ public class CIIToUBLConverter
 
     // Tax Representative Party
     {
-      final TradePartyType aTaxRepresentativeParty = aAgreement.getSellerTaxRepresentativeTradeParty ();
+      final TradePartyType aTaxRepresentativeParty = aHeaderAgreement.getSellerTaxRepresentativeTradeParty ();
       if (aTaxRepresentativeParty != null)
       {
         final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty);
@@ -754,9 +777,13 @@ public class CIIToUBLConverter
         for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
           aUBLParty.addPartyTaxScheme (_convertPartyTaxScheme (aTaxRegistration));
 
-        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aTaxRepresentativeParty);
-        if (aUBLPartyLegalEntity != null)
-          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        // validation rules warning
+        if (false)
+        {
+          final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aTaxRepresentativeParty);
+          if (aUBLPartyLegalEntity != null)
+            aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        }
 
         final ContactType aUBLContact = _convertContact (aTaxRepresentativeParty);
         if (aUBLContact != null)
@@ -768,12 +795,12 @@ public class CIIToUBLConverter
 
     // Delivery
     {
-      final TradePartyType aShipToParty = aDelivery.getShipToTradeParty ();
+      final TradePartyType aShipToParty = aHeaderDelivery.getShipToTradeParty ();
       if (aShipToParty != null)
       {
         final DeliveryType aUBLDelivery = new DeliveryType ();
 
-        final SupplyChainEventType aSCE = aDelivery.getActualDeliverySupplyChainEvent ();
+        final SupplyChainEventType aSCE = aHeaderDelivery.getActualDeliverySupplyChainEvent ();
         if (aSCE != null)
         {
           final DateTimeType aODT = aSCE.getOccurrenceDateTime ();
@@ -817,7 +844,7 @@ public class CIIToUBLConverter
 
     // Payment means
     {
-      for (final TradeSettlementPaymentMeansType aPaymentMeans : aSettlement.getSpecifiedTradeSettlementPaymentMeans ())
+      for (final TradeSettlementPaymentMeansType aPaymentMeans : aHeaderSettlement.getSpecifiedTradeSettlementPaymentMeans ())
       {
         final PaymentMeansType aUBLPaymentMeans = new PaymentMeansType ();
 
@@ -827,7 +854,7 @@ public class CIIToUBLConverter
           aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
         aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
 
-        for (final TextType aPaymentRef : aSettlement.getPaymentReference ())
+        for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
         {
           final PaymentIDType aUBLPaymentID = new PaymentIDType ();
           aUBLPaymentID.setValue (aPaymentRef.getValue ());
@@ -868,7 +895,7 @@ public class CIIToUBLConverter
           boolean bUseMandate = false;
           final PaymentMandateType aUBLPaymentMandate = new PaymentMandateType ();
 
-          for (final TradePaymentTermsType aPaymentTerms : aSettlement.getSpecifiedTradePaymentTerms ())
+          for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
           {
             if (aPaymentTerms.hasDirectDebitMandateIDEntries ())
             {
@@ -878,7 +905,7 @@ public class CIIToUBLConverter
             }
           }
 
-          final IDType aCreditorRefID = aSettlement.getCreditorReferenceID ();
+          final IDType aCreditorRefID = aHeaderSettlement.getCreditorReferenceID ();
           if (aCreditorRefID != null)
           {
             final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
@@ -897,7 +924,7 @@ public class CIIToUBLConverter
 
     // Payment Terms
     {
-      for (final TradePaymentTermsType aPaymentTerms : aSettlement.getSpecifiedTradePaymentTerms ())
+      for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
       {
         boolean bUsePaymenTerms = false;
         final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
@@ -915,11 +942,11 @@ public class CIIToUBLConverter
 
     // Allowance Charge
     {
-      for (final TradeAllowanceChargeType aAllowanceCharge : aSettlement.getSpecifiedTradeAllowanceCharge ())
+      for (final TradeAllowanceChargeType aAllowanceCharge : aHeaderSettlement.getSpecifiedTradeAllowanceCharge ())
       {
         ETriState eIsCharge = ETriState.UNDEFINED;
         if (aAllowanceCharge.getChargeIndicator () != null)
-          eIsCharge = _parseIndicator (aAllowanceCharge.getChargeIndicator ().getIndicatorStringValue (), aErrorList);
+          eIsCharge = _parseIndicator (aAllowanceCharge.getChargeIndicator (), aErrorList);
         else
           aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
                                                        "SupplyChainTradeTransaction",
@@ -936,7 +963,7 @@ public class CIIToUBLConverter
       }
     }
 
-    final TradeSettlementHeaderMonetarySummationType aSTSHMS = aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
+    final TradeSettlementHeaderMonetarySummationType aSTSHMS = aHeaderSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
 
     // TaxTotal
     {
@@ -956,7 +983,7 @@ public class CIIToUBLConverter
         aUBLTaxTotal.setTaxAmount (aUBLTaxAmount);
       }
 
-      for (final TradeTaxType aTradeTax : aSettlement.getApplicableTradeTax ())
+      for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
       {
         final TaxSubtotalType aUBLTaxSubtotal = new TaxSubtotalType ();
 
@@ -1122,8 +1149,7 @@ public class CIIToUBLConverter
       {
         ETriState eIsCharge = ETriState.UNDEFINED;
         if (aLineAllowanceCharge.getChargeIndicator () != null)
-          eIsCharge = _parseIndicator (aLineAllowanceCharge.getChargeIndicator ().getIndicatorStringValue (),
-                                       aErrorList);
+          eIsCharge = _parseIndicator (aLineAllowanceCharge.getChargeIndicator (), aErrorList);
         else
           aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
                                                        "SupplyChainTradeTransaction",
@@ -1260,8 +1286,7 @@ public class CIIToUBLConverter
         {
           ETriState eIsCharge = ETriState.UNDEFINED;
           if (aPriceAllowanceCharge.getChargeIndicator () != null)
-            eIsCharge = _parseIndicator (aPriceAllowanceCharge.getChargeIndicator ().getIndicatorStringValue (),
-                                         aErrorList);
+            eIsCharge = _parseIndicator (aPriceAllowanceCharge.getChargeIndicator (), aErrorList);
           else
             aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
                                                          "SupplyChainTradeTransaction",
