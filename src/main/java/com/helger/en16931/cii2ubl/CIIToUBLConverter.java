@@ -452,7 +452,7 @@ public class CIIToUBLConverter
     for (final TradeTaxType aTradeTax : aAllowanceCharge.getCategoryTradeTax ())
     {
       final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
-      aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
+      aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
       if (aTradeTax.getRateApplicablePercentValue () != null)
         aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
       final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
@@ -965,7 +965,7 @@ public class CIIToUBLConverter
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
-        aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
+        aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
         if (StringHelper.hasText (aTradeTax.getExemptionReasonCodeValue ()))
@@ -1193,7 +1193,7 @@ public class CIIToUBLConverter
       for (final TradeTaxType aTradeTax : aLineSettlement.getApplicableTradeTax ())
       {
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
-        aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
+        aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
