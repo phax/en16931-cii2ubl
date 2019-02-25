@@ -31,7 +31,7 @@ public final class CIIToUBLConverterTest
                                                               "CII_example4.xml",
                                                               "CII_example5.xml",
                                                               "CII_example6.xml",
-                                                              // "CII_example7.xml",
+                                                              "CII_example7.xml",
                                                               "CII_example8.xml",
                                                               "CII_example9.xml" };
 

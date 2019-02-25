@@ -2,6 +2,7 @@ package com.helger.en16931.cii2ubl;
 
 import java.io.File;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import javax.annotation.Nonnull;
@@ -439,7 +440,8 @@ public class CIIToUBLConverter
     {
       final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
       aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
-      aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+      if (aTradeTax.getRateApplicablePercentValue () != null)
+        aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
       final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
       aUBLTaxScheme.setID ("VAT");
       aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -916,6 +918,14 @@ public class CIIToUBLConverter
                                                 new TaxAmountType (),
                                                 sDefaultCurrencyCode));
       }
+      else
+      {
+        // Mandatory in UBL
+        final TaxAmountType aUBLTaxAmount = new TaxAmountType ();
+        aUBLTaxAmount.setValue (BigDecimal.ZERO);
+        aUBLTaxAmount.setCurrencyID (sDefaultCurrencyCode);
+        aUBLTaxTotal.setTaxAmount (aUBLTaxAmount);
+      }
 
       for (final TradeTaxType aTradeTax : aSettlement.getApplicableTradeTax ())
       {
@@ -937,7 +947,8 @@ public class CIIToUBLConverter
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
-        aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+        if (aTradeTax.getRateApplicablePercentValue () != null)
+          aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
         aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
         if (aTradeTax.getExemptionReason () != null)
         {
@@ -1163,7 +1174,8 @@ public class CIIToUBLConverter
       {
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getTypeCodeValue ());
-        aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+        if (aTradeTax.getRateApplicablePercentValue () != null)
+          aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID ("VAT");
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
