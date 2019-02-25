@@ -116,6 +116,9 @@ public class CIIToUBLConverter
   {
     if (aCIIID == null)
       return null;
+    if (StringHelper.hasNoText (aCIIID.getValue ()))
+      return null;
+
     aUBLID.setValue (aCIIID.getValue ());
     aUBLID.setSchemeID (aCIIID.getSchemeID ());
     aUBLID.setSchemeName (aCIIID.getSchemeName ());
@@ -872,23 +875,27 @@ public class CIIToUBLConverter
           aUBLPaymentMeans.setCardAccount (aUBLCardAccount);
         }
 
-        final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
-        final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
-        if (aAccount != null || aInstitution != null)
         {
           final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+          final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
           if (aAccount != null)
           {
             aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
             aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName (), new NameType ()));
           }
+
+          final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
           if (aInstitution != null)
           {
             final BranchType aUBLBranch = new BranchType ();
             aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
             aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
           }
-          aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
+
+          if (aUBLFinancialAccount.getID () != null ||
+              aUBLFinancialAccount.getName () != null ||
+              aUBLFinancialAccount.getFinancialInstitutionBranch () != null)
+            aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
         }
 
         {
@@ -967,12 +974,22 @@ public class CIIToUBLConverter
 
     // TaxTotal
     {
-      final TaxTotalType aUBLTaxTotal = new TaxTotalType ();
+      TaxTotalType aUBLTaxTotal = null;
       if (aSTSHMS != null && aSTSHMS.hasTaxTotalAmountEntries ())
       {
-        aUBLTaxTotal.setTaxAmount (_copyAmount (aSTSHMS.getTaxTotalAmountAtIndex (0),
-                                                new TaxAmountType (),
-                                                sDefaultCurrencyCode));
+        // For all currencies
+        for (final AmountType aTaxTotalAmount : aSTSHMS.getTaxTotalAmount ())
+        {
+          final TaxTotalType aUBLCurTaxTotal = new TaxTotalType ();
+          aUBLCurTaxTotal.setTaxAmount (_copyAmount (aTaxTotalAmount, new TaxAmountType (), sDefaultCurrencyCode));
+          aUBLInvoice.addTaxTotal (aUBLCurTaxTotal);
+
+          if (aUBLTaxTotal == null)
+          {
+            // Use the first one
+            aUBLTaxTotal = aUBLCurTaxTotal;
+          }
+        }
       }
       else
       {
@@ -980,7 +997,10 @@ public class CIIToUBLConverter
         final TaxAmountType aUBLTaxAmount = new TaxAmountType ();
         aUBLTaxAmount.setValue (BigDecimal.ZERO);
         aUBLTaxAmount.setCurrencyID (sDefaultCurrencyCode);
+
+        aUBLTaxTotal = new TaxTotalType ();
         aUBLTaxTotal.setTaxAmount (aUBLTaxAmount);
+        aUBLInvoice.addTaxTotal (aUBLTaxTotal);
       }
 
       for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
@@ -1022,8 +1042,6 @@ public class CIIToUBLConverter
 
         aUBLTaxTotal.addTaxSubtotal (aUBLTaxSubtotal);
       }
-
-      aUBLInvoice.addTaxTotal (aUBLTaxTotal);
     }
 
     // LegalMonetaryTotal
