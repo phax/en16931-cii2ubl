@@ -115,7 +115,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-ubl21</artifactId>
+      <artifactId>ph-ubl22</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>

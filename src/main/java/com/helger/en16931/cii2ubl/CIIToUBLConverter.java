@@ -26,9 +26,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.CGlobal;
 import com.helger.commons.ValueEnforcer;
@@ -43,10 +40,10 @@ import com.helger.commons.string.StringHelper;
 import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.*;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.*;
-import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
-import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.*;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.*;
+import oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType;
+import oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.*;
@@ -59,10 +56,13 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.IndicatorType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
+/**
+ * CII to UBL 2.2 converter.
+ *
+ * @author Philip Helger
+ */
 public class CIIToUBLConverter
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverter.class);
-
   public CIIToUBLConverter ()
   {}
 
@@ -149,9 +149,9 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _copyID (@Nullable final IDType aCIIID)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType _copyID (@Nullable final IDType aCIIID)
   {
-    return _copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType ());
+    return _copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType ());
   }
 
   @Nullable
@@ -168,12 +168,12 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType _copyNote (@Nullable final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aNote)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType _copyNote (@Nullable final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aNote)
   {
     if (aNote == null)
       return null;
 
-    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType ();
+    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType ();
     final StringBuilder aSB = new StringBuilder ();
     for (final TextType aText : aNote.getContent ())
     {
@@ -186,12 +186,12 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType _copyNote (@Nullable final TextType aText)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType _copyNote (@Nullable final TextType aText)
   {
     if (aText == null)
       return null;
 
-    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType ();
+    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType ();
     aUBLNote.setValue (aText.getValue ());
     aUBLNote.setLanguageID (aText.getLanguageID ());
     aUBLNote.setLanguageLocaleID (aText.getLanguageLocaleID ());
@@ -278,7 +278,7 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _extractPartyID (@Nonnull final TradePartyType aParty)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType _extractPartyID (@Nonnull final TradePartyType aParty)
   {
     IDType aID;
     if (aParty.hasGlobalIDEntries ())
@@ -303,7 +303,7 @@ public class CIIToUBLConverter
       ret.setEndpointID (_copyID (UC.getURIID (), new EndpointIDType ()));
     }
 
-    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType aUBLID = _extractPartyID (aParty);
+    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType aUBLID = _extractPartyID (aParty);
     if (aUBLID != null)
     {
       final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
@@ -411,7 +411,7 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_21.AmountType> T _copyAmount (@Nullable final AmountType aAmount,
+  private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_22.AmountType> T _copyAmount (@Nullable final AmountType aAmount,
                                                                                                                         @Nonnull final T ret,
                                                                                                                         @Nullable final String sDefaultCurrencyCode)
   {
@@ -427,7 +427,7 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_21.QuantityType> T _copyQuantity (@Nullable final QuantityType aQuantity,
+  private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_22.QuantityType> T _copyQuantity (@Nullable final QuantityType aQuantity,
                                                                                                                             @Nonnull final T ret)
   {
     if (aQuantity == null)
@@ -442,11 +442,11 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType _copyAmount (@Nullable final AmountType aAmount,
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AmountType _copyAmount (@Nullable final AmountType aAmount,
                                                                                                            @Nullable final String sDefaultCurrencyCode)
   {
     return _copyAmount (aAmount,
-                        new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType (),
+                        new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AmountType (),
                         sDefaultCurrencyCode);
   }
 
@@ -865,10 +865,10 @@ public class CIIToUBLConverter
             aUBLDelivery.setActualDeliveryDate (_parseDateDDMMYYYY (aODT.getDateTimeStringValue (), aErrorList));
         }
 
-        final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.LocationType ();
+        final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType ();
         boolean bUseLocation = false;
 
-        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType aUBLID = _extractPartyID (aShipToParty);
+        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType aUBLID = _extractPartyID (aShipToParty);
         if (aUBLID != null)
         {
           aUBLDeliveryLocation.setID (aUBLID);
@@ -1407,6 +1407,901 @@ public class CIIToUBLConverter
     return aUBLInvoice;
   }
 
+  @Nullable
+  protected CreditNoteType convertToCreditNote (@Nonnull final CrossIndustryInvoiceType aCIICreditNote,
+                                                @Nonnull final ErrorList aErrorList)
+  {
+    final ExchangedDocumentType aED = aCIICreditNote.getExchangedDocument ();
+    final SupplyChainTradeTransactionType aSCTT = aCIICreditNote.getSupplyChainTradeTransaction ();
+    if (aSCTT == null)
+    {
+      // Mandatory element
+      return null;
+    }
+
+    final HeaderTradeAgreementType aHeaderAgreement = aSCTT.getApplicableHeaderTradeAgreement ();
+    final HeaderTradeDeliveryType aHeaderDelivery = aSCTT.getApplicableHeaderTradeDelivery ();
+    final HeaderTradeSettlementType aHeaderSettlement = aSCTT.getApplicableHeaderTradeSettlement ();
+    if (aHeaderAgreement == null || aHeaderDelivery == null || aHeaderSettlement == null)
+    {
+      // All mandatory elements
+      return null;
+    }
+
+    final CreditNoteType aUBLCreditNote = new CreditNoteType ();
+    aUBLCreditNote.setUBLVersionID ("2.1");
+    aUBLCreditNote.setCustomizationID ("urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0");
+    aUBLCreditNote.setProfileID ("urn:fdc:peppol.eu:2017:poacc:billing:01:1.0");
+    if (aED != null)
+      aUBLCreditNote.setID (aED.getIDValue ());
+
+    // Mandatory supplier
+    final SupplierPartyType aUBLSupplier = new SupplierPartyType ();
+    aUBLCreditNote.setAccountingSupplierParty (aUBLSupplier);
+
+    // Mandatory customer
+    final CustomerPartyType aUBLCustomer = new CustomerPartyType ();
+    aUBLCreditNote.setAccountingCustomerParty (aUBLCustomer);
+
+    // IssueDate
+    {
+      XMLGregorianCalendar aIssueDate = null;
+      if (aED != null && aED.getIssueDateTime () != null)
+        aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue (), aErrorList);
+
+      if (aIssueDate != null)
+        aUBLCreditNote.setIssueDate (aIssueDate);
+    }
+
+    // DueDate
+    {
+      XMLGregorianCalendar aDueDate = null;
+      for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
+        if (aPaymentTerms.getDueDateDateTime () != null)
+        {
+          aDueDate = _parseDateDDMMYYYY (aPaymentTerms.getDueDateDateTime ().getDateTimeStringValue (), aErrorList);
+          if (aDueDate != null)
+            break;
+        }
+      if (aDueDate != null)
+        aUBLCreditNote.setDueDate (aDueDate);
+    }
+
+    // CreditNoteTypeCode
+    if (aED != null)
+      aUBLCreditNote.setCreditNoteTypeCode (aED.getTypeCodeValue ());
+
+    // Note
+    if (aED != null)
+      for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
+        aUBLCreditNote.addNote (_copyNote (aEDNote));
+
+    // TaxPointDate
+    for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
+    {
+      if (aTradeTax.getTaxPointDate () != null)
+      {
+        final XMLGregorianCalendar aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ()
+                                                                                .getDateStringValue (),
+                                                                       aErrorList);
+        if (aTaxPointDate != null)
+        {
+          // Use the first tax point date only
+          aUBLCreditNote.setTaxPointDate (aTaxPointDate);
+          break;
+        }
+      }
+    }
+
+    // DocumentCurrencyCode
+    final String sDefaultCurrencyCode = aHeaderSettlement.getInvoiceCurrencyCodeValue ();
+    aUBLCreditNote.setDocumentCurrencyCode (sDefaultCurrencyCode);
+
+    // TaxCurrencyCode
+    if (aHeaderSettlement.getTaxCurrencyCodeValue () != null)
+    {
+      aUBLCreditNote.setTaxCurrencyCode (aHeaderSettlement.getTaxCurrencyCodeValue ());
+    }
+
+    // AccountingCost
+    for (final TradeAccountingAccountType aAccount : aHeaderSettlement.getReceivableSpecifiedTradeAccountingAccount ())
+    {
+      final String sID = aAccount.getIDValue ();
+      if (StringHelper.hasText (sID))
+      {
+        // Use the first ID
+        aUBLCreditNote.setAccountingCost (sID);
+        break;
+      }
+    }
+
+    // BuyerReferences
+    if (aHeaderAgreement.getBuyerReferenceValue () != null)
+    {
+      aUBLCreditNote.setBuyerReference (aHeaderAgreement.getBuyerReferenceValue ());
+    }
+
+    // CreditNotePeriod
+    {
+      final SpecifiedPeriodType aSPT = aHeaderSettlement.getBillingSpecifiedPeriod ();
+      if (aSPT != null)
+      {
+        final DateTimeType aStartDT = aSPT.getStartDateTime ();
+        final DateTimeType aEndDT = aSPT.getEndDateTime ();
+
+        if (aStartDT != null && aEndDT != null)
+        {
+          final PeriodType aUBLPeriod = new PeriodType ();
+          aUBLPeriod.setStartDate (_parseDateDDMMYYYY (aStartDT.getDateTimeStringValue (), aErrorList));
+          aUBLPeriod.setEndDate (_parseDateDDMMYYYY (aEndDT.getDateTimeStringValue (), aErrorList));
+          aUBLCreditNote.addInvoicePeriod (aUBLPeriod);
+        }
+      }
+    }
+
+    // OrderReference
+    {
+      final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
+      final ReferencedDocumentType aBuyerOrderRef = aHeaderAgreement.getBuyerOrderReferencedDocument ();
+      if (aBuyerOrderRef != null)
+        aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
+      final ReferencedDocumentType aSellerOrderRef = aHeaderAgreement.getSellerOrderReferencedDocument ();
+      if (aSellerOrderRef != null)
+        aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
+
+      // Set if any field is set
+      if (aUBLOrderRef.getIDValue () != null || aUBLOrderRef.getSalesOrderIDValue () != null)
+        aUBLCreditNote.setOrderReference (aUBLOrderRef);
+    }
+
+    // BillingReference
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderSettlement.getInvoiceReferencedDocument (),
+                                                                          aErrorList);
+      if (aUBLDocRef != null)
+      {
+        final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
+        aUBLBillingRef.setCreditNoteDocumentReference (aUBLDocRef);
+        aUBLCreditNote.addBillingReference (aUBLBillingRef);
+      }
+    }
+
+    // DespatchDocumentReference
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getDespatchAdviceReferencedDocument (),
+                                                                          aErrorList);
+      if (aUBLDocRef != null)
+        aUBLCreditNote.addDespatchDocumentReference (aUBLDocRef);
+    }
+
+    // ReceiptDocumentReference
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getReceivingAdviceReferencedDocument (),
+                                                                          aErrorList);
+      if (aUBLDocRef != null)
+        aUBLCreditNote.addReceiptDocumentReference (aUBLDocRef);
+    }
+
+    // OriginatorDocumentReference
+    {
+      for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
+      {
+        // Use for "Tender or lot reference" with TypeCode "50"
+        if ("50".equals (aRD.getTypeCodeValue ()))
+        {
+          final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
+          if (aUBLDocRef != null)
+            aUBLCreditNote.addOriginatorDocumentReference (aUBLDocRef);
+        }
+      }
+    }
+
+    // ContractDocumentReference
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderAgreement.getContractReferencedDocument (),
+                                                                          aErrorList);
+      if (aUBLDocRef != null)
+        aUBLCreditNote.addContractDocumentReference (aUBLDocRef);
+    }
+
+    // AdditionalDocumentReference
+    {
+      for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
+      {
+        // Except OriginatorDocumentReference
+        if (!"50".equals (aRD.getTypeCodeValue ()))
+        {
+          final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
+          if (aUBLDocRef != null)
+            aUBLCreditNote.addAdditionalDocumentReference (aUBLDocRef);
+        }
+      }
+    }
+
+    // ProjectReference
+    {
+      final ProcuringProjectType aSpecifiedProcuring = aHeaderAgreement.getSpecifiedProcuringProject ();
+      if (aSpecifiedProcuring != null)
+      {
+        final String sID = aSpecifiedProcuring.getIDValue ();
+        if (StringHelper.hasText (sID))
+        {
+          final ProjectReferenceType aUBLProjectRef = new ProjectReferenceType ();
+          aUBLProjectRef.setID (sID);
+          aUBLCreditNote.addProjectReference (aUBLProjectRef);
+        }
+      }
+    }
+
+    // Supplier Party
+    {
+      final TradePartyType aSellerParty = aHeaderAgreement.getSellerTradeParty ();
+      if (aSellerParty != null)
+      {
+        final PartyType aUBLParty = _convertParty (aSellerParty);
+
+        for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
+          if (aUBLPartyTaxScheme != null)
+            aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
+
+        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aSellerParty);
+        if (aUBLPartyLegalEntity != null)
+          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+
+        final ContactType aUBLContact = _convertContact (aSellerParty);
+        if (aUBLContact != null)
+          aUBLParty.setContact (aUBLContact);
+
+        aUBLSupplier.setParty (aUBLParty);
+      }
+    }
+
+    // Customer Party
+    {
+      final TradePartyType aBuyerParty = aHeaderAgreement.getBuyerTradeParty ();
+      if (aBuyerParty != null)
+      {
+        final PartyType aUBLParty = _convertParty (aBuyerParty);
+
+        for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
+          if (aUBLPartyTaxScheme != null)
+            aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
+
+        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aBuyerParty);
+        if (aUBLPartyLegalEntity != null)
+          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+
+        final ContactType aUBLContact = _convertContact (aBuyerParty);
+        if (aUBLContact != null)
+          aUBLParty.setContact (aUBLContact);
+
+        aUBLCustomer.setParty (aUBLParty);
+      }
+    }
+
+    // Payee Party
+    {
+      final TradePartyType aPayeeParty = aHeaderSettlement.getPayeeTradeParty ();
+      if (aPayeeParty != null)
+      {
+        final PartyType aUBLParty = _convertParty (aPayeeParty);
+
+        for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
+          if (aUBLPartyTaxScheme != null)
+            aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
+
+        // validation rules warning
+        if (false)
+        {
+          final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aPayeeParty);
+          if (aUBLPartyLegalEntity != null)
+            aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        }
+
+        final ContactType aUBLContact = _convertContact (aPayeeParty);
+        if (aUBLContact != null)
+          aUBLParty.setContact (aUBLContact);
+
+        aUBLCreditNote.setPayeeParty (aUBLParty);
+      }
+    }
+
+    // Tax Representative Party
+    {
+      final TradePartyType aTaxRepresentativeParty = aHeaderAgreement.getSellerTaxRepresentativeTradeParty ();
+      if (aTaxRepresentativeParty != null)
+      {
+        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty);
+
+        for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
+        {
+          final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
+          if (aUBLPartyTaxScheme != null)
+            aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
+        }
+
+        // validation rules warning
+        if (false)
+        {
+          final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aTaxRepresentativeParty);
+          if (aUBLPartyLegalEntity != null)
+            aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        }
+
+        final ContactType aUBLContact = _convertContact (aTaxRepresentativeParty);
+        if (aUBLContact != null)
+          aUBLParty.setContact (aUBLContact);
+
+        aUBLCreditNote.setTaxRepresentativeParty (aUBLParty);
+      }
+    }
+
+    // Delivery
+    {
+      final TradePartyType aShipToParty = aHeaderDelivery.getShipToTradeParty ();
+      if (aShipToParty != null)
+      {
+        final DeliveryType aUBLDelivery = new DeliveryType ();
+
+        final SupplyChainEventType aSCE = aHeaderDelivery.getActualDeliverySupplyChainEvent ();
+        if (aSCE != null)
+        {
+          final DateTimeType aODT = aSCE.getOccurrenceDateTime ();
+          if (aODT != null)
+            aUBLDelivery.setActualDeliveryDate (_parseDateDDMMYYYY (aODT.getDateTimeStringValue (), aErrorList));
+        }
+
+        final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType ();
+        boolean bUseLocation = false;
+
+        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType aUBLID = _extractPartyID (aShipToParty);
+        if (aUBLID != null)
+        {
+          aUBLDeliveryLocation.setID (aUBLID);
+          bUseLocation = true;
+        }
+
+        final TradeAddressType aPostalAddress = aShipToParty.getPostalTradeAddress ();
+        if (aPostalAddress != null)
+        {
+          aUBLDeliveryLocation.setAddress (_convertPostalAddress (aPostalAddress));
+          bUseLocation = true;
+        }
+
+        if (bUseLocation)
+          aUBLDelivery.setDeliveryLocation (aUBLDeliveryLocation);
+
+        final TextType aName = aShipToParty.getName ();
+        if (aName != null)
+        {
+          final PartyType aUBLDeliveryParty = new PartyType ();
+          final PartyNameType aUBLPartyName = new PartyNameType ();
+          aUBLPartyName.setName (_copyName (aName, new NameType ()));
+          aUBLDeliveryParty.addPartyName (aUBLPartyName);
+          aUBLDelivery.setDeliveryParty (aUBLDeliveryParty);
+        }
+
+        aUBLCreditNote.addDelivery (aUBLDelivery);
+      }
+    }
+
+    // Payment means
+    {
+      for (final TradeSettlementPaymentMeansType aPaymentMeans : aHeaderSettlement.getSpecifiedTradeSettlementPaymentMeans ())
+      {
+        final PaymentMeansType aUBLPaymentMeans = new PaymentMeansType ();
+
+        final PaymentMeansCodeType aUBLPaymentMeansCode = new PaymentMeansCodeType ();
+        aUBLPaymentMeansCode.setValue (aPaymentMeans.getTypeCodeValue ());
+        if (aPaymentMeans.hasInformationEntries ())
+          aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
+        aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
+
+        final boolean bRequiresPayeeFinancialAccountID = "30".equals (aUBLPaymentMeansCode.getValue ()) ||
+                                                         "58".equals (aUBLPaymentMeansCode.getValue ());
+
+        for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
+        {
+          final PaymentIDType aUBLPaymentID = new PaymentIDType ();
+          aUBLPaymentID.setValue (aPaymentRef.getValue ());
+          aUBLPaymentMeans.addPaymentID (aUBLPaymentID);
+        }
+
+        final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
+        if (aCard != null)
+        {
+          final CardAccountType aUBLCardAccount = new CardAccountType ();
+          aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
+          // No CII field present
+          aUBLCardAccount.setNetworkID ("mapped-from-cii");
+          aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
+          aUBLPaymentMeans.setCardAccount (aUBLCardAccount);
+        }
+
+        {
+          final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+
+          final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
+          if (aAccount != null)
+          {
+            aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
+            aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName (), new NameType ()));
+          }
+          else
+          {
+            // For PaymentMeansCode 58
+            final DebtorFinancialAccountType aAccount2 = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
+            if (aAccount2 != null)
+            {
+              aUBLFinancialAccount.setID (_copyID (aAccount2.getIBANID ()));
+              aUBLFinancialAccount.setName (_copyName (aAccount2.getAccountName (), new NameType ()));
+            }
+          }
+
+          if (bRequiresPayeeFinancialAccountID && aUBLFinancialAccount.getID () == null)
+          {
+            // Ignore PaymentMeans because required IBAN is missing
+            continue;
+          }
+
+          final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
+          if (aInstitution != null)
+          {
+            final BranchType aUBLBranch = new BranchType ();
+            aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
+            aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
+          }
+
+          if (aUBLFinancialAccount.getID () != null ||
+              aUBLFinancialAccount.getName () != null ||
+              aUBLFinancialAccount.getFinancialInstitutionBranch () != null)
+            aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
+        }
+
+        {
+          boolean bUseMandate = false;
+          final PaymentMandateType aUBLPaymentMandate = new PaymentMandateType ();
+
+          for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
+          {
+            if (aPaymentTerms.hasDirectDebitMandateIDEntries ())
+            {
+              aUBLPaymentMandate.setID (_copyID (aPaymentTerms.getDirectDebitMandateIDAtIndex (0)));
+              bUseMandate = true;
+              break;
+            }
+          }
+
+          final IDType aCreditorRefID = aHeaderSettlement.getCreditorReferenceID ();
+          if (aCreditorRefID != null)
+          {
+            final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+            aUBLFinancialAccount.setID (_copyID (aCreditorRefID));
+            aUBLPaymentMandate.setPayerFinancialAccount (aUBLFinancialAccount);
+            bUseMandate = true;
+          }
+
+          if (bUseMandate)
+            aUBLPaymentMeans.setPaymentMandate (aUBLPaymentMandate);
+        }
+
+        aUBLCreditNote.addPaymentMeans (aUBLPaymentMeans);
+      }
+    }
+
+    // Payment Terms
+    {
+      for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
+      {
+        boolean bUsePaymenTerms = false;
+        final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
+
+        for (final TextType aDesc : aPaymentTerms.getDescription ())
+        {
+          aUBLPaymenTerms.addNote (_copyNote (aDesc));
+          bUsePaymenTerms = true;
+        }
+
+        if (bUsePaymenTerms)
+          aUBLCreditNote.addPaymentTerms (aUBLPaymenTerms);
+      }
+    }
+
+    // Allowance Charge
+    {
+      for (final TradeAllowanceChargeType aAllowanceCharge : aHeaderSettlement.getSpecifiedTradeAllowanceCharge ())
+      {
+        ETriState eIsCharge = ETriState.UNDEFINED;
+        if (aAllowanceCharge.getChargeIndicator () != null)
+          eIsCharge = _parseIndicator (aAllowanceCharge.getChargeIndicator (), aErrorList);
+        else
+          aErrorList.add (_buildError (new String [] { "CrossIndustryCreditNote",
+                                                       "SupplyChainTradeTransaction",
+                                                       "ApplicableHeaderTradeSettlement",
+                                                       "SpecifiedTradeAllowanceCharge" },
+                                       "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
+        if (eIsCharge.isDefined ())
+        {
+          final AllowanceChargeType aUBLAllowanceCharge = new AllowanceChargeType ();
+          aUBLAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
+          _copyAllowanceCharge (aAllowanceCharge, aUBLAllowanceCharge, sDefaultCurrencyCode);
+          aUBLCreditNote.addAllowanceCharge (aUBLAllowanceCharge);
+        }
+      }
+    }
+
+    final TradeSettlementHeaderMonetarySummationType aSTSHMS = aHeaderSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
+
+    // TaxTotal
+    {
+      TaxTotalType aUBLTaxTotal = null;
+      if (aSTSHMS != null && aSTSHMS.hasTaxTotalAmountEntries ())
+      {
+        // For all currencies
+        for (final AmountType aTaxTotalAmount : aSTSHMS.getTaxTotalAmount ())
+        {
+          final TaxTotalType aUBLCurTaxTotal = new TaxTotalType ();
+          aUBLCurTaxTotal.setTaxAmount (_copyAmount (aTaxTotalAmount, new TaxAmountType (), sDefaultCurrencyCode));
+          aUBLCreditNote.addTaxTotal (aUBLCurTaxTotal);
+
+          if (aUBLTaxTotal == null)
+          {
+            // Use the first one
+            aUBLTaxTotal = aUBLCurTaxTotal;
+          }
+        }
+      }
+      else
+      {
+        // Mandatory in UBL
+        final TaxAmountType aUBLTaxAmount = new TaxAmountType ();
+        aUBLTaxAmount.setValue (BigDecimal.ZERO);
+        aUBLTaxAmount.setCurrencyID (sDefaultCurrencyCode);
+
+        aUBLTaxTotal = new TaxTotalType ();
+        aUBLTaxTotal.setTaxAmount (aUBLTaxAmount);
+        aUBLCreditNote.addTaxTotal (aUBLTaxTotal);
+      }
+
+      for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
+      {
+        final TaxSubtotalType aUBLTaxSubtotal = new TaxSubtotalType ();
+
+        if (aTradeTax.hasBasisAmountEntries ())
+        {
+          aUBLTaxSubtotal.setTaxableAmount (_copyAmount (aTradeTax.getBasisAmountAtIndex (0),
+                                                         new TaxableAmountType (),
+                                                         sDefaultCurrencyCode));
+        }
+
+        if (aTradeTax.hasCalculatedAmountEntries ())
+        {
+          aUBLTaxSubtotal.setTaxAmount (_copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
+                                                     new TaxAmountType (),
+                                                     sDefaultCurrencyCode));
+        }
+
+        final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
+        aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
+        if (aTradeTax.getRateApplicablePercentValue () != null)
+          aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+        if (StringHelper.hasText (aTradeTax.getExemptionReasonCodeValue ()))
+          aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
+        if (aTradeTax.getExemptionReason () != null)
+        {
+          final TaxExemptionReasonType aUBLTaxExemptionReason = new TaxExemptionReasonType ();
+          aUBLTaxExemptionReason.setValue (aTradeTax.getExemptionReason ().getValue ());
+          aUBLTaxExemptionReason.setLanguageID (aTradeTax.getExemptionReason ().getLanguageID ());
+          aUBLTaxExemptionReason.setLanguageLocaleID (aTradeTax.getExemptionReason ().getLanguageLocaleID ());
+          aUBLTaxCategory.addTaxExemptionReason (aUBLTaxExemptionReason);
+        }
+        final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
+        aUBLTaxScheme.setID ("VAT");
+        aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
+        aUBLTaxSubtotal.setTaxCategory (aUBLTaxCategory);
+
+        aUBLTaxTotal.addTaxSubtotal (aUBLTaxSubtotal);
+      }
+    }
+
+    // LegalMonetaryTotal
+    {
+      final MonetaryTotalType aUBLMonetaryTotal = new MonetaryTotalType ();
+      if (aSTSHMS != null)
+      {
+        if (aSTSHMS.hasLineTotalAmountEntries ())
+          aUBLMonetaryTotal.setLineExtensionAmount (_copyAmount (aSTSHMS.getLineTotalAmountAtIndex (0),
+                                                                 new LineExtensionAmountType (),
+                                                                 sDefaultCurrencyCode));
+        if (aSTSHMS.hasTaxBasisTotalAmountEntries ())
+          aUBLMonetaryTotal.setTaxExclusiveAmount (_copyAmount (aSTSHMS.getTaxBasisTotalAmountAtIndex (0),
+                                                                new TaxExclusiveAmountType (),
+                                                                sDefaultCurrencyCode));
+        if (aSTSHMS.hasGrandTotalAmountEntries ())
+          aUBLMonetaryTotal.setTaxInclusiveAmount (_copyAmount (aSTSHMS.getGrandTotalAmountAtIndex (0),
+                                                                new TaxInclusiveAmountType (),
+                                                                sDefaultCurrencyCode));
+        if (aSTSHMS.hasAllowanceTotalAmountEntries ())
+          aUBLMonetaryTotal.setAllowanceTotalAmount (_copyAmount (aSTSHMS.getAllowanceTotalAmountAtIndex (0),
+                                                                  new AllowanceTotalAmountType (),
+                                                                  sDefaultCurrencyCode));
+        if (aSTSHMS.hasChargeTotalAmountEntries ())
+          aUBLMonetaryTotal.setChargeTotalAmount (_copyAmount (aSTSHMS.getChargeTotalAmountAtIndex (0),
+                                                               new ChargeTotalAmountType (),
+                                                               sDefaultCurrencyCode));
+        if (aSTSHMS.hasTotalPrepaidAmountEntries ())
+          aUBLMonetaryTotal.setPrepaidAmount (_copyAmount (aSTSHMS.getTotalPrepaidAmountAtIndex (0),
+                                                           new PrepaidAmountType (),
+                                                           sDefaultCurrencyCode));
+        if (aSTSHMS.hasRoundingAmountEntries ())
+          aUBLMonetaryTotal.setPayableRoundingAmount (_copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
+                                                                   new PayableRoundingAmountType (),
+                                                                   sDefaultCurrencyCode));
+        if (aSTSHMS.hasDuePayableAmountEntries ())
+          aUBLMonetaryTotal.setPayableAmount (_copyAmount (aSTSHMS.getDuePayableAmountAtIndex (0),
+                                                           new PayableAmountType (),
+                                                           sDefaultCurrencyCode));
+      }
+      aUBLCreditNote.setLegalMonetaryTotal (aUBLMonetaryTotal);
+    }
+
+    // All invoice lines
+    for (final SupplyChainTradeLineItemType aLineItem : aSCTT.getIncludedSupplyChainTradeLineItem ())
+    {
+      final CreditNoteLineType aUBLCreditNoteLine = new CreditNoteLineType ();
+
+      final DocumentLineDocumentType aDLD = aLineItem.getAssociatedDocumentLineDocument ();
+      aUBLCreditNoteLine.setID (_copyID (aDLD.getLineID ()));
+
+      // Note
+      for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
+        aUBLCreditNoteLine.addNote (_copyNote (aLineNote));
+
+      // CreditNoted quantity
+      final LineTradeDeliveryType aLineDelivery = aLineItem.getSpecifiedLineTradeDelivery ();
+      if (aLineDelivery != null)
+      {
+        final QuantityType aBilledQuantity = aLineDelivery.getBilledQuantity ();
+        if (aBilledQuantity != null)
+        {
+          aUBLCreditNoteLine.setCreditedQuantity (_copyQuantity (aBilledQuantity, new CreditedQuantityType ()));
+        }
+      }
+
+      // Line extension amount
+      final LineTradeSettlementType aLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
+      final TradeSettlementLineMonetarySummationType aSTSLMS = aLineSettlement.getSpecifiedTradeSettlementLineMonetarySummation ();
+      if (aSTSLMS != null)
+      {
+        if (aSTSLMS.hasLineTotalAmountEntries ())
+          aUBLCreditNoteLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
+                                                                  new LineExtensionAmountType (),
+                                                                  sDefaultCurrencyCode));
+      }
+
+      // Accounting cost
+      if (aLineSettlement.hasReceivableSpecifiedTradeAccountingAccountEntries ())
+      {
+        final TradeAccountingAccountType aLineAA = aLineSettlement.getReceivableSpecifiedTradeAccountingAccountAtIndex (0);
+        aUBLCreditNoteLine.setAccountingCost (aLineAA.getIDValue ());
+      }
+
+      // CreditNote period
+      final SpecifiedPeriodType aLineBillingPeriod = aLineSettlement.getBillingSpecifiedPeriod ();
+      if (aLineBillingPeriod != null)
+      {
+        final PeriodType aUBLLinePeriod = new PeriodType ();
+        if (aLineBillingPeriod.getStartDateTime () != null)
+          aUBLLinePeriod.setStartDate (_parseDateDDMMYYYY (aLineBillingPeriod.getStartDateTime ()
+                                                                             .getDateTimeStringValue (),
+                                                           aErrorList));
+        if (aLineBillingPeriod.getEndDateTime () != null)
+          aUBLLinePeriod.setEndDate (_parseDateDDMMYYYY (aLineBillingPeriod.getEndDateTime ().getDateTimeStringValue (),
+                                                         aErrorList));
+        aUBLCreditNoteLine.addInvoicePeriod (aUBLLinePeriod);
+      }
+
+      // Order line reference
+      final LineTradeAgreementType aLineAgreement = aLineItem.getSpecifiedLineTradeAgreement ();
+      if (aLineAgreement != null)
+      {
+        final ReferencedDocumentType aOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
+        if (aOrderReference != null)
+        {
+          final OrderLineReferenceType aUBLOrderLineReference = new OrderLineReferenceType ();
+          aUBLOrderLineReference.setLineID (_copyID (aOrderReference.getLineID (), new LineIDType ()));
+          aUBLCreditNoteLine.addOrderLineReference (aUBLOrderLineReference);
+        }
+      }
+
+      // Document reference
+      for (final ReferencedDocumentType aLineReferencedDocument : aLineSettlement.getAdditionalReferencedDocument ())
+      {
+        final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aLineReferencedDocument, aErrorList);
+        if (aUBLDocRef != null)
+          aUBLCreditNoteLine.addDocumentReference (aUBLDocRef);
+      }
+
+      // Allowance charge
+      for (final TradeAllowanceChargeType aLineAllowanceCharge : aLineSettlement.getSpecifiedTradeAllowanceCharge ())
+      {
+        ETriState eIsCharge = ETriState.UNDEFINED;
+        if (aLineAllowanceCharge.getChargeIndicator () != null)
+          eIsCharge = _parseIndicator (aLineAllowanceCharge.getChargeIndicator (), aErrorList);
+        else
+          aErrorList.add (_buildError (new String [] { "CrossIndustryCreditNote",
+                                                       "SupplyChainTradeTransaction",
+                                                       "IncludedSupplyChainTradeLineItem",
+                                                       "SpecifiedLineTradeSettlement",
+                                                       "SpecifiedTradeAllowanceCharge" },
+                                       "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
+        if (eIsCharge.isDefined ())
+        {
+          final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
+          aUBLLineAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
+          _copyAllowanceCharge (aLineAllowanceCharge, aUBLLineAllowanceCharge, sDefaultCurrencyCode);
+          aUBLCreditNoteLine.addAllowanceCharge (aUBLLineAllowanceCharge);
+        }
+      }
+
+      // Item
+      final ItemType aUBLItem = new ItemType ();
+      final TradeProductType aLineProduct = aLineItem.getSpecifiedTradeProduct ();
+      if (aLineProduct != null)
+      {
+        final TextType aDescription = aLineProduct.getDescription ();
+        if (aDescription != null)
+          aUBLItem.addDescription (_copyName (aDescription, new DescriptionType ()));
+
+        if (aLineProduct.hasNameEntries ())
+          aUBLItem.setName (_copyName (aLineProduct.getNameAtIndex (0), new NameType ()));
+
+        final IDType aBuyerAssignedID = aLineProduct.getBuyerAssignedID ();
+        if (aBuyerAssignedID != null)
+        {
+          final ItemIdentificationType aUBLID = new ItemIdentificationType ();
+          aUBLID.setID (_copyID (aBuyerAssignedID));
+          aUBLItem.setBuyersItemIdentification (aUBLID);
+        }
+
+        final IDType aSellerAssignedID = aLineProduct.getSellerAssignedID ();
+        if (aSellerAssignedID != null)
+        {
+          final ItemIdentificationType aUBLID = new ItemIdentificationType ();
+          aUBLID.setID (_copyID (aSellerAssignedID));
+          aUBLItem.setSellersItemIdentification (aUBLID);
+        }
+
+        final IDType aGlobalID = aLineProduct.getGlobalID ();
+        if (aGlobalID != null)
+        {
+          final ItemIdentificationType aUBLID = new ItemIdentificationType ();
+          aUBLID.setID (_copyID (aGlobalID));
+          aUBLItem.setStandardItemIdentification (aUBLID);
+        }
+
+        final TradeCountryType aOriginCountry = aLineProduct.getOriginTradeCountry ();
+        if (aOriginCountry != null)
+        {
+          final CountryType aUBLCountry = new CountryType ();
+          aUBLCountry.setIdentificationCode (aOriginCountry.getIDValue ());
+          if (aOriginCountry.hasNameEntries ())
+            aUBLCountry.setName (_copyName (aOriginCountry.getNameAtIndex (0), new NameType ()));
+          aUBLItem.setOriginCountry (aUBLCountry);
+        }
+
+        // Commodity Classification
+        for (final ProductClassificationType aLineProductClassification : aLineProduct.getDesignatedProductClassification ())
+        {
+          final CodeType aClassCode = aLineProductClassification.getClassCode ();
+          if (aClassCode != null)
+          {
+            final CommodityClassificationType aUBLCommodityClassification = new CommodityClassificationType ();
+            aUBLCommodityClassification.setItemClassificationCode (_copyCode (aClassCode,
+                                                                              new ItemClassificationCodeType ()));
+            aUBLItem.addCommodityClassification (aUBLCommodityClassification);
+          }
+        }
+      }
+
+      for (final TradeTaxType aTradeTax : aLineSettlement.getApplicableTradeTax ())
+      {
+        final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
+        aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
+        if (aTradeTax.getRateApplicablePercentValue () != null)
+          aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+        final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
+        aUBLTaxScheme.setID ("VAT");
+        aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
+        aUBLItem.addClassifiedTaxCategory (aUBLTaxCategory);
+      }
+
+      if (aLineProduct != null)
+      {
+        for (final ProductCharacteristicType aAPC : aLineProduct.getApplicableProductCharacteristic ())
+          if (aAPC.hasDescriptionEntries ())
+          {
+            final ItemPropertyType aUBLAdditionalItem = new ItemPropertyType ();
+            aUBLAdditionalItem.setName (_copyName (aAPC.getDescriptionAtIndex (0), new NameType ()));
+            if (aAPC.hasValueEntries ())
+              aUBLAdditionalItem.setValue (aAPC.getValueAtIndex (0).getValue ());
+            aUBLItem.addAdditionalItemProperty (aUBLAdditionalItem);
+          }
+      }
+
+      final PriceType aUBLPrice = new PriceType ();
+      boolean bUsePrice = false;
+      if (aLineAgreement != null)
+      {
+
+        final TradePriceType aNPPTP = aLineAgreement.getNetPriceProductTradePrice ();
+        if (aNPPTP != null)
+        {
+          if (aNPPTP.hasChargeAmountEntries ())
+          {
+            aUBLPrice.setPriceAmount (_copyAmount (aNPPTP.getChargeAmountAtIndex (0),
+                                                   new PriceAmountType (),
+                                                   sDefaultCurrencyCode));
+            bUsePrice = true;
+          }
+        }
+
+        final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
+        if (aGPPTP != null)
+        {
+          if (aGPPTP.getBasisQuantity () != null)
+          {
+            aUBLPrice.setBaseQuantity (_copyQuantity (aGPPTP.getBasisQuantity (), new BaseQuantityType ()));
+            bUsePrice = true;
+          }
+        }
+      }
+
+      // Allowance charge
+      final TradePriceType aTradePrice = aLineAgreement.getNetPriceProductTradePrice ();
+      if (aTradePrice != null)
+        for (final TradeAllowanceChargeType aPriceAllowanceCharge : aTradePrice.getAppliedTradeAllowanceCharge ())
+        {
+          ETriState eIsCharge = ETriState.UNDEFINED;
+          if (aPriceAllowanceCharge.getChargeIndicator () != null)
+            eIsCharge = _parseIndicator (aPriceAllowanceCharge.getChargeIndicator (), aErrorList);
+          else
+            aErrorList.add (_buildError (new String [] { "CrossIndustryCreditNote",
+                                                         "SupplyChainTradeTransaction",
+                                                         "IncludedSupplyChainTradeLineItem",
+                                                         "SpecifiedLineTradeAgreement",
+                                                         "NetPriceProductTradePrice",
+                                                         "AppliedTradeAllowanceCharge" },
+                                         "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
+          if (eIsCharge.isDefined ())
+          {
+            final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
+            aUBLLineAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
+            _copyAllowanceCharge (aPriceAllowanceCharge, aUBLLineAllowanceCharge, sDefaultCurrencyCode);
+            aUBLPrice.addAllowanceCharge (aUBLLineAllowanceCharge);
+          }
+        }
+
+      if (bUsePrice)
+        aUBLCreditNoteLine.setPrice (aUBLPrice);
+
+      aUBLCreditNoteLine.setItem (aUBLItem);
+
+      aUBLCreditNote.addCreditNoteLine (aUBLCreditNoteLine);
+    }
+
+    return aUBLCreditNote;
+  }
+
   /**
    * Convert CII to UBL
    *
@@ -1464,9 +2359,7 @@ public class CIIToUBLConverter
       return aUBLInvoice;
     }
 
-    LOGGER.info ("CreditNote is not yet supported");
-    // Credit note
-    // TODO
-    return null;
+    final CreditNoteType aUBLCreditNote = convertToCreditNote (aCIIInvoice, aErrorList);
+    return aUBLCreditNote;
   }
 }
