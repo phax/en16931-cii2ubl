@@ -20,7 +20,6 @@ package com.helger.en16931.cii2ubl;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,15 +28,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.CGlobal;
 import com.helger.commons.ValueEnforcer;
-import com.helger.commons.datetime.PDTFromString;
-import com.helger.commons.error.IError;
-import com.helger.commons.error.SingleError;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.math.MathHelper;
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
-import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.*;
@@ -52,7 +47,6 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.IndicatorType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
@@ -61,110 +55,15 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  *
  * @author Philip Helger
  */
-public class CIIToUBLConverter
+public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
 {
-  public CIIToUBLConverter ()
+  public CIIToUBL22Converter ()
   {}
-
-  @Nonnull
-  private static IError _buildError (@Nullable final String [] aPath, final String sErrorMsg)
-  {
-    return SingleError.builderError ()
-                      .setErrorText (sErrorMsg)
-                      .setErrorFieldName (aPath == null ? null : StringHelper.getImploded ('/', aPath))
-                      .build ();
-  }
-
-  @Nullable
-  private static XMLGregorianCalendar _parseDateDDMMYYYY (@Nullable final String sDate,
-                                                          @Nonnull final IErrorList aErrorList)
-  {
-    if (StringHelper.hasNoText (sDate))
-      return null;
-
-    final LocalDate aDate = PDTFromString.getLocalDateFromString (sDate, "uuuuMMdd");
-    if (aDate == null)
-      aErrorList.add (_buildError (null, "Failed to parse the date '" + sDate + "'"));
-
-    return PDTXMLConverter.getXMLCalendarDate (aDate);
-  }
-
-  @Nonnull
-  private static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator,
-                                            @Nonnull final IErrorList aErrorList)
-  {
-    if (aIndicator == null)
-      return ETriState.UNDEFINED;
-
-    // Choice
-    if (aIndicator.isIndicator () != null)
-      return ETriState.valueOf (aIndicator.isIndicator ().booleanValue ());
-
-    if (aIndicator.getIndicatorString () != null)
-    {
-      final String sIndicator = aIndicator.getIndicatorStringValue ();
-      // Parse string
-      if (sIndicator == null)
-        return ETriState.UNDEFINED;
-      if ("true".equals (sIndicator))
-        return ETriState.TRUE;
-      if ("false".equals (sIndicator))
-        return ETriState.FALSE;
-
-      aErrorList.add (_buildError (null,
-                                   "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
-      return ETriState.UNDEFINED;
-    }
-
-    throw new IllegalStateException ("Indicator has neither string nor boolen");
-  }
-
-  /**
-   * Copy all ID parts from a CII ID to a CCTS/UBL ID.
-   *
-   * @param aCIIID
-   *        CII ID
-   * @param aUBLID
-   *        UBL ID
-   * @return Created UBL ID
-   */
-  @Nullable
-  private static <T extends com.helger.xsds.ccts.cct.schemamodule.IdentifierType> T _copyID (@Nullable final IDType aCIIID,
-                                                                                             @Nonnull final T aUBLID)
-  {
-    if (aCIIID == null)
-      return null;
-    if (StringHelper.hasNoText (aCIIID.getValue ()))
-      return null;
-
-    aUBLID.setValue (aCIIID.getValue ());
-    aUBLID.setSchemeID (aCIIID.getSchemeID ());
-    aUBLID.setSchemeName (aCIIID.getSchemeName ());
-    aUBLID.setSchemeAgencyID (aCIIID.getSchemeAgencyID ());
-    aUBLID.setSchemeAgencyName (aCIIID.getSchemeAgencyName ());
-    aUBLID.setSchemeVersionID (aCIIID.getSchemeVersionID ());
-    aUBLID.setSchemeDataURI (aCIIID.getSchemeDataURI ());
-    aUBLID.setSchemeURI (aCIIID.getSchemeURI ());
-    return aUBLID;
-  }
 
   @Nullable
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType _copyID (@Nullable final IDType aCIIID)
   {
     return _copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType ());
-  }
-
-  @Nullable
-  private static <T extends com.helger.xsds.ccts.cct.schemamodule.TextType> T _copyName (@Nullable final TextType aName,
-                                                                                         @Nonnull final T ret)
-  {
-    if (aName == null)
-      return null;
-
-    ret.setValue (aName.getValue ());
-    ret.setLanguageID (aName.getLanguageID ());
-    ret.setLanguageLocaleID (aName.getLanguageLocaleID ());
-    return ret;
   }
 
   @Nullable
@@ -188,14 +87,7 @@ public class CIIToUBLConverter
   @Nullable
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType _copyNote (@Nullable final TextType aText)
   {
-    if (aText == null)
-      return null;
-
-    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType ();
-    aUBLNote.setValue (aText.getValue ());
-    aUBLNote.setLanguageID (aText.getLanguageID ());
-    aUBLNote.setLanguageLocaleID (aText.getLanguageLocaleID ());
-    return aUBLNote;
+    return _copyName (aText, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType ());
   }
 
   @Nullable
@@ -339,7 +231,7 @@ public class CIIToUBLConverter
 
     String sSchemeID = aTaxRegistration.getID ().getSchemeID ();
     if (StringHelper.hasNoText (sSchemeID))
-      sSchemeID = "VAT";
+      sSchemeID = DEFAULT_VAT_SCHEME;
 
     final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
     aUBLTaxScheme.setID (sSchemeID);
@@ -411,63 +303,12 @@ public class CIIToUBLConverter
   }
 
   @Nullable
-  private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_22.AmountType> T _copyAmount (@Nullable final AmountType aAmount,
-                                                                                                                        @Nonnull final T ret,
-                                                                                                                        @Nullable final String sDefaultCurrencyCode)
-  {
-    if (aAmount == null)
-      return null;
-
-    ret.setValue (aAmount.getValue ());
-    ret.setCurrencyID (aAmount.getCurrencyID ());
-    if (StringHelper.hasNoText (ret.getCurrencyID ()))
-      ret.setCurrencyID (sDefaultCurrencyCode);
-    ret.setCurrencyCodeListVersionID (aAmount.getCurrencyCodeListVersionID ());
-    return ret;
-  }
-
-  @Nullable
-  private static <T extends oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_22.QuantityType> T _copyQuantity (@Nullable final QuantityType aQuantity,
-                                                                                                                            @Nonnull final T ret)
-  {
-    if (aQuantity == null)
-      return null;
-
-    ret.setValue (aQuantity.getValue ());
-    ret.setUnitCode (aQuantity.getUnitCode ());
-    ret.setUnitCodeListID (aQuantity.getUnitCodeListID ());
-    ret.setUnitCodeListAgencyID (aQuantity.getUnitCodeListAgencyID ());
-    ret.setUnitCodeListAgencyName (aQuantity.getUnitCodeListAgencyName ());
-    return ret;
-  }
-
-  @Nullable
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AmountType _copyAmount (@Nullable final AmountType aAmount,
                                                                                                            @Nullable final String sDefaultCurrencyCode)
   {
     return _copyAmount (aAmount,
                         new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AmountType (),
                         sDefaultCurrencyCode);
-  }
-
-  @Nullable
-  private static <T extends com.helger.xsds.ccts.cct.schemamodule.CodeType> T _copyCode (@Nullable final CodeType aCode,
-                                                                                         @Nonnull final T ret)
-  {
-    if (aCode == null)
-      return null;
-
-    ret.setValue (aCode.getValue ());
-    ret.setListID (aCode.getListID ());
-    ret.setListAgencyID (aCode.getListAgencyID ());
-    ret.setListAgencyName (aCode.getListAgencyName ());
-    ret.setListName (aCode.getListName ());
-    ret.setListVersionID (aCode.getListVersionID ());
-    ret.setName (aCode.getName ());
-    ret.setLanguageID (aCode.getLanguageID ());
-    ret.setListURI (aCode.getListURI ());
-    ret.setListSchemeURI (aCode.getListSchemeURI ());
-    return ret;
   }
 
   private static void _copyAllowanceCharge (@Nonnull final TradeAllowanceChargeType aAllowanceCharge,
@@ -506,7 +347,7 @@ public class CIIToUBLConverter
       if (aTradeTax.getRateApplicablePercentValue () != null)
         aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
       final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-      aUBLTaxScheme.setID ("VAT");
+      aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
       aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
       aUBLAllowanceCharge.addTaxCategory (aUBLTaxCategory);
     }
@@ -534,9 +375,9 @@ public class CIIToUBLConverter
     }
 
     final InvoiceType aUBLInvoice = new InvoiceType ();
-    aUBLInvoice.setUBLVersionID ("2.1");
-    aUBLInvoice.setCustomizationID ("urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0");
-    aUBLInvoice.setProfileID ("urn:fdc:peppol.eu:2017:poacc:billing:01:1.0");
+    aUBLInvoice.setUBLVersionID ("2.2");
+    aUBLInvoice.setCustomizationID (DEFAULT_CUSTOMIZATION_ID);
+    aUBLInvoice.setProfileID (DEFAULT_PROFILE_ID);
     if (aED != null)
       aUBLInvoice.setID (aED.getIDValue ());
 
@@ -692,7 +533,7 @@ public class CIIToUBLConverter
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Use for "Tender or lot reference" with TypeCode "50"
-        if ("50".equals (aRD.getTypeCodeValue ()))
+        if (isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
@@ -714,7 +555,7 @@ public class CIIToUBLConverter
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Except OriginatorDocumentReference
-        if (!"50".equals (aRD.getTypeCodeValue ()))
+        if (!isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
@@ -911,8 +752,7 @@ public class CIIToUBLConverter
           aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
         aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
 
-        final boolean bRequiresPayeeFinancialAccountID = "30".equals (aUBLPaymentMeansCode.getValue ()) ||
-                                                         "58".equals (aUBLPaymentMeansCode.getValue ());
+        final boolean bRequiresPayeeFinancialAccountID = paymentMeansCodeRequiresPayeeFinancialAccountID (aUBLPaymentMeansCode.getValue ());
 
         for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
         {
@@ -927,7 +767,7 @@ public class CIIToUBLConverter
           final CardAccountType aUBLCardAccount = new CardAccountType ();
           aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
           // No CII field present
-          aUBLCardAccount.setNetworkID ("mapped-from-cii");
+          aUBLCardAccount.setNetworkID (DEFAULT_CARD_ACCOUNT_NETWORK_ID);
           aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
           aUBLPaymentMeans.setCardAccount (aUBLCardAccount);
         }
@@ -1110,7 +950,7 @@ public class CIIToUBLConverter
           aUBLTaxCategory.addTaxExemptionReason (aUBLTaxExemptionReason);
         }
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-        aUBLTaxScheme.setID ("VAT");
+        aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
         aUBLTaxSubtotal.setTaxCategory (aUBLTaxCategory);
 
@@ -1325,7 +1165,7 @@ public class CIIToUBLConverter
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-        aUBLTaxScheme.setID ("VAT");
+        aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
         aUBLItem.addClassifiedTaxCategory (aUBLTaxCategory);
       }
@@ -1429,9 +1269,9 @@ public class CIIToUBLConverter
     }
 
     final CreditNoteType aUBLCreditNote = new CreditNoteType ();
-    aUBLCreditNote.setUBLVersionID ("2.1");
-    aUBLCreditNote.setCustomizationID ("urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0");
-    aUBLCreditNote.setProfileID ("urn:fdc:peppol.eu:2017:poacc:billing:01:1.0");
+    aUBLCreditNote.setUBLVersionID ("2.2");
+    aUBLCreditNote.setCustomizationID (DEFAULT_CUSTOMIZATION_ID);
+    aUBLCreditNote.setProfileID (DEFAULT_PROFILE_ID);
     if (aED != null)
       aUBLCreditNote.setID (aED.getIDValue ());
 
@@ -1587,7 +1427,7 @@ public class CIIToUBLConverter
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Use for "Tender or lot reference" with TypeCode "50"
-        if ("50".equals (aRD.getTypeCodeValue ()))
+        if (isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
@@ -1609,7 +1449,7 @@ public class CIIToUBLConverter
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Except OriginatorDocumentReference
-        if (!"50".equals (aRD.getTypeCodeValue ()))
+        if (!isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
@@ -1806,8 +1646,7 @@ public class CIIToUBLConverter
           aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
         aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
 
-        final boolean bRequiresPayeeFinancialAccountID = "30".equals (aUBLPaymentMeansCode.getValue ()) ||
-                                                         "58".equals (aUBLPaymentMeansCode.getValue ());
+        final boolean bRequiresPayeeFinancialAccountID = paymentMeansCodeRequiresPayeeFinancialAccountID (aUBLPaymentMeansCode.getValue ());
 
         for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
         {
@@ -1822,7 +1661,7 @@ public class CIIToUBLConverter
           final CardAccountType aUBLCardAccount = new CardAccountType ();
           aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
           // No CII field present
-          aUBLCardAccount.setNetworkID ("mapped-from-cii");
+          aUBLCardAccount.setNetworkID (DEFAULT_CARD_ACCOUNT_NETWORK_ID);
           aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
           aUBLPaymentMeans.setCardAccount (aUBLCardAccount);
         }
@@ -2005,7 +1844,7 @@ public class CIIToUBLConverter
           aUBLTaxCategory.addTaxExemptionReason (aUBLTaxExemptionReason);
         }
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-        aUBLTaxScheme.setID ("VAT");
+        aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
         aUBLTaxSubtotal.setTaxCategory (aUBLTaxCategory);
 
@@ -2220,7 +2059,7 @@ public class CIIToUBLConverter
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-        aUBLTaxScheme.setID ("VAT");
+        aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
         aUBLItem.addClassifiedTaxCategory (aUBLTaxCategory);
       }

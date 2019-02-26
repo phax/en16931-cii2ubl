@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.bdve.en16931.EN16931Validation;
-import com.helger.bdve.executorset.ValidationExecutorSetRegistry;
 import com.helger.bdve.result.ValidationResult;
 import com.helger.bdve.result.ValidationResultList;
 import com.helger.bdve.source.ValidationSource;
@@ -50,42 +49,26 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 
 /**
- * Test class for class {@link CIIToUBLConverter}.
+ * Test class for class {@link CIIToUBL22Converter}.
  *
  * @author Philip Helger
  */
-public final class CIIToUBLConverterTest
+public final class CIIToUBL22ConverterTest
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverterTest.class);
-  private static final String [] TEST_FILES = new String [] { "CII_business_example_01.xml",
-                                                              "CII_business_example_02.xml",
-                                                              "CII_example1.xml",
-                                                              "CII_example2.xml",
-                                                              "CII_example3.xml",
-                                                              "CII_example4.xml",
-                                                              "CII_example5.xml",
-                                                              "CII_example6.xml",
-                                                              "CII_example7.xml",
-                                                              "CII_example8.xml",
-                                                              "CII_example9.xml" };
-  private static final ValidationExecutorSetRegistry VES_REGISTRY = new ValidationExecutorSetRegistry ();
-  static
-  {
-    EN16931Validation.initEN16931 (VES_REGISTRY);
-  }
+  private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBL22ConverterTest.class);
 
   @Test
   public void testConvertAndValidateAll ()
   {
-    for (final String sFilename : TEST_FILES)
+    for (final String sFilename : MockSettings.TEST_FILES)
     {
       LOGGER.info ("Converting " + sFilename + " to UBL");
 
       // Main conversion
       final ErrorList aErrorList = new ErrorList ();
-      final Serializable aInvoice = new CIIToUBLConverter ().convertCIItoUBL (new File ("src/test/resources/cii",
-                                                                                        sFilename),
-                                                                              aErrorList);
+      final Serializable aInvoice = new CIIToUBL22Converter ().convertCIItoUBL (new File ("src/test/resources/cii",
+                                                                                          sFilename),
+                                                                                aErrorList);
       assertTrue ("Errors: " + aErrorList.toString (), aErrorList.isEmpty ());
       assertNotNull (aInvoice);
 
@@ -101,9 +84,9 @@ public final class CIIToUBLConverterTest
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
-        aResultList = VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_110)
-                                  .createExecutionManager ()
-                                  .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
+        aResultList = MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_110)
+                                               .createExecutionManager ()
+                                               .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
       }
       else
       {
@@ -114,9 +97,9 @@ public final class CIIToUBLConverterTest
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
-        aResultList = VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_CREDIT_NOTE_110)
-                                  .createExecutionManager ()
-                                  .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
+        aResultList = MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_CREDIT_NOTE_110)
+                                               .createExecutionManager ()
+                                               .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
       }
 
       assertNotNull (aResultList);
@@ -130,7 +113,7 @@ public final class CIIToUBLConverterTest
   @Nullable
   private static Serializable _convert (final CrossIndustryInvoiceType aInvoice)
   {
-    return new CIIToUBLConverter ().convertCIItoUBL (aInvoice, new ErrorList ());
+    return new CIIToUBL22Converter ().convertCIItoUBL (aInvoice, new ErrorList ());
   }
 
   @Test
