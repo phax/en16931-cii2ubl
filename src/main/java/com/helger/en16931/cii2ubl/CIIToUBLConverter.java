@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.CGlobal;
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.error.IError;
 import com.helger.commons.error.SingleError;
@@ -511,21 +512,33 @@ public class CIIToUBLConverter
     }
   }
 
-  @Nonnull
-  private InvoiceType _convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
-                                         @Nonnull final ErrorList aErrorList)
+  @Nullable
+  protected InvoiceType convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
+                                          @Nonnull final ErrorList aErrorList)
   {
     final ExchangedDocumentType aED = aCIIInvoice.getExchangedDocument ();
     final SupplyChainTradeTransactionType aSCTT = aCIIInvoice.getSupplyChainTradeTransaction ();
+    if (aSCTT == null)
+    {
+      // Mandatory element
+      return null;
+    }
+
     final HeaderTradeAgreementType aHeaderAgreement = aSCTT.getApplicableHeaderTradeAgreement ();
     final HeaderTradeDeliveryType aHeaderDelivery = aSCTT.getApplicableHeaderTradeDelivery ();
     final HeaderTradeSettlementType aHeaderSettlement = aSCTT.getApplicableHeaderTradeSettlement ();
+    if (aHeaderAgreement == null || aHeaderDelivery == null || aHeaderSettlement == null)
+    {
+      // All mandatory elements
+      return null;
+    }
 
     final InvoiceType aUBLInvoice = new InvoiceType ();
     aUBLInvoice.setUBLVersionID ("2.1");
     aUBLInvoice.setCustomizationID ("urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0");
     aUBLInvoice.setProfileID ("urn:fdc:peppol.eu:2017:poacc:billing:01:1.0");
-    aUBLInvoice.setID (aED.getIDValue ());
+    if (aED != null)
+      aUBLInvoice.setID (aED.getIDValue ());
 
     // Mandatory supplier
     final SupplierPartyType aUBLSupplier = new SupplierPartyType ();
@@ -538,7 +551,7 @@ public class CIIToUBLConverter
     // IssueDate
     {
       XMLGregorianCalendar aIssueDate = null;
-      if (aED.getIssueDateTime () != null)
+      if (aED != null && aED.getIssueDateTime () != null)
         aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue (), aErrorList);
 
       if (aIssueDate != null)
@@ -560,13 +573,13 @@ public class CIIToUBLConverter
     }
 
     // InvoiceTypeCode
-    aUBLInvoice.setInvoiceTypeCode (aED.getTypeCodeValue ());
+    if (aED != null)
+      aUBLInvoice.setInvoiceTypeCode (aED.getTypeCodeValue ());
 
     // Note
-    {
+    if (aED != null)
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
         aUBLInvoice.addNote (_copyNote (aEDNote));
-    }
 
     // TaxPointDate
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
@@ -1391,7 +1404,6 @@ public class CIIToUBLConverter
       aUBLInvoice.addInvoiceLine (aUBLInvoiceLine);
     }
 
-    // TODO
     return aUBLInvoice;
   }
 
@@ -1408,21 +1420,47 @@ public class CIIToUBLConverter
   @Nullable
   public Serializable convertCIItoUBL (@Nonnull final File aFile, @Nonnull final ErrorList aErrorList)
   {
+    // Parse XML and convert to domain model
     final CrossIndustryInvoiceType aCIIInvoice = CIID16BReader.crossIndustryInvoice ()
                                                               .setValidationEventHandler (new WrappedCollectingValidationEventHandler (aErrorList))
                                                               .read (aFile);
     if (aCIIInvoice == null)
       return null;
 
-    final TradeSettlementHeaderMonetarySummationType aTotal = aCIIInvoice.getSupplyChainTradeTransaction ()
-                                                                         .getApplicableHeaderTradeSettlement ()
-                                                                         .getSpecifiedTradeSettlementHeaderMonetarySummation ();
-    final AmountType aDuePayable = aTotal == null ? null : aTotal.getDuePayableAmount ().get (0);
+    return convertCIItoUBL (aCIIInvoice, aErrorList);
+  }
+
+  /**
+   * Convert CII to UBL
+   *
+   * @param aCIIInvoice
+   *        The CII invoice to be converted. May not be <code>null</code>.
+   *        Ideally this is a valid CII invoice only and not some handcrafted
+   *        domain object.
+   * @param aErrorList
+   *        Error list to be filled. May not be <code>null</code>.
+   * @return The parsed {@link InvoiceType} or {@link CreditNoteType}. May be
+   *         <code>null</code> in case of error.
+   */
+  @Nullable
+  public Serializable convertCIItoUBL (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
+                                       @Nonnull final ErrorList aErrorList)
+  {
+    ValueEnforcer.notNull (aCIIInvoice, "CIIInvoice");
+    ValueEnforcer.notNull (aErrorList, "ErrorList");
+
+    final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
+    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null
+                                                                       : aTransaction.getApplicableHeaderTradeSettlement ();
+    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
+                                                                                  : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
+    final AmountType aDuePayable = aTotal == null ||
+                                   aTotal.hasNoDuePayableAmountEntries () ? null
+                                                                          : aTotal.getDuePayableAmount ().get (0);
 
     if (aDuePayable == null || MathHelper.isGE0 (aDuePayable.getValue ()))
     {
-      final InvoiceType aUBLInvoice = _convertToInvoice (aCIIInvoice, aErrorList);
-      // TODO
+      final InvoiceType aUBLInvoice = convertToInvoice (aCIIInvoice, aErrorList);
       return aUBLInvoice;
     }
 

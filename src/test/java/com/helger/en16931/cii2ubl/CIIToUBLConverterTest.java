@@ -18,10 +18,13 @@
 package com.helger.en16931.cii2ubl;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.Serializable;
+
+import javax.annotation.Nullable;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -39,6 +42,11 @@ import com.helger.ubl21.UBL21Writer;
 import com.helger.ubl21.UBL21WriterBuilder;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
+import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 
 /**
  * Test class for class {@link CIIToUBLConverter}.
@@ -97,5 +105,35 @@ public final class CIIToUBLConverterTest
         assertTrue ("Errors: " + aResult.getErrorList ().toString (), aResult.getErrorList ().isEmpty ());
       }
     }
+  }
+
+  @Nullable
+  private static InvoiceType _convert (final CrossIndustryInvoiceType aInvoice)
+  {
+    return (InvoiceType) new CIIToUBLConverter ().convertCIItoUBL (aInvoice, new ErrorList ());
+  }
+
+  @Test
+  public void testConvertCreepy ()
+  {
+    final CrossIndustryInvoiceType aInvoice = new CrossIndustryInvoiceType ();
+    assertNull (_convert (aInvoice));
+
+    final SupplyChainTradeTransactionType aSCTTT = new SupplyChainTradeTransactionType ();
+    aInvoice.setSupplyChainTradeTransaction (aSCTTT);
+    assertNull (_convert (aInvoice));
+
+    final HeaderTradeAgreementType aHeaderAgreement = new HeaderTradeAgreementType ();
+    aSCTTT.setApplicableHeaderTradeAgreement (aHeaderAgreement);
+    assertNull (_convert (aInvoice));
+
+    final HeaderTradeDeliveryType aHeaderDelivery = new HeaderTradeDeliveryType ();
+    aSCTTT.setApplicableHeaderTradeDelivery (aHeaderDelivery);
+    assertNull (_convert (aInvoice));
+
+    final HeaderTradeSettlementType aHeaderSettlement = new HeaderTradeSettlementType ();
+    aSCTTT.setApplicableHeaderTradeSettlement (aHeaderSettlement);
+    // First version working
+    assertNotNull (_convert (aInvoice));
   }
 }
