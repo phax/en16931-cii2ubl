@@ -38,10 +38,11 @@ import com.helger.bdve.source.ValidationSource;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.io.file.FilenameHelper;
 import com.helger.commons.io.resource.FileSystemResource;
-import com.helger.ubl21.UBL21Writer;
-import com.helger.ubl21.UBL21WriterBuilder;
+import com.helger.ubl22.UBL22Writer;
+import com.helger.ubl22.UBL22WriterBuilder;
 
-import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
+import oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType;
+import oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
@@ -76,7 +77,6 @@ public final class CIIToUBLConverterTest
   @Test
   public void testConvertAndValidateAll ()
   {
-    final UBL21WriterBuilder <InvoiceType> aWriter = UBL21Writer.invoice ().setFormattedOutput (true);
     for (final String sFilename : TEST_FILES)
     {
       LOGGER.info ("Converting " + sFilename + " to UBL");
@@ -88,17 +88,37 @@ public final class CIIToUBLConverterTest
                                                                               aErrorList);
       assertTrue ("Errors: " + aErrorList.toString (), aErrorList.isEmpty ());
       assertNotNull (aInvoice);
-      assertTrue (aInvoice instanceof InvoiceType);
 
-      // Check UBL XSD scheme
-      final InvoiceType aUBLInvoice = (InvoiceType) aInvoice;
       final File aDestFile = new File ("toubl", FilenameHelper.getBaseName (sFilename) + "-ubl.xml");
-      aWriter.write (aUBLInvoice, aDestFile);
+      final ValidationResultList aResultList;
 
-      // Validate against EN16931 validation rules
-      final ValidationResultList aResultList = VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_110)
-                                                           .createExecutionManager ()
-                                                           .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
+      if (aInvoice instanceof InvoiceType)
+      {
+        final InvoiceType aUBLInvoice = (InvoiceType) aInvoice;
+
+        // Check UBL XSD scheme
+        final UBL22WriterBuilder <InvoiceType> aWriter = UBL22Writer.invoice ().setFormattedOutput (true);
+        aWriter.write (aUBLInvoice, aDestFile);
+
+        // Validate against EN16931 validation rules
+        aResultList = VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_110)
+                                  .createExecutionManager ()
+                                  .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
+      }
+      else
+      {
+        final CreditNoteType aUBLInvoice = (CreditNoteType) aInvoice;
+
+        // Check UBL XSD scheme
+        final UBL22WriterBuilder <CreditNoteType> aWriter = UBL22Writer.creditNote ().setFormattedOutput (true);
+        aWriter.write (aUBLInvoice, aDestFile);
+
+        // Validate against EN16931 validation rules
+        aResultList = VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_CREDIT_NOTE_110)
+                                  .createExecutionManager ()
+                                  .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
+      }
+
       assertNotNull (aResultList);
       for (final ValidationResult aResult : aResultList)
       {
@@ -108,9 +128,9 @@ public final class CIIToUBLConverterTest
   }
 
   @Nullable
-  private static InvoiceType _convert (final CrossIndustryInvoiceType aInvoice)
+  private static Serializable _convert (final CrossIndustryInvoiceType aInvoice)
   {
-    return (InvoiceType) new CIIToUBLConverter ().convertCIItoUBL (aInvoice, new ErrorList ());
+    return new CIIToUBLConverter ().convertCIItoUBL (aInvoice, new ErrorList ());
   }
 
   @Test
