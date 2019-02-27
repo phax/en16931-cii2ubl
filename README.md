@@ -4,7 +4,7 @@ Converter for EN16931 invoices from CII to UBL
 
 # News and noteworthy
 
-* v1.1.1 - work in progress
+* v1.1.1 - 2019-02-27
     * Improved delivery date handling
     * Improved price base quantity handling
 * v1.1.0 - 2019-02-26
