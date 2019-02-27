@@ -72,7 +72,7 @@ public final class CIIToUBL22ConverterTest
       assertTrue ("Errors: " + aErrorList.toString (), aErrorList.isEmpty ());
       assertNotNull (aInvoice);
 
-      final File aDestFile = new File ("toubl", FilenameHelper.getBaseName (sFilename) + "-ubl.xml");
+      final File aDestFile = new File ("toubl22", FilenameHelper.getBaseName (sFilename) + "-ubl.xml");
       final ValidationResultList aResultList;
 
       if (aInvoice instanceof InvoiceType)
