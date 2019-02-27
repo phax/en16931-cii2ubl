@@ -1308,15 +1308,24 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
                                                    sDefaultCurrencyCode));
             bUsePrice = true;
           }
+          if (aNPPTP.getBasisQuantity () != null)
+          {
+            aUBLPrice.setBaseQuantity (_copyQuantity (aNPPTP.getBasisQuantity (), new BaseQuantityType ()));
+            bUsePrice = true;
+          }
         }
 
-        final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
-        if (aGPPTP != null)
+        if (aUBLPrice.getBaseQuantity () == null)
         {
-          if (aGPPTP.getBasisQuantity () != null)
+          // Use only as fallback
+          final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
+          if (aGPPTP != null)
           {
-            aUBLPrice.setBaseQuantity (_copyQuantity (aGPPTP.getBasisQuantity (), new BaseQuantityType ()));
-            bUsePrice = true;
+            if (aGPPTP.getBasisQuantity () != null)
+            {
+              aUBLPrice.setBaseQuantity (_copyQuantity (aGPPTP.getBasisQuantity (), new BaseQuantityType ()));
+              bUsePrice = true;
+            }
           }
         }
       }

@@ -103,6 +103,8 @@ public final class CIIToUBL22ConverterTest
       }
 
       assertNotNull (aResultList);
+
+      // Check that no errors (but maybe warnings) are contained
       for (final ValidationResult aResult : aResultList)
       {
         assertTrue ("Errors: " + aResult.getErrorList ().toString (), aResult.getErrorList ().isEmpty ());

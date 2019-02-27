@@ -6,6 +6,7 @@ Converter for EN16931 invoices from CII to UBL
 
 * v1.1.1 - work in progress
     * Improved delivery date handling
+    * Improved price base quantity handling
 * v1.1.0 - 2019-02-26
     * Added support to create UBL 2.1 Invoice and CreditNote
 * v1.0.0 - 2019-02-26

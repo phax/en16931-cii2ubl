@@ -123,6 +123,7 @@ het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Blue
     </cac:Item>
       <cac:Price>
       <cbc:PriceAmount currencyID="EUR">49</cbc:PriceAmount>
+          <cbc:BaseQuantity unitCode="MON">49</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
 </Invoice>
