@@ -1313,20 +1313,6 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter
             bUsePrice = true;
           }
         }
-
-        if (aUBLPrice.getBaseQuantity () == null)
-        {
-          // Use only as fallback
-          final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
-          if (aGPPTP != null)
-          {
-            if (aGPPTP.getBasisQuantity () != null)
-            {
-              aUBLPrice.setBaseQuantity (_copyQuantity (aGPPTP.getBasisQuantity (), new BaseQuantityType ()));
-              bUsePrice = true;
-            }
-          }
-        }
       }
 
       // Allowance charge
