@@ -2199,14 +2199,9 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter
                                                    sDefaultCurrencyCode));
             bUsePrice = true;
           }
-        }
-
-        final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
-        if (aGPPTP != null)
-        {
-          if (aGPPTP.getBasisQuantity () != null)
+          if (aNPPTP.getBasisQuantity () != null)
           {
-            aUBLPrice.setBaseQuantity (_copyQuantity (aGPPTP.getBasisQuantity (), new BaseQuantityType ()));
+            aUBLPrice.setBaseQuantity (_copyQuantity (aNPPTP.getBasisQuantity (), new BaseQuantityType ()));
             bUsePrice = true;
           }
         }

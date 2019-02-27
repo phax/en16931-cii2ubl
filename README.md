@@ -11,3 +11,9 @@ Converter for EN16931 invoices from CII to UBL
     * Added support to create UBL 2.1 Invoice and CreditNote
 * v1.0.0 - 2019-02-26
     * Initial release creating UBL 2.2 Invoice and CreditNote
+
+# Open issues
+
+* The migration of CII `NetPriceProductTradePrice/BasisQuantity` to UBL `Price/BaseQuantity` is not consistent for me
+    * See example files 2, 8 and 9
+    * The UBL example files use a BaseQuanity of 1 in all cases
