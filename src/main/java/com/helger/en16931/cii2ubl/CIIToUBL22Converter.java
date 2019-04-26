@@ -35,113 +35,13 @@ import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.AddressLineType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.AddressType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.AllowanceChargeType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.AttachmentType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.BillingReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.BranchType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.CardAccountType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.CommodityClassificationType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.ContactType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.CountryType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.CreditNoteLineType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.CustomerPartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.DeliveryType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.DocumentReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.ExternalReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.FinancialAccountType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.InvoiceLineType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.ItemIdentificationType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.ItemPropertyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.ItemType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.MonetaryTotalType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.OrderLineReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.OrderReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PartyIdentificationType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PartyLegalEntityType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PartyNameType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PartyTaxSchemeType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PaymentMandateType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PaymentMeansType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PaymentTermsType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PeriodType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.PriceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.ProjectReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.SupplierPartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.TaxCategoryType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.TaxSchemeType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.TaxSubtotalType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.TaxTotalType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AllowanceChargeReasonType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AllowanceTotalAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.BaseAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.BaseQuantityType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.ChargeTotalAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.CompanyIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.CreditedQuantityType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.DescriptionType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.DocumentDescriptionType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.EmbeddedDocumentBinaryObjectType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.EndpointIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.InvoicedQuantityType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.ItemClassificationCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.LineExtensionAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.LineIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NameType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.PayableAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.PayableRoundingAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.PaymentIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.PaymentMeansCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.PrepaidAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.PriceAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.PrimaryAccountNumberIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.TaxAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.TaxExclusiveAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.TaxExemptionReasonType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.TaxInclusiveAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.TaxableAmountType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.*;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.*;
 import oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialAccountType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialInstitutionType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DebtorFinancialAccountType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeAgreementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeSettlementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductCharacteristicType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainEventType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeCountryType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeProductType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementFinancialCardType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementLineMonetarySummationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.UniversalCommunicationType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.*;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
@@ -332,6 +232,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
     String sSchemeID = aTaxRegistration.getID ().getSchemeID ();
     if (StringHelper.hasNoText (sSchemeID))
       sSchemeID = DEFAULT_VAT_SCHEME;
+    else
+    {
+      // Special case CII validation artefacts 1.0.0 and 1.2.0
+      if ("VA".equals (sSchemeID))
+        sSchemeID = DEFAULT_VAT_SCHEME;
+    }
 
     final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
     aUBLTaxScheme.setID (sSchemeID);
@@ -475,7 +381,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
     }
 
     final InvoiceType aUBLInvoice = new InvoiceType ();
-    aUBLInvoice.setUBLVersionID ("2.2");
+    if (false)
+      aUBLInvoice.setUBLVersionID ("2.2");
     aUBLInvoice.setCustomizationID (DEFAULT_CUSTOMIZATION_ID);
     aUBLInvoice.setProfileID (DEFAULT_PROFILE_ID);
     if (aED != null)
@@ -950,6 +857,10 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
         }
 
         aUBLInvoice.addPaymentMeans (aUBLPaymentMeans);
+
+        // Since v1.2.0 only one is allowed
+        if (true)
+          break;
       }
     }
 
@@ -1374,7 +1285,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
     }
 
     final CreditNoteType aUBLCreditNote = new CreditNoteType ();
-    aUBLCreditNote.setUBLVersionID ("2.2");
+    if (false)
+      aUBLCreditNote.setUBLVersionID ("2.2");
     aUBLCreditNote.setCustomizationID (DEFAULT_CUSTOMIZATION_ID);
     aUBLCreditNote.setProfileID (DEFAULT_PROFILE_ID);
     if (aED != null)
@@ -1839,6 +1751,10 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
         }
 
         aUBLCreditNote.addPaymentMeans (aUBLPaymentMeans);
+
+        // Since v1.2.0 only one is allowed
+        if (true)
+          break;
       }
     }
 
@@ -2268,9 +2184,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
    * Convert CII to UBL
    *
    * @param aCIIInvoice
-   *        The CII invoice to be converted. May not be <code>null</code>. Ideally
-   *        this is a valid CII invoice only and not some handcrafted domain
-   *        object.
+   *        The CII invoice to be converted. May not be <code>null</code>.
+   *        Ideally this is a valid CII invoice only and not some handcrafted
+   *        domain object.
    * @param aErrorList
    *        Error list to be filled. May not be <code>null</code>.
    * @return The parsed {@link InvoiceType} or {@link CreditNoteType}. May be
