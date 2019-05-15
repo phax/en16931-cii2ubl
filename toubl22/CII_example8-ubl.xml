@@ -87,6 +87,13 @@ www.enexis.nl</cbc:Note>
       <cbc:ID>NL28RBOS0420242228</cbc:ID>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+      <cbc:PaymentID>1100512149</cbc:PaymentID>
+      <cac:PayeeFinancialAccount>
+      <cbc:ID>NL28RBOS0420242228</cbc:ID>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
   <cac:PaymentTerms>
     <cbc:Note>Enexis brengt wettelijke rente in rekening over te laat betaalde
 facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>

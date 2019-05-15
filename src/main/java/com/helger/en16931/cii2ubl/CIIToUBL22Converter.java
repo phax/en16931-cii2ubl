@@ -858,9 +858,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
 
         aUBLInvoice.addPaymentMeans (aUBLPaymentMeans);
 
-        // Since v1.2.0 only one is allowed
-        if (true)
-          break;
+        // Allowed again in 1.2.1: exactly 2
+        if (false)
+          // Since v1.2.0 only one is allowed
+          if (true)
+            break;
       }
     }
 
@@ -1752,9 +1754,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
 
         aUBLCreditNote.addPaymentMeans (aUBLPaymentMeans);
 
-        // Since v1.2.0 only one is allowed
-        if (true)
-          break;
+        // Allowed again in 1.2.1: exactly 2
+        if (false)
+          // Since v1.2.0 only one is allowed
+          if (true)
+            break;
       }
     }
 

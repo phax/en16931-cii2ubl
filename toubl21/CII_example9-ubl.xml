@@ -71,6 +71,13 @@ het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Blue
       </cac:FinancialInstitutionBranch>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+      <cbc:PaymentID>2015 0483 0000 0000</cbc:PaymentID>
+      <cac:PayeeFinancialAccount>
+      <cbc:ID>NL13RABO0377815500</cbc:ID>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="EUR">30.87</cbc:TaxAmount>
       <cac:TaxSubtotal>

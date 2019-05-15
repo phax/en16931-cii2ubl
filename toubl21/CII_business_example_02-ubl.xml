@@ -68,6 +68,13 @@
       <cbc:ID>DK1212341234123412</cbc:ID>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+      <cbc:PaymentID>INV000013</cbc:PaymentID>
+      <cac:PayeeFinancialAccount>
+      <cbc:ID>DK1212341234123412</cbc:ID>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
   <cac:AllowanceCharge>
     <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
       <cbc:AllowanceChargeReason>Rabatt</cbc:AllowanceChargeReason>

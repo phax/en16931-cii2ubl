@@ -88,6 +88,13 @@
       <cbc:ID>DK1212341234123412</cbc:ID>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+      <cbc:PaymentID>Payref1</cbc:PaymentID>
+      <cac:PayeeFinancialAccount>
+      <cbc:ID>DK1212341234123412</cbc:ID>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="DKK">675</cbc:TaxAmount>
       <cac:TaxSubtotal>

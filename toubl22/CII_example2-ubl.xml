@@ -155,6 +155,13 @@
       </cac:FinancialInstitutionBranch>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+      <cbc:PaymentID>0003434323213231</cbc:PaymentID>
+      <cac:PayeeFinancialAccount>
+      <cbc:ID>NO9386011117947</cbc:ID>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
   <cac:PaymentTerms>
     <cbc:Note>2 % discount if paid within 2 days
 Penalty percentage 10% from due date</cbc:Note>
