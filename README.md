@@ -4,6 +4,8 @@ Converter for EN16931 invoices from CII to UBL
 
 # News and noteworthy
 
+* v1.1.4 - 2019-07-15
+    * Updated to EN 16931 validation artefacts 1.2.3
 * v1.1.3 - 2019-05-15
     * Updated to EN 16931 validation artefacts 1.2.1
 * v1.1.2 - 2019-04-26
