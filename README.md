@@ -4,6 +4,8 @@ Converter for EN16931 invoices from CII to UBL
 
 # News and noteworthy
 
+* v1.1.5 - work in progress
+    * Added possibility to enforce invoice creation
 * v1.1.4 - 2019-07-15
     * Updated to EN 16931 validation artefacts 1.2.3
 * v1.1.3 - 2019-05-15
@@ -23,3 +25,13 @@ Converter for EN16931 invoices from CII to UBL
 * The migration of CII `NetPriceProductTradePrice/BasisQuantity` to UBL `Price/BaseQuantity` is not consistent for me
     * See example files 2, 8 and 9
     * The UBL example files use a BaseQuanity of 1 in all cases
+
+# Maven usage
+
+```xml
+<dependency>
+  <groupId>com.helger</groupId>
+  <artifactId>en16931-cii2ubl</artifactId>
+  <version>1.1.5-SNAPSHOT</version>
+</dependency>
+```

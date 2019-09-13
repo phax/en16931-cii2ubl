@@ -2214,7 +2214,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter
                                    aTotal.hasNoDuePayableAmountEntries () ? null
                                                                           : aTotal.getDuePayableAmount ().get (0);
 
-    if (aDuePayable == null || MathHelper.isGE0 (aDuePayable.getValue ()))
+    if (aDuePayable == null || MathHelper.isGE0 (aDuePayable.getValue ()) || isForceInvoiceCreation ())
     {
       final InvoiceType aUBLInvoice = convertToInvoice (aCIIInvoice, aErrorList);
       return aUBLInvoice;

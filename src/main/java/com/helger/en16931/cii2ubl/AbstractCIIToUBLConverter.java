@@ -50,8 +50,20 @@ public abstract class AbstractCIIToUBLConverter
   public static final String DEFAULT_PROFILE_ID = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
 
+  private boolean m_bForceInvoiceCreation = false;
+
   protected AbstractCIIToUBLConverter ()
   {}
+
+  public final boolean isForceInvoiceCreation ()
+  {
+    return m_bForceInvoiceCreation;
+  }
+
+  public final void setForceInvoiceCreation (final boolean bForceInvoiceCreation)
+  {
+    m_bForceInvoiceCreation = bForceInvoiceCreation;
+  }
 
   @Nonnull
   protected static IError _buildError (@Nullable final String [] aPath, final String sErrorMsg)
