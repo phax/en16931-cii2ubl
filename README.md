@@ -1,10 +1,10 @@
 # en16931-cii2ubl
 
-Converter for EN16931 invoices from CII to UBL
+Converter for unidirectional EN16931 invoices from CII to UBL.
 
 # News and noteworthy
 
-* v1.1.5 - work in progress
+* v1.1.5 - 2019-09-13
     * Added possibility to enforce invoice creation
 * v1.1.4 - 2019-07-15
     * Updated to EN 16931 validation artefacts 1.2.3
@@ -32,6 +32,11 @@ Converter for EN16931 invoices from CII to UBL
 <dependency>
   <groupId>com.helger</groupId>
   <artifactId>en16931-cii2ubl</artifactId>
-  <version>1.1.5-SNAPSHOT</version>
+  <version>1.1.5</version>
 </dependency>
 ```
+
+---
+
+My personal [Coding Styleguide](https://github.com/phax/meta/blob/master/CodingStyleguide.md) |
+On Twitter: <a href="https://twitter.com/philiphelger">@philiphelger</a>
