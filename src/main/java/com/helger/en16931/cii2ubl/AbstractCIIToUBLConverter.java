@@ -23,6 +23,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.error.IError;
 import com.helger.commons.error.SingleError;
@@ -39,30 +40,33 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 /**
- * Base class for conversion
+ * Base class for conversion from CII to UBL.
  *
  * @author Philip Helger
  */
 public abstract class AbstractCIIToUBLConverter
 {
+  public static final EUBLCreationMode DEFAULT_UBL_CREATION_MODE = EUBLCreationMode.AUTOMATIC;
   public static final String DEFAULT_VAT_SCHEME = "VAT";
   public static final String DEFAULT_CUSTOMIZATION_ID = "urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0";
   public static final String DEFAULT_PROFILE_ID = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
 
-  private boolean m_bForceInvoiceCreation = false;
+  private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
 
   protected AbstractCIIToUBLConverter ()
   {}
 
-  public final boolean isForceInvoiceCreation ()
+  @Nonnull
+  public final EUBLCreationMode getUBLCreationMode ()
   {
-    return m_bForceInvoiceCreation;
+    return m_eCreationMode;
   }
 
-  public final void setForceInvoiceCreation (final boolean bForceInvoiceCreation)
+  public final void setUBLCreationMode (@Nonnull final EUBLCreationMode eCreationMode)
   {
-    m_bForceInvoiceCreation = bForceInvoiceCreation;
+    ValueEnforcer.notNull (eCreationMode, "CreationMode");
+    m_eCreationMode = eCreationMode;
   }
 
   @Nonnull

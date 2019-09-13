@@ -2212,13 +2212,17 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
                                    aTotal.hasNoDuePayableAmountEntries () ? null
                                                                           : aTotal.getDuePayableAmount ().get (0);
 
-    if (aDuePayable == null || MathHelper.isGE0 (aDuePayable.getValue ()) || isForceInvoiceCreation ())
+    final boolean bWouldBeInvoice = aDuePayable == null || MathHelper.isGE0 (aDuePayable.getValue ());
+    switch (getUBLCreationMode ())
     {
-      final InvoiceType aUBLInvoice = convertToInvoice (aCIIInvoice, aErrorList);
-      return aUBLInvoice;
+      case AUTOMATIC:
+        return bWouldBeInvoice ? convertToInvoice (aCIIInvoice, aErrorList)
+                               : convertToCreditNote (aCIIInvoice, aErrorList);
+      case INVOICE:
+        return convertToInvoice (aCIIInvoice, aErrorList);
+      case CREDIT_NOTE:
+        return convertToCreditNote (aCIIInvoice, aErrorList);
     }
-
-    final CreditNoteType aUBLCreditNote = convertToCreditNote (aCIIInvoice, aErrorList);
-    return aUBLCreditNote;
+    throw new IllegalStateException ("Unsupported creation mode");
   }
 }
