@@ -4,6 +4,8 @@ Converter for unidirectional EN16931 invoices from CII to UBL.
 
 # News and noteworthy
 
+* v1.1.6 - work in progress
+    * Verified against EN 16931 validation artefacts 1.3.0 - no changes in the output
 * v1.1.5 - 2019-09-13
     * Added possibility to enforce invoice creation
 * v1.1.4 - 2019-07-15

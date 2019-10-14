@@ -217,6 +217,7 @@ public abstract class AbstractCIIToUBLConverter
 
   protected static boolean paymentMeansCodeRequiresPayeeFinancialAccountID (@Nullable final String s)
   {
+    // in ebinterface-ubl-mapping this is 30, 31, 42 and 58
     return "30".equals (s) || "58".equals (s);
   }
 
