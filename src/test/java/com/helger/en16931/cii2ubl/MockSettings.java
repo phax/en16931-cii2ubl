@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Philip Helger
+ * Copyright (C) 2019-2020 Philip Helger
  * http://www.helger.com
  * philip[at]helger[dot]com
  *
