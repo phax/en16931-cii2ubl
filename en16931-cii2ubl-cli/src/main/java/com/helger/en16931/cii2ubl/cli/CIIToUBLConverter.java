@@ -8,20 +8,25 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import com.helger.commons.error.list.ErrorList;
-import com.helger.commons.io.file.FilenameHelper;
-import com.helger.en16931.cii2ubl.CIIToUBL21Converter;
-import com.helger.en16931.cii2ubl.EUBLCreationMode;
-import com.helger.ubl21.UBL21Writer;
-import com.helger.ubl21.UBL21WriterBuilder;
+import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
+import com.helger.commons.error.IError;
+import com.helger.commons.error.list.ErrorList;
+import com.helger.commons.io.file.FilenameHelper;
+import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverter;
+import com.helger.en16931.cii2ubl.CIIToUBL21Converter;
+import com.helger.en16931.cii2ubl.CIIToUBL22Converter;
+import com.helger.en16931.cii2ubl.EUBLCreationMode;
+import com.helger.ubl21.UBL21Writer;
+import com.helger.ubl22.UBL22Writer;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -30,100 +35,148 @@ import picocli.CommandLine.Parameters;
 /**
  * Main
  */
-@Command(description = "CII to UBL Converter.", name = "CIItoUBLConverter", mixinStandardHelpOptions = true, separator = " ")
-public class CIIToUBLConverter implements Callable<Integer> {
+@Command (description = "CII to UBL Converter.", name = "CIItoUBLConverter", mixinStandardHelpOptions = true, separator = " ")
+public class CIIToUBLConverter implements Callable <Integer>
+{
+  private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverter.class);
 
-    private static final Logger log = LoggerFactory.getLogger(CIIToUBLConverter.class);
+  @Option (names = "--ubl", defaultValue = "2.1", description = "Version of the target UBL Format (default: ${DEFAULT-VALUE})")
+  private String m_sUBLVersion;
 
-    @Option(names = "--ubl", defaultValue = "2.1", description = "Version of the target UBL Format (default: ${DEFAULT-VALUE})")
-    private String UBLVersion;
+  @Option (names = "--mode", defaultValue = "INVOICE", description = "Allowedvalues:${COMPLETION-CANDIDATES}")
+  private EUBLCreationMode m_eMode;
 
-    @Option(names = "--mode", defaultValue = "INVOICE", description = "Allowedvalues:${COMPLETION-CANDIDATES}")
-    private EUBLCreationMode mode;
+  @Option (names = { "-t",
+                     "--target" }, paramLabel = "out", defaultValue = ".", description = "The target directory for result output (default: ${DEFAULT-VALUE})")
+  private String m_sOutputDir;
 
-    @Option(names = { "-t",
-            "--target" }, paramLabel = "out", defaultValue = ".", description = "The target directory for result output (default: ${DEFAULT-VALUE})")
-    private String outputDir;
+  @Parameters (arity = "1..*", description = "One or more Files")
+  private List <File> m_aSourceFiles;
 
-    @Parameters(arity = "1..*", description = "One or more Files")
-    private List<File> files;
+  private static String _normalizeOutputDirectory (final String dir)
+  {
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("CLI option output directory=" + dir);
+    final String ret = Paths.get (dir).toAbsolutePath ().normalize ().toString ();
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Normalized output directory=" + ret);
+    return ret;
+  }
 
-    // doing the business
-    public Integer call() throws Exception {
-        try {
-            init();
-        } catch (IOException e) {
-            log.error("Could not initialize converter", e.getLocalizedMessage());
+  @Nonnull
+  private static File _normalizeFile (@Nonnull final Path path)
+  {
+    return path.toAbsolutePath ().normalize ().toFile ();
+  }
+
+  @Nonnull
+  private List <File> _normalizeInputFiles (@Nonnull final List <File> files) throws IOException
+  {
+    final List <File> ret = new ArrayList <> ();
+
+    List <File> dirFiles = new ArrayList <> ();
+    for (final File file : files)
+    {
+      if (file.isDirectory ())
+      {
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("Is a directory=" + file.toString ());
+        // collecting readable and normalized absolute path files
+        dirFiles = Files.walk (file.toPath ())
+                        .filter (p -> Files.isReadable (p) && !Files.isDirectory (p))
+                        .map (p -> _normalizeFile (p))
+                        .peek (f -> LOGGER.debug ("Add file={}", f.toString ()))
+                        .collect (Collectors.toList ());
+        ret.addAll (dirFiles);
+      }
+      else
+        if (file.canRead ())
+        {
+          if (LOGGER.isDebugEnabled ())
+            LOGGER.debug ("Is a file={}", file.toString ());
+          ret.add (_normalizeFile (file.toPath ()));
         }
-        // TODO switch between versions
-        final CIIToUBL21Converter converter = new CIIToUBL21Converter();
-        converter.setUBLCreationMode(mode);
-        final ErrorList errorList = new ErrorList();
+    }
+    return ret;
 
-        Serializable invoice = null;
-        InvoiceType ublInvoiceType = null;
-        File destFile = null;
-        UBL21WriterBuilder<InvoiceType> aWriter = null;
+  }
 
-        for (File f : this.files) {
-            log.debug("Converting file={}", f.toString());
-            invoice = converter.convertCIItoUBL(f, errorList);
-            ublInvoiceType = (InvoiceType) invoice;
-            destFile = new File(this.outputDir, FilenameHelper.getBaseName(f) + "-ubl.xml");
-            aWriter = UBL21Writer.invoice().setFormattedOutput(true);
-            aWriter.write(ublInvoiceType, destFile);
+  // doing the business
+  public Integer call () throws Exception
+  {
+    m_sOutputDir = _normalizeOutputDirectory (m_sOutputDir);
+    m_aSourceFiles = _normalizeInputFiles (m_aSourceFiles);
+
+    final AbstractCIIToUBLConverter aConverter;
+    if ("2.1".equals (m_sUBLVersion))
+      aConverter = new CIIToUBL21Converter ();
+    else
+      if ("2.2".equals (m_sUBLVersion))
+        aConverter = new CIIToUBL22Converter ();
+      else
+        throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
+    aConverter.setUBLCreationMode (m_eMode);
+
+    final Locale aErrorLocale = Locale.US;
+    for (final File f : m_aSourceFiles)
+    {
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Converting file=" + f.getAbsolutePath ());
+
+      final File aDestFile = new File (m_sOutputDir, FilenameHelper.getBaseName (f) + "-ubl.xml");
+
+      // TODO switch between versions
+      final ErrorList aErrorList = new ErrorList ();
+      final Serializable aUBL = aConverter.convertCIItoUBL (f, aErrorList);
+      final boolean bFormattedOutput = true;
+      if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType)
+      {
+        UBL21Writer.invoice ()
+                   .setFormattedOutput (bFormattedOutput)
+                   .write ((oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType) aUBL, aDestFile);
+      }
+      else
+        if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType)
+        {
+          UBL21Writer.creditNote ()
+                     .setFormattedOutput (bFormattedOutput)
+                     .write ((oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType) aUBL, aDestFile);
         }
-
-        return 0;
-    }
-
-    private void init() throws IOException {
-        this.outputDir = normalizeOutputDirectory(this.outputDir);
-        this.files = normalizeInputFiles(this.files);
-    }
-
-    private String normalizeOutputDirectory(String dir) {
-
-        log.debug("CLI option output directory={}", dir);
-        String result = "";
-        result = Paths.get(dir).toAbsolutePath().normalize().toString();
-        log.debug("Normalized output directory={}", result);
-        return result;
-    }
-
-    private List<File> normalizeInputFiles(List<File> files) throws IOException {
-        List<File> normalizedFiles = new ArrayList<File>();
-
-        List<File> dirFiles = new ArrayList<File>();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                log.debug("Is a diractory={}", file.toString());
-                // collecting readable and normalized absolute path files
-                dirFiles = Files.walk(file.toPath()).filter(p -> Files.isReadable(p) && !Files.isDirectory(p))
-                        .map(p -> normalizeFile(p)).peek(f -> log.debug("Add file={}", f.toString()))
-                        .collect(Collectors.toList());
-                normalizedFiles.addAll(dirFiles);
-            } else if (file.canRead()) {
-                log.debug("Is a file={}", file.toString());
-                normalizedFiles.add(normalizeFile(file.toPath()));
+        else
+          if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType)
+          {
+            UBL22Writer.invoice ()
+                       .setFormattedOutput (bFormattedOutput)
+                       .write ((oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType) aUBL, aDestFile);
+          }
+          else
+            if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType)
+            {
+              UBL22Writer.creditNote ()
+                         .setFormattedOutput (bFormattedOutput)
+                         .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL,
+                                 aDestFile);
             }
-        }
-        return normalizedFiles;
+            else
+            {
+              if (aUBL != null)
+                throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");
 
+              LOGGER.error ("Failed to convert CII file '" + f.getAbsolutePath () + "' to UBL:");
+              for (final IError aError : aErrorList)
+                LOGGER.error (aError.getAsString (aErrorLocale));
+            }
     }
 
-    private static File normalizeFile(Path path) {
+    return Integer.valueOf (0);
+  }
 
-        return new File(path.toAbsolutePath().normalize().toString());
-
-    }
-
-    public static void main(final String[] args) {
-
-        log.info("Starting CII to UBL Converter");
-        final CommandLine cmd = new CommandLine(new CIIToUBLConverter());
-        cmd.setCaseInsensitiveEnumValuesAllowed(true);
-        final int exitCode = cmd.execute(args);
-        System.exit(exitCode);
-    }
+  public static void main (final String [] aArgs)
+  {
+    LOGGER.info ("Starting CII to UBL Converter");
+    final CommandLine cmd = new CommandLine (new CIIToUBLConverter ());
+    cmd.setCaseInsensitiveEnumValuesAllowed (true);
+    final int nExitCode = cmd.execute (aArgs);
+    System.exit (nExitCode);
+  }
 }

@@ -17,7 +17,6 @@
  */
 package com.helger.en16931.cii2ubl;
 
-import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -25,7 +24,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.CGlobal;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.error.list.ErrorList;
@@ -33,7 +31,6 @@ import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.math.MathHelper;
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
-import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.*;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.*;
@@ -2163,41 +2160,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter
     return aUBLCreditNote;
   }
 
-  /**
-   * Convert CII to UBL
-   *
-   * @param aFile
-   *        Source file with CII to be parsed. May not be <code>null</code>.
-   * @param aErrorList
-   *        Error list to be filled. May not be <code>null</code>.
-   * @return The parsed {@link InvoiceType} or {@link CreditNoteType}. May be
-   *         <code>null</code> in case of error.
-   */
-  @Nullable
-  public Serializable convertCIItoUBL (@Nonnull final File aFile, @Nonnull final ErrorList aErrorList)
-  {
-    // Parse XML and convert to domain model
-    final CrossIndustryInvoiceType aCIIInvoice = CIID16BReader.crossIndustryInvoice ()
-                                                              .setValidationEventHandler (new WrappedCollectingValidationEventHandler (aErrorList))
-                                                              .read (aFile);
-    if (aCIIInvoice == null)
-      return null;
-
-    return convertCIItoUBL (aCIIInvoice, aErrorList);
-  }
-
-  /**
-   * Convert CII to UBL
-   *
-   * @param aCIIInvoice
-   *        The CII invoice to be converted. May not be <code>null</code>.
-   *        Ideally this is a valid CII invoice only and not some handcrafted
-   *        domain object.
-   * @param aErrorList
-   *        Error list to be filled. May not be <code>null</code>.
-   * @return The parsed {@link InvoiceType} or {@link CreditNoteType}. May be
-   *         <code>null</code> in case of error.
-   */
+  @Override
   @Nullable
   public Serializable convertCIItoUBL (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
                                        @Nonnull final ErrorList aErrorList)
