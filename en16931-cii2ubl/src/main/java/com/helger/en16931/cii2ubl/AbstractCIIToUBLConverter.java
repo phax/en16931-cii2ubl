@@ -34,6 +34,7 @@ import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.traits.IGenericImplTrait;
 import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
@@ -51,8 +52,11 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  * Base class for conversion from CII to UBL.
  *
  * @author Philip Helger
+ * @param <IMPLTYPE>
+ *        The implementation type
  */
-public abstract class AbstractCIIToUBLConverter
+public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToUBLConverter <IMPLTYPE>> implements
+                                                IGenericImplTrait <IMPLTYPE>
 {
   public static final EUBLCreationMode DEFAULT_UBL_CREATION_MODE = EUBLCreationMode.AUTOMATIC;
   public static final String DEFAULT_VAT_SCHEME = "VAT";
@@ -61,6 +65,10 @@ public abstract class AbstractCIIToUBLConverter
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
 
   private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
+  private String m_sVATScheme = DEFAULT_VAT_SCHEME;
+  private String m_sCustomizationID = DEFAULT_CUSTOMIZATION_ID;
+  private String m_sProfileID = DEFAULT_PROFILE_ID;
+  private String m_sCardAccountNetworkID = DEFAULT_CARD_ACCOUNT_NETWORK_ID;
 
   protected AbstractCIIToUBLConverter ()
   {}
@@ -71,10 +79,68 @@ public abstract class AbstractCIIToUBLConverter
     return m_eCreationMode;
   }
 
-  public final void setUBLCreationMode (@Nonnull final EUBLCreationMode eCreationMode)
+  @Nonnull
+  public final IMPLTYPE setUBLCreationMode (@Nonnull final EUBLCreationMode eCreationMode)
   {
     ValueEnforcer.notNull (eCreationMode, "CreationMode");
     m_eCreationMode = eCreationMode;
+    return thisAsT ();
+  }
+
+  @Nonnull
+  public final String getVATScheme ()
+  {
+    return m_sVATScheme;
+  }
+
+  @Nonnull
+  public final IMPLTYPE setVATScheme (@Nonnull final String sVATScheme)
+  {
+    ValueEnforcer.notNull (sVATScheme, "VATScheme");
+    m_sVATScheme = sVATScheme;
+    return thisAsT ();
+  }
+
+  @Nonnull
+  public final String getCustomizationID ()
+  {
+    return m_sCustomizationID;
+  }
+
+  @Nonnull
+  public final IMPLTYPE setCustomizationID (@Nonnull final String sCustomizationID)
+  {
+    ValueEnforcer.notNull (sCustomizationID, "CustomizationID");
+    m_sCustomizationID = sCustomizationID;
+    return thisAsT ();
+  }
+
+  @Nonnull
+  public final String getProfileID ()
+  {
+    return m_sProfileID;
+  }
+
+  @Nonnull
+  public final IMPLTYPE setProfileID (@Nonnull final String sProfileID)
+  {
+    ValueEnforcer.notNull (sProfileID, "ProfileID");
+    m_sProfileID = sProfileID;
+    return thisAsT ();
+  }
+
+  @Nonnull
+  public final String getCardAccountNetworkID ()
+  {
+    return m_sCardAccountNetworkID;
+  }
+
+  @Nonnull
+  public final IMPLTYPE setCardAccountNetworkID (@Nonnull final String sCardAccountNetworkID)
+  {
+    ValueEnforcer.notNull (sCardAccountNetworkID, "CardAccountNetworkID");
+    m_sCardAccountNetworkID = sCardAccountNetworkID;
+    return thisAsT ();
   }
 
   @Nonnull

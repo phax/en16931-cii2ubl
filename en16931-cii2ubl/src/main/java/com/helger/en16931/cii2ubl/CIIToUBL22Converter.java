@@ -52,7 +52,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  *
  * @author Philip Helger
  */
-public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
+public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Converter>
 {
   public CIIToUBL22Converter ()
   {}
@@ -218,7 +218,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
   }
 
   @Nonnull
-  private static PartyTaxSchemeType _convertPartyTaxScheme (@Nonnull final TaxRegistrationType aTaxRegistration)
+  private PartyTaxSchemeType _convertPartyTaxScheme (@Nonnull final TaxRegistrationType aTaxRegistration)
   {
     if (aTaxRegistration.getID () == null)
       return null;
@@ -228,12 +228,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
 
     String sSchemeID = aTaxRegistration.getID ().getSchemeID ();
     if (StringHelper.hasNoText (sSchemeID))
-      sSchemeID = DEFAULT_VAT_SCHEME;
+      sSchemeID = getVATScheme ();
     else
     {
       // Special case CII validation artefacts 1.0.0 and 1.2.0
       if ("VA".equals (sSchemeID))
-        sSchemeID = DEFAULT_VAT_SCHEME;
+        sSchemeID = getVATScheme ();
     }
 
     final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
@@ -314,9 +314,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
                         sDefaultCurrencyCode);
   }
 
-  private static void _copyAllowanceCharge (@Nonnull final TradeAllowanceChargeType aAllowanceCharge,
-                                            @Nonnull final AllowanceChargeType aUBLAllowanceCharge,
-                                            @Nullable final String sDefaultCurrencyCode)
+  private void _copyAllowanceCharge (@Nonnull final TradeAllowanceChargeType aAllowanceCharge,
+                                     @Nonnull final AllowanceChargeType aUBLAllowanceCharge,
+                                     @Nullable final String sDefaultCurrencyCode)
   {
     if (StringHelper.hasText (aAllowanceCharge.getReasonCodeValue ()))
       aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
@@ -350,7 +350,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
       if (aTradeTax.getRateApplicablePercentValue () != null)
         aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
       final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-      aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
+      aUBLTaxScheme.setID (getVATScheme ());
       aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
       aUBLAllowanceCharge.addTaxCategory (aUBLTaxCategory);
     }
@@ -380,8 +380,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
     final InvoiceType aUBLInvoice = new InvoiceType ();
     if (false)
       aUBLInvoice.setUBLVersionID ("2.2");
-    aUBLInvoice.setCustomizationID (DEFAULT_CUSTOMIZATION_ID);
-    aUBLInvoice.setProfileID (DEFAULT_PROFILE_ID);
+    aUBLInvoice.setCustomizationID (getCustomizationID ());
+    aUBLInvoice.setProfileID (getProfileID ());
     if (aED != null)
       aUBLInvoice.setID (aED.getIDValue ());
 
@@ -788,7 +788,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
           final CardAccountType aUBLCardAccount = new CardAccountType ();
           aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
           // No CII field present
-          aUBLCardAccount.setNetworkID (DEFAULT_CARD_ACCOUNT_NETWORK_ID);
+          aUBLCardAccount.setNetworkID (getCardAccountNetworkID ());
           aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
           aUBLPaymentMeans.setCardAccount (aUBLCardAccount);
         }
@@ -977,7 +977,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
           aUBLTaxCategory.addTaxExemptionReason (aUBLTaxExemptionReason);
         }
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-        aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
+        aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
         aUBLTaxSubtotal.setTaxCategory (aUBLTaxCategory);
 
@@ -1192,7 +1192,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-        aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
+        aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
         aUBLItem.addClassifiedTaxCategory (aUBLTaxCategory);
       }
@@ -1293,8 +1293,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
     final CreditNoteType aUBLCreditNote = new CreditNoteType ();
     if (false)
       aUBLCreditNote.setUBLVersionID ("2.2");
-    aUBLCreditNote.setCustomizationID (DEFAULT_CUSTOMIZATION_ID);
-    aUBLCreditNote.setProfileID (DEFAULT_PROFILE_ID);
+    aUBLCreditNote.setCustomizationID (getCustomizationID ());
+    aUBLCreditNote.setProfileID (getProfileID ());
     if (aED != null)
       aUBLCreditNote.setID (aED.getIDValue ());
 
@@ -1691,7 +1691,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
           final CardAccountType aUBLCardAccount = new CardAccountType ();
           aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
           // No CII field present
-          aUBLCardAccount.setNetworkID (DEFAULT_CARD_ACCOUNT_NETWORK_ID);
+          aUBLCardAccount.setNetworkID (getCardAccountNetworkID ());
           aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
           aUBLPaymentMeans.setCardAccount (aUBLCardAccount);
         }
@@ -1880,7 +1880,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
           aUBLTaxCategory.addTaxExemptionReason (aUBLTaxExemptionReason);
         }
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-        aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
+        aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
         aUBLTaxSubtotal.setTaxCategory (aUBLTaxCategory);
 
@@ -2095,7 +2095,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
-        aUBLTaxScheme.setID (DEFAULT_VAT_SCHEME);
+        aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
         aUBLItem.addClassifiedTaxCategory (aUBLTaxCategory);
       }

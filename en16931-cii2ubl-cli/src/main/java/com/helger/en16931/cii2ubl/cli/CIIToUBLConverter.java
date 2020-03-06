@@ -33,7 +33,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 /**
- * Main
+ * Main command line client
  */
 @Command (description = "CII to UBL Converter.", name = "CIItoUBLConverter", mixinStandardHelpOptions = true, separator = " ")
 public class CIIToUBLConverter implements Callable <Integer>
@@ -49,6 +49,18 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Option (names = { "-t",
                      "--target" }, paramLabel = "out", defaultValue = ".", description = "The target directory for result output (default: ${DEFAULT-VALUE})")
   private String m_sOutputDir;
+
+  @Option (names = "--ubl-vatscheme", defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME, description = "The UBL VAT scheme to be used (default: ${DEFAULT-VALUE})")
+  private String m_sVATScheme;
+
+  @Option (names = "--ubl-customizationid", defaultValue = AbstractCIIToUBLConverter.DEFAULT_CUSTOMIZATION_ID, description = "The UBL customization ID to be used (default: ${DEFAULT-VALUE})")
+  private String m_sCustomizationID;
+
+  @Option (names = "--ubl-profileid", defaultValue = AbstractCIIToUBLConverter.DEFAULT_PROFILE_ID, description = "The UBL profile ID to be used (default: ${DEFAULT-VALUE})")
+  private String m_sProfileID;
+
+  @Option (names = "--ubl-cardaccountnetworkid", defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID, description = "The UBL CardAccount network ID to be used (default: ${DEFAULT-VALUE})")
+  private String m_sCardAccountNetworkID;
 
   @Parameters (arity = "1..*", description = "One or more Files")
   private List <File> m_aSourceFiles;
@@ -107,7 +119,7 @@ public class CIIToUBLConverter implements Callable <Integer>
     m_sOutputDir = _normalizeOutputDirectory (m_sOutputDir);
     m_aSourceFiles = _normalizeInputFiles (m_aSourceFiles);
 
-    final AbstractCIIToUBLConverter aConverter;
+    final AbstractCIIToUBLConverter <?> aConverter;
     if ("2.1".equals (m_sUBLVersion))
       aConverter = new CIIToUBL21Converter ();
     else
@@ -115,7 +127,11 @@ public class CIIToUBLConverter implements Callable <Integer>
         aConverter = new CIIToUBL22Converter ();
       else
         throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
-    aConverter.setUBLCreationMode (m_eMode);
+    aConverter.setUBLCreationMode (m_eMode)
+              .setVATScheme (m_sVATScheme)
+              .setCustomizationID (m_sCustomizationID)
+              .setProfileID (m_sProfileID)
+              .setCardAccountNetworkID (m_sCardAccountNetworkID);
 
     final Locale aErrorLocale = Locale.US;
     for (final File f : m_aSourceFiles)
