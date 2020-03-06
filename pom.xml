@@ -98,6 +98,12 @@
         <artifactId>picocli</artifactId>
         <version>4.2.0</version>
       </dependency>
+      
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>en16931-cii2ubl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

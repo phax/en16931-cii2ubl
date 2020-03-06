@@ -25,11 +25,11 @@
     <artifactId>en16931-cii2ubl-parent-pom</artifactId>
     <version>1.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>en16931-cii2ubl</artifactId>
+  <artifactId>en16931-cii2ubl-cli</artifactId>
   <packaging>bundle</packaging>
-  <name>en16931-cii2ubl</name>
+  <name>en16931-cii2ubl-cli</name>
   <inceptionYear>2019</inceptionYear>
-  <url>https://github.com/phax/en16931-cii2ubl/en16931-cii2ubl</url>
+  <url>https://github.com/phax/en16931-cii2ubl/en16931-cii2ubl-cli</url>
 
   <licenses>
     <license>
@@ -51,41 +51,20 @@
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-commons</artifactId>
+      <artifactId>en16931-cii2ubl</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-jaxb</artifactId>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-xml</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-datetime</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-cii-d16b</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-ubl21</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-ubl22</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -103,8 +82,9 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Automatic-Module-Name>com.helger.en16931-cii2ubl</Automatic-Module-Name>
-            <Export-Package>com.helger.en16931-cii2ubl.*</Export-Package>
+            <Main-Class>com.helger.en16931.cii2ubl.cli.CIIToUBLConverter</Main-Class>
+            <Automatic-Module-Name>com.helger.en16931.cii2ubl.cli</Automatic-Module-Name>
+            <Export-Package>com.helger.en16931.cii2ubl.cli.*</Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
           </instructions>
         </configuration>
@@ -122,6 +102,34 @@
             <exclude>toubl22/*</exclude>
           </excludes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <configuration>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>full</shadedClassifierName>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
