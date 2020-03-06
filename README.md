@@ -43,6 +43,7 @@ Additionally an `ErrorList` object must be provided as a container for all the e
     * Added commandline interface (CLI) - (see [PR #3](https://github.com/phax/en16931-cii2ubl/pull/3)) - thanks to [@rkottmann](https://github.com/rkottmann)
     * Fixed creating invalid UBL if `SellerOrderReferencedDocument` is present but `BuyerOrderReferencedDocument` is not set (see [issue #5](https://github.com/phax/en16931-cii2ubl/issues/5))
     * Made default VAT scheme, UBL `CustomizationID`, UBL `ProfileID` and the `PaymentMeans/CardAccount/NetworkID` customizable (see [issue #1](https://github.com/phax/en16931-cii2ubl/issues/1) and [issue #2](https://github.com/phax/en16931-cii2ubl/issues/2))
+    * Fixed embedded attachment mapping (see [issue #4](https://github.com/phax/en16931-cii2ubl/issues/4))
 * v1.1.5 - 2019-09-13
     * Added possibility to enforce invoice creation
     * Verified against EN 16931 validation artefacts 1.3.0
