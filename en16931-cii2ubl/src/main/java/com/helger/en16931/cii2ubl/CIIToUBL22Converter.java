@@ -497,7 +497,14 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
         aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
       final ReferencedDocumentType aSellerOrderRef = aHeaderAgreement.getSellerOrderReferencedDocument ();
       if (aSellerOrderRef != null)
+      {
+        if (aUBLOrderRef.getIDValue () == null)
+        {
+          // Mandatory element
+          aUBLOrderRef.setID ("");
+        }
         aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
+      }
 
       // Set if any field is set
       if (aUBLOrderRef.getIDValue () != null || aUBLOrderRef.getSalesOrderIDValue () != null)
@@ -1403,7 +1410,14 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter
         aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
       final ReferencedDocumentType aSellerOrderRef = aHeaderAgreement.getSellerOrderReferencedDocument ();
       if (aSellerOrderRef != null)
+      {
+        if (aUBLOrderRef.getIDValue () == null)
+        {
+          // Mandatory element
+          aUBLOrderRef.setID ("");
+        }
         aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
+      }
 
       // Set if any field is set
       if (aUBLOrderRef.getIDValue () != null || aUBLOrderRef.getSalesOrderIDValue () != null)
