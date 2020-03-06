@@ -17,26 +17,46 @@
  */
 package com.helger.en16931.cii2ubl;
 
+import java.io.File;
+
+import javax.annotation.Nonnull;
+
 import com.helger.bdve.en16931.EN16931Validation;
 import com.helger.bdve.executorset.ValidationExecutorSetRegistry;
+import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 
 final class MockSettings
 {
-  static final String [] TEST_FILES = new String [] { "CII_business_example_01.xml",
-                                                      "CII_business_example_02.xml",
-                                                      "CII_example1.xml",
-                                                      "CII_example2.xml",
-                                                      "CII_example3.xml",
-                                                      "CII_example4.xml",
-                                                      "CII_example5.xml",
-                                                      "CII_example6.xml",
-                                                      "CII_example7.xml",
-                                                      "CII_example8.xml",
-                                                      "CII_example9.xml" };
+  private static final String BASE_TEST_DIR = "src/test/resources/cii";
+  private static final String [] TEST_FILES_EN16931 = new String [] { "CII_business_example_01.xml",
+                                                                      "CII_business_example_02.xml",
+                                                                      "CII_example1.xml",
+                                                                      "CII_example2.xml",
+                                                                      "CII_example3.xml",
+                                                                      "CII_example4.xml",
+                                                                      "CII_example5.xml",
+                                                                      "CII_example6.xml",
+                                                                      "CII_example7.xml",
+                                                                      "CII_example8.xml",
+                                                                      "CII_example9.xml" };
+
   static final ValidationExecutorSetRegistry VES_REGISTRY = new ValidationExecutorSetRegistry ();
   static
   {
     EN16931Validation.initEN16931 (VES_REGISTRY);
   }
 
+  @Nonnull
+  @Nonempty
+  @ReturnsMutableCopy
+  public static ICommonsList <File> getAllTestFiles ()
+  {
+    final ICommonsList <File> ret = new CommonsArrayList <> ();
+    for (final String sFile : TEST_FILES_EN16931)
+      ret.add (new File (BASE_TEST_DIR, sFile));
+    return ret;
+  }
 }

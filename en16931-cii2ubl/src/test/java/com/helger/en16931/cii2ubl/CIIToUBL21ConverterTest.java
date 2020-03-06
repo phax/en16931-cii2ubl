@@ -60,19 +60,17 @@ public final class CIIToUBL21ConverterTest
   @Test
   public void testConvertAndValidateAll ()
   {
-    for (final String sFilename : MockSettings.TEST_FILES)
+    for (final File aFile : MockSettings.getAllTestFiles ())
     {
-      LOGGER.info ("Converting " + sFilename + " to UBL");
+      LOGGER.info ("Converting " + aFile.getName () + " to UBL 2.1");
 
       // Main conversion
       final ErrorList aErrorList = new ErrorList ();
-      final Serializable aInvoice = new CIIToUBL21Converter ().convertCIItoUBL (new File ("src/test/resources/cii",
-                                                                                          sFilename),
-                                                                                aErrorList);
+      final Serializable aInvoice = new CIIToUBL21Converter ().convertCIItoUBL (aFile, aErrorList);
       assertTrue ("Errors: " + aErrorList.toString (), aErrorList.isEmpty ());
       assertNotNull (aInvoice);
 
-      final File aDestFile = new File ("toubl21", FilenameHelper.getBaseName (sFilename) + "-ubl.xml");
+      final File aDestFile = new File ("toubl21", FilenameHelper.getBaseName (aFile.getName ()) + "-ubl.xml");
       final ValidationResultList aResultList;
 
       if (aInvoice instanceof InvoiceType)
