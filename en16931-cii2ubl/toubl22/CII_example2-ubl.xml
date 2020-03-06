@@ -24,7 +24,7 @@
     <cbc:ID>Doc1</cbc:ID>
       <cbc:DocumentDescription>Timesheet</cbc:DocumentDescription>
       <cac:Attachment>
-      <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="EHF.pdf" />
+      <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="EHF.pdf">SlZCRVJpMHhMalVOQ2lVTkNqRWdNQ0J2WW1vT3k2SlRaWDliY2dSVnhJVkcuLi50Ykxvc0NoVTJYUmY5eGIvb21zY2dUWS9sWEVoVWI=</cbc:EmbeddedDocumentBinaryObject>
           <cac:ExternalReference>
         <cbc:URI>http://www.suppliersite.eu/sheet001.html</cbc:URI>
       </cac:ExternalReference>

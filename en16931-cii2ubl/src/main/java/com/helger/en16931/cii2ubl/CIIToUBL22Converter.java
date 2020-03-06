@@ -126,6 +126,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       final EmbeddedDocumentBinaryObjectType aEmbeddedDoc = new EmbeddedDocumentBinaryObjectType ();
       aEmbeddedDoc.setMimeCode (aBinObj.getMimeCode ());
       aEmbeddedDoc.setFilename (aBinObj.getFilename ());
+      aEmbeddedDoc.setValue (aBinObj.getValue ());
       aUBLAttachment.setEmbeddedDocumentBinaryObject (aEmbeddedDoc);
 
       final String sURI = aRD.getURIIDValue ();
