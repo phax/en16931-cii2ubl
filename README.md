@@ -38,8 +38,9 @@ Additionally an `ErrorList` object must be provided as a container for all the e
 
 # News and noteworthy
 
-* v1.1.6 - work in progress
+* v1.2.0 - work in progress
     * Verified against EN 16931 validation artefacts 1.3.0 - no changes in the output
+    * Added commandline interface (CLI) - (see [PR #3](https://github.com/phax/en16931-cii2ubl/pull/3)) - thanks to [@rkottmann](https://github.com/rkottmann)
 * v1.1.5 - 2019-09-13
     * Added possibility to enforce invoice creation
 * v1.1.4 - 2019-07-15
