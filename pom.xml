@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
     Copyright (C) 2019-2020 Philip Helger
@@ -93,6 +93,11 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>info.picocli</groupId>
+        <artifactId>picocli</artifactId>
+        <version>4.1.4</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -125,7 +130,11 @@
       <groupId>com.helger</groupId>
       <artifactId>ph-ubl22</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>4.1.4</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -134,7 +143,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
@@ -151,6 +160,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Main-Class>com.helger.en16931.cii2ubl.cli.CIIToUBLConverter</Main-Class>
             <Automatic-Module-Name>com.helger.en16931-cii2ubl</Automatic-Module-Name>
             <Export-Package>com.helger.en16931-cii2ubl.*</Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
@@ -170,6 +180,36 @@
             <exclude>toubl22/*</exclude>
           </excludes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.1</version>
+        <configuration>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>full</shadedClassifierName> <!-- Any name that makes sense -->
+            </configuration>
+          </execution>
+        </executions>
+
       </plugin>
     </plugins>
   </build>
