@@ -41,8 +41,10 @@ Additionally an `ErrorList` object must be provided as a container for all the e
 * v1.2.0 - work in progress
     * Verified against EN 16931 validation artefacts 1.3.0 - no changes in the output
     * Added commandline interface (CLI) - (see [PR #3](https://github.com/phax/en16931-cii2ubl/pull/3)) - thanks to [@rkottmann](https://github.com/rkottmann)
+    * Fixed creating invalid UBL if `SellerOrderReferencedDocument` is present but `BuyerOrderReferencedDocument` is not set
 * v1.1.5 - 2019-09-13
     * Added possibility to enforce invoice creation
+    * Verified against EN 16931 validation artefacts 1.3.0
 * v1.1.4 - 2019-07-15
     * Updated to EN 16931 validation artefacts 1.2.3
 * v1.1.3 - 2019-05-15
