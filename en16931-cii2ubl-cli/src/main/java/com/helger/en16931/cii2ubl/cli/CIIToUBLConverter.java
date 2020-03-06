@@ -50,7 +50,7 @@ public class CIIToUBLConverter implements Callable <Integer>
                      "--target" }, paramLabel = "director", defaultValue = ".", description = "The target directory for result output (default: ${DEFAULT-VALUE})")
   private String m_sOutputDir;
 
-  @Option (names = "--ubl-vatscheme", paramLabel = "vatScheme", defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME, description = "The UBL VAT scheme to be used (default: ${DEFAULT-VALUE})")
+  @Option (names = "--ubl-vatscheme", paramLabel = "vat scheme", defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME, description = "The UBL VAT scheme to be used (default: ${DEFAULT-VALUE})")
   private String m_sVATScheme;
 
   @Option (names = "--ubl-customizationid", paramLabel = "ID", defaultValue = AbstractCIIToUBLConverter.DEFAULT_CUSTOMIZATION_ID, description = "The UBL customization ID to be used (default: ${DEFAULT-VALUE})")
@@ -62,7 +62,7 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Option (names = "--ubl-cardaccountnetworkid", paramLabel = "ID", defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID, description = "The UBL CardAccount network ID to be used (default: ${DEFAULT-VALUE})")
   private String m_sCardAccountNetworkID;
 
-  @Parameters (arity = "1..*", description = "One or more Files")
+  @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more Files")
   private List <File> m_aSourceFiles;
 
   private static String _normalizeOutputDirectory (final String dir)
