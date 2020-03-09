@@ -52,34 +52,57 @@ import picocli.CommandLine.Parameters;
 /**
  * Main command line client
  */
-@Command (description = "CII to UBL Converter.", name = "CIItoUBLConverter", mixinStandardHelpOptions = true, separator = " ")
+@Command (description = "CII to UBL Converter.",
+          name = "CIItoUBLConverter",
+          mixinStandardHelpOptions = true,
+          separator = " ")
 public class CIIToUBLConverter implements Callable <Integer>
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverter.class);
 
-  @Option (names = "--ubl", paramLabel = "version", defaultValue = "2.1", description = "Version of the target UBL Format (default: ${DEFAULT-VALUE})")
+  @Option (names = "--ubl",
+           paramLabel = "version",
+           defaultValue = "2.1",
+           description = "Version of the target UBL Format (default: ${DEFAULT-VALUE})")
   private String m_sUBLVersion;
 
-  @Option (names = "--mode", paramLabel = "mode", defaultValue = "INVOICE", description = "Allowedvalues:${COMPLETION-CANDIDATES}")
+  @Option (names = "--mode",
+           paramLabel = "mode",
+           defaultValue = "INVOICE",
+           description = "Allowed values: ${COMPLETION-CANDIDATES}")
   private EUBLCreationMode m_eMode;
 
-  @Option (names = { "-t",
-                     "--target" }, paramLabel = "director", defaultValue = ".", description = "The target directory for result output (default: ${DEFAULT-VALUE})")
+  @Option (names = { "-t", "--target" },
+           paramLabel = "director",
+           defaultValue = ".",
+           description = "The target directory for result output (default: ${DEFAULT-VALUE})")
   private String m_sOutputDir;
 
-  @Option (names = "--ubl-vatscheme", paramLabel = "vat scheme", defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME, description = "The UBL VAT scheme to be used (default: ${DEFAULT-VALUE})")
+  @Option (names = "--ubl-vatscheme",
+           paramLabel = "vat scheme",
+           defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME,
+           description = "The UBL VAT scheme to be used (default: ${DEFAULT-VALUE})")
   private String m_sVATScheme;
 
-  @Option (names = "--ubl-customizationid", paramLabel = "ID", defaultValue = AbstractCIIToUBLConverter.DEFAULT_CUSTOMIZATION_ID, description = "The UBL customization ID to be used (default: ${DEFAULT-VALUE})")
+  @Option (names = "--ubl-customizationid",
+           paramLabel = "ID",
+           defaultValue = AbstractCIIToUBLConverter.DEFAULT_CUSTOMIZATION_ID,
+           description = "The UBL customization ID to be used (default: ${DEFAULT-VALUE})")
   private String m_sCustomizationID;
 
-  @Option (names = "--ubl-profileid", paramLabel = "ID", defaultValue = AbstractCIIToUBLConverter.DEFAULT_PROFILE_ID, description = "The UBL profile ID to be used (default: ${DEFAULT-VALUE})")
+  @Option (names = "--ubl-profileid",
+           paramLabel = "ID",
+           defaultValue = AbstractCIIToUBLConverter.DEFAULT_PROFILE_ID,
+           description = "The UBL profile ID to be used (default: ${DEFAULT-VALUE})")
   private String m_sProfileID;
 
-  @Option (names = "--ubl-cardaccountnetworkid", paramLabel = "ID", defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID, description = "The UBL CardAccount network ID to be used (default: ${DEFAULT-VALUE})")
+  @Option (names = "--ubl-cardaccountnetworkid",
+           paramLabel = "ID",
+           defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID,
+           description = "The UBL CardAccount network ID to be used (default: ${DEFAULT-VALUE})")
   private String m_sCardAccountNetworkID;
 
-  @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more Files")
+  @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more CII file(s)")
   private List <File> m_aSourceFiles;
 
   private static String _normalizeOutputDirectory (final String dir)

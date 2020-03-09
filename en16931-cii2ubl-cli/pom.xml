@@ -97,9 +97,6 @@
             <exclude>**/LICENSE</exclude>
             <exclude>**/NOTICE</exclude>
             <exclude>**/*.txt</exclude>
-            <exclude>src/test/resources/cii/*</exclude>
-            <exclude>toubl21/*</exclude>
-            <exclude>toubl22/*</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -107,16 +104,16 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
-          <filters>
-            <filter>
-              <artifact>*:*</artifact>
-              <excludes>
-                <exclude>META-INF/*.SF</exclude>
-                <exclude>META-INF/*.DSA</exclude>
-                <exclude>META-INF/*.RSA</exclude>
-              </excludes>
-            </filter>
-          </filters>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <shadedArtifactAttached>true</shadedArtifactAttached>
+          <shadedClassifierName>full</shadedClassifierName>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+              <resource>.RSA</resource>
+              <resource>.SF</resource>
+            </transformer>
+          </transformers>
         </configuration>
         <executions>
           <execution>
@@ -124,10 +121,6 @@
             <goals>
               <goal>shade</goal>
             </goals>
-            <configuration>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>full</shadedClassifierName>
-            </configuration>
           </execution>
         </executions>
       </plugin>
