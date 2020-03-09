@@ -26,8 +26,41 @@ Additionally an `ErrorList` object must be provided as a container for all the e
 <dependency>
   <groupId>com.helger</groupId>
   <artifactId>en16931-cii2ubl</artifactId>
-  <version>1.1.5</version>
+  <version>1.2.0</version>
 </dependency>
+```
+
+## Commandline usage
+
+The CLI interface was introduced in v1.2.0.
+
+Call it via `java -jar en16931-cii2ubl-cli-1.2.0-full.jar`
+
+
+```
+Missing required parameter: source files
+Usage: CIItoUBLConverter [-hV] [--mode mode] [-t director] [--ubl version]
+                         [--ubl-cardaccountnetworkid ID] [--ubl-customizationid
+                         ID] [--ubl-profileid ID] [--ubl-vatscheme vat scheme]
+                         source files...
+CII to UBL Converter.
+      source files...      One or more CII file(s)
+  -h, --help               Show this help message and exit.
+      --mode mode          Allowed values: AUTOMATIC, INVOICE, CREDIT_NOTE
+  -t, --target director    The target directory for result output (default: .)
+      --ubl version        Version of the target UBL Format (default: 2.1)
+      --ubl-cardaccountnetworkid ID
+                           The UBL CardAccount network ID to be used (default:
+                             mapped-from-cii)
+      --ubl-customizationid ID
+                           The UBL customization ID to be used (default: urn:
+                             cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:
+                             2017:poacc:billing:3.0)
+      --ubl-profileid ID   The UBL profile ID to be used (default: urn:fdc:
+                             peppol.eu:2017:poacc:billing:01:1.0)
+      --ubl-vatscheme vat scheme
+                           The UBL VAT scheme to be used (default: VAT)
+  -V, --version            Print version information and exit.
 ```
 
 # Open issues
