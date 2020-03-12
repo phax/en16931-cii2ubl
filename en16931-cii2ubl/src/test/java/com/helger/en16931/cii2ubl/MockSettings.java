@@ -59,6 +59,8 @@ final class MockSettings
                                                                             "01.15a-INVOICE_uncefact.xml",
                                                                             "02.01a-INVOICE_uncefact.xml",
                                                                             "02.02a-INVOICE_uncefact.xml",
+                                                                            "02.03a-INVOICE_uncefact.xml",
+                                                                            "02.04a-INVOICE_uncefact.xml",
                                                                             // "03.01a-INVOICE_uncefact.xml",
                                                                             "03.02a-INVOICE_uncefact.xml" };
 
