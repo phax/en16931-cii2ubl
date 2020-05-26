@@ -67,13 +67,6 @@
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
-        <artifactId>ph-xsds-parent-pom</artifactId>
-        <version>2.2.6</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.helger</groupId>
         <artifactId>ph-ubl-parent-pom</artifactId>
         <version>6.2.1</version>
         <type>pom</type>
