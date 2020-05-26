@@ -67,11 +67,6 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-bdve-en16931</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

@@ -82,7 +82,7 @@ public final class CIIToUBL22ConverterTest
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
-        aResultList = MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_131)
+        aResultList = MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_132)
                                                .createExecutionManager ()
                                                .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
       }
@@ -95,7 +95,7 @@ public final class CIIToUBL22ConverterTest
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
-        aResultList = MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_CREDIT_NOTE_131)
+        aResultList = MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_CREDIT_NOTE_132)
                                                .createExecutionManager ()
                                                .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
       }

@@ -26,7 +26,7 @@ Additionally an `ErrorList` object must be provided as a container for all the e
 <dependency>
   <groupId>com.helger</groupId>
   <artifactId>en16931-cii2ubl</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 </dependency>
 ```
 
@@ -71,7 +71,9 @@ CII to UBL Converter.
 
 # News and noteworthy
 
-* v1.2.0 - work in progress
+* v1.2.1 - 2020-05-26
+    * Updated to new Maven groupIds
+* v1.2.0 - 2020-03-09
     * Verified against EN 16931 validation artefacts 1.3.0 - no changes in the output
     * Added commandline interface (CLI) - (see [PR #3](https://github.com/phax/en16931-cii2ubl/pull/3)) - thanks to [@rkottmann](https://github.com/rkottmann)
     * Fixed creating invalid UBL if `SellerOrderReferencedDocument` is present but `BuyerOrderReferencedDocument` is not set (see [issue #5](https://github.com/phax/en16931-cii2ubl/issues/5))

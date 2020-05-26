@@ -66,15 +66,15 @@
       <artifactId>ph-datetime</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.cii</groupId>
       <artifactId>ph-cii-d16b</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.ubl</groupId>
       <artifactId>ph-ubl21</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.ubl</groupId>
       <artifactId>ph-ubl22</artifactId>
     </dependency>
 
@@ -89,7 +89,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.bdve</groupId>
       <artifactId>ph-bdve-en16931</artifactId>
       <scope>test</scope>
     </dependency>
