@@ -21,8 +21,9 @@ import java.io.File;
 
 import javax.annotation.Nonnull;
 
+import com.helger.bdve.api.executorset.ValidationExecutorSetRegistry;
 import com.helger.bdve.en16931.EN16931Validation;
-import com.helger.bdve.executorset.ValidationExecutorSetRegistry;
+import com.helger.bdve.engine.source.IValidationSourceXML;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
@@ -64,7 +65,7 @@ final class MockSettings
                                                                             // "03.01a-INVOICE_uncefact.xml",
                                                                             "03.02a-INVOICE_uncefact.xml" };
 
-  static final ValidationExecutorSetRegistry VES_REGISTRY = new ValidationExecutorSetRegistry ();
+  static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
   static
   {
     EN16931Validation.initEN16931 (VES_REGISTRY);

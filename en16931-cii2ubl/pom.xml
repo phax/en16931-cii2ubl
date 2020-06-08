@@ -89,8 +89,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.helger.bdve</groupId>
-      <artifactId>ph-bdve-en16931</artifactId>
+      <groupId>com.helger.bdve.rules</groupId>
+      <artifactId>ph-bdve-rules-en16931</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

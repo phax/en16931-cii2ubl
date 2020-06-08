@@ -30,10 +30,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.bdve.api.execute.ValidationExecutionManager;
+import com.helger.bdve.api.result.ValidationResult;
+import com.helger.bdve.api.result.ValidationResultList;
 import com.helger.bdve.en16931.EN16931Validation;
-import com.helger.bdve.result.ValidationResult;
-import com.helger.bdve.result.ValidationResultList;
-import com.helger.bdve.source.ValidationSource;
+import com.helger.bdve.engine.source.ValidationSourceXML;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.io.file.FilenameHelper;
 import com.helger.commons.io.resource.FileSystemResource;
@@ -82,9 +83,8 @@ public final class CIIToUBL21ConverterTest
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
-        aResultList = MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_132)
-                                               .createExecutionManager ()
-                                               .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
+        aResultList = ValidationExecutionManager.executeValidation (MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_132),
+                                                                    ValidationSourceXML.create (new FileSystemResource (aDestFile)));
       }
       else
       {
@@ -95,9 +95,8 @@ public final class CIIToUBL21ConverterTest
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
-        aResultList = MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_CREDIT_NOTE_132)
-                                               .createExecutionManager ()
-                                               .executeValidation (ValidationSource.createXMLSource (new FileSystemResource (aDestFile)));
+        aResultList = ValidationExecutionManager.executeValidation (MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_CREDIT_NOTE_132),
+                                                                    ValidationSourceXML.create (new FileSystemResource (aDestFile)));
       }
 
       assertNotNull (aResultList);
