@@ -52,10 +52,7 @@ import picocli.CommandLine.Parameters;
 /**
  * Main command line client
  */
-@Command (description = "CII to UBL Converter.",
-          name = "CIItoUBLConverter",
-          mixinStandardHelpOptions = true,
-          separator = " ")
+@Command (description = "CII to UBL Converter.", name = "CIItoUBLConverter", mixinStandardHelpOptions = true, separator = " ")
 public class CIIToUBLConverter implements Callable <Integer>
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverter.class);
@@ -66,10 +63,7 @@ public class CIIToUBLConverter implements Callable <Integer>
            description = "Version of the target UBL Format (default: ${DEFAULT-VALUE})")
   private String m_sUBLVersion;
 
-  @Option (names = "--mode",
-           paramLabel = "mode",
-           defaultValue = "INVOICE",
-           description = "Allowed values: ${COMPLETION-CANDIDATES}")
+  @Option (names = "--mode", paramLabel = "mode", defaultValue = "INVOICE", description = "Allowed values: ${COMPLETION-CANDIDATES}")
   private EUBLCreationMode m_eMode;
 
   @Option (names = { "-t", "--target" },
@@ -210,8 +204,7 @@ public class CIIToUBLConverter implements Callable <Integer>
             {
               UBL22Writer.creditNote ()
                          .setFormattedOutput (bFormattedOutput)
-                         .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL,
-                                 aDestFile);
+                         .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL, aDestFile);
             }
             else
             {

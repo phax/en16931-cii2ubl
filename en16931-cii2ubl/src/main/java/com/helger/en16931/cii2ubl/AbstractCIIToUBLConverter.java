@@ -153,8 +153,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static XMLGregorianCalendar _parseDateDDMMYYYY (@Nullable final String sDate,
-                                                            @Nonnull final IErrorList aErrorList)
+  protected static XMLGregorianCalendar _parseDateDDMMYYYY (@Nullable final String sDate, @Nonnull final IErrorList aErrorList)
   {
     if (StringHelper.hasNoText (sDate))
       return null;
@@ -167,8 +166,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nonnull
-  protected static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator,
-                                              @Nonnull final IErrorList aErrorList)
+  protected static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator, @Nonnull final IErrorList aErrorList)
   {
     if (aIndicator == null)
       return ETriState.UNDEFINED;
@@ -188,8 +186,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       if ("false".equals (sIndicator))
         return ETriState.FALSE;
 
-      aErrorList.add (_buildError (null,
-                                   "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
+      aErrorList.add (_buildError (null, "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
       return ETriState.UNDEFINED;
     }
 
@@ -336,6 +333,5 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    *         <code>null</code> in case of error.
    */
   @Nullable
-  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice,
-                                                @Nonnull ErrorList aErrorList);
+  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice, @Nonnull ErrorList aErrorList);
 }
