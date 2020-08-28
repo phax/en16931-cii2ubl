@@ -71,6 +71,9 @@ CII to UBL Converter.
 
 # News and noteworthy
 
+* v1.2.2 - work in progress
+    * Updated to ph-commons 9.4.7
+    * Updated to ph-cii 2.3.0
 * v1.2.1 - 2020-05-26
     * Updated to new Maven groupIds
 * v1.2.0 - 2020-03-09

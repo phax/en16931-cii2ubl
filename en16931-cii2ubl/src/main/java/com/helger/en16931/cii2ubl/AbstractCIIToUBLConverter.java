@@ -23,7 +23,6 @@ import java.time.LocalDate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.ValueEnforcer;
@@ -35,7 +34,6 @@ import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.traits.IGenericImplTrait;
-import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
@@ -153,7 +151,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static XMLGregorianCalendar _parseDateDDMMYYYY (@Nullable final String sDate, @Nonnull final IErrorList aErrorList)
+  protected static LocalDate _parseDateDDMMYYYY (@Nullable final String sDate, @Nonnull final IErrorList aErrorList)
   {
     if (StringHelper.hasNoText (sDate))
       return null;
@@ -162,7 +160,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aDate == null)
       aErrorList.add (_buildError (null, "Failed to parse the date '" + sDate + "'"));
 
-    return PDTXMLConverter.getXMLCalendarDate (aDate);
+    return aDate;
   }
 
   @Nonnull

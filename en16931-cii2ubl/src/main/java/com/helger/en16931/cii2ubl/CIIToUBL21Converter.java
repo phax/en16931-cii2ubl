@@ -19,10 +19,10 @@ package com.helger.en16931.cii2ubl;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import com.helger.commons.CGlobal;
 import com.helger.commons.ValueEnforcer;
@@ -390,7 +390,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
 
     // IssueDate
     {
-      XMLGregorianCalendar aIssueDate = null;
+      LocalDate aIssueDate = null;
       if (aED != null && aED.getIssueDateTime () != null)
         aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue (), aErrorList);
 
@@ -400,7 +400,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
 
     // DueDate
     {
-      XMLGregorianCalendar aDueDate = null;
+      LocalDate aDueDate = null;
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
         if (aPaymentTerms.getDueDateDateTime () != null)
         {
@@ -426,7 +426,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     {
       if (aTradeTax.getTaxPointDate () != null)
       {
-        final XMLGregorianCalendar aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ().getDateStringValue (), aErrorList);
+        final LocalDate aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ().getDateStringValue (), aErrorList);
         if (aTaxPointDate != null)
         {
           // Use the first tax point date only
@@ -1289,7 +1289,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
 
     // IssueDate
     {
-      XMLGregorianCalendar aIssueDate = null;
+      LocalDate aIssueDate = null;
       if (aED != null && aED.getIssueDateTime () != null)
         aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue (), aErrorList);
 
@@ -1299,7 +1299,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
 
     // DueDate (UBL 2.2 only)
     // {
-    // XMLGregorianCalendar aDueDate = null;
+    // LocalDate aDueDate = null;
     // for (final TradePaymentTermsType aPaymentTerms :
     // aHeaderSettlement.getSpecifiedTradePaymentTerms ())
     // if (aPaymentTerms.getDueDateDateTime () != null)
@@ -1327,7 +1327,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     {
       if (aTradeTax.getTaxPointDate () != null)
       {
-        final XMLGregorianCalendar aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ().getDateStringValue (), aErrorList);
+        final LocalDate aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ().getDateStringValue (), aErrorList);
         if (aTaxPointDate != null)
         {
           // Use the first tax point date only
