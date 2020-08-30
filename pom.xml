@@ -61,28 +61,28 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>9.4.7-SNAPSHOT</version>
+        <version>9.4.7</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.ubl</groupId>
         <artifactId>ph-ubl-parent-pom</artifactId>
-        <version>6.4.0-SNAPSHOT</version>
+        <version>6.4.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.cii</groupId>
         <artifactId>ph-cii-parent-pom</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.3.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-schematron-parent-pom</artifactId>
-        <version>5.6.0</version>
+        <version>5.6.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -96,14 +96,14 @@
       <dependency>
         <groupId>com.helger.bdve.rules</groupId>
         <artifactId>ph-bdve-rules-parent-pom</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.5.0</version>
+        <version>4.5.1</version>
       </dependency>
       
       <dependency>

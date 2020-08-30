@@ -22,11 +22,13 @@ Additionally an `ErrorList` object must be provided as a container for all the e
 
 ## Maven usage
 
+Replace `x.y.z` with the effective version you want to use:
+
 ```xml
 <dependency>
   <groupId>com.helger</groupId>
   <artifactId>en16931-cii2ubl</artifactId>
-  <version>1.2.1</version>
+  <version>x.y.z</version>
 </dependency>
 ```
 
@@ -71,9 +73,10 @@ CII to UBL Converter.
 
 # News and noteworthy
 
-* v1.2.2 - work in progress
+* v1.2.2 - 2020-08-30
     * Updated to ph-commons 9.4.7
     * Updated to ph-cii 2.3.0
+    * Updated to ph-ubl 6.4.0
 * v1.2.1 - 2020-05-26
     * Updated to new Maven groupIds
 * v1.2.0 - 2020-03-09
