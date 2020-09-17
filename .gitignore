@@ -27,3 +27,5 @@ target/
 *.iml
 .project 
 .classpath 
+zz
+release.properties
