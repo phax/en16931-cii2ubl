@@ -73,6 +73,8 @@ CII to UBL Converter.
 
 # News and noteworthy
 
+* v1.2.3 - 2020-09-17
+    * Updated to Jakarta JAXB 2.3.3
 * v1.2.2 - 2020-08-30
     * Updated to ph-commons 9.4.7
     * Updated to ph-cii 2.3.0
