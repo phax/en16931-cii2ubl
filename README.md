@@ -73,6 +73,9 @@ CII to UBL Converter.
 
 # News and noteworthy
 
+* v1.2.4 - 2020-10-20
+    * Tested with EN 16031 validation rules 1.3.3
+    * Not emitting the `LegalMonetaryTotal/PayableRoundingAmount` if the value is `0` as a work around for https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
 * v1.2.3 - 2020-09-17
     * Updated to Jakarta JAXB 2.3.3
 * v1.2.2 - 2020-08-30
