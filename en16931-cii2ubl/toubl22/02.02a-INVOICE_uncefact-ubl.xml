@@ -230,7 +230,6 @@
       <cbc:AllowanceTotalAmount currencyID="EUR">0</cbc:AllowanceTotalAmount>
       <cbc:ChargeTotalAmount currencyID="EUR">0</cbc:ChargeTotalAmount>
       <cbc:PrepaidAmount currencyID="EUR">0</cbc:PrepaidAmount>
-      <cbc:PayableRoundingAmount currencyID="EUR">0</cbc:PayableRoundingAmount>
       <cbc:PayableAmount currencyID="EUR">10781.25</cbc:PayableAmount>
   </cac:LegalMonetaryTotal>
   <cac:InvoiceLine>

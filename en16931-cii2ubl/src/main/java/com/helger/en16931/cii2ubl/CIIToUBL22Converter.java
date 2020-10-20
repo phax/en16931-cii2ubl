@@ -1004,9 +1004,14 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                                            new PrepaidAmountType (),
                                                            sDefaultCurrencyCode));
         if (aSTSHMS.hasRoundingAmountEntries ())
-          aUBLMonetaryTotal.setPayableRoundingAmount (_copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
-                                                                   new PayableRoundingAmountType (),
-                                                                   sDefaultCurrencyCode));
+        {
+          // Work around
+          // https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
+          if (MathHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
+            aUBLMonetaryTotal.setPayableRoundingAmount (_copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
+                                                                     new PayableRoundingAmountType (),
+                                                                     sDefaultCurrencyCode));
+        }
         if (aSTSHMS.hasDuePayableAmountEntries ())
           aUBLMonetaryTotal.setPayableAmount (_copyAmount (aSTSHMS.getDuePayableAmountAtIndex (0),
                                                            new PayableAmountType (),
@@ -1894,9 +1899,14 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                                            new PrepaidAmountType (),
                                                            sDefaultCurrencyCode));
         if (aSTSHMS.hasRoundingAmountEntries ())
-          aUBLMonetaryTotal.setPayableRoundingAmount (_copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
-                                                                   new PayableRoundingAmountType (),
-                                                                   sDefaultCurrencyCode));
+        {
+          // Work around
+          // https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
+          if (MathHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
+            aUBLMonetaryTotal.setPayableRoundingAmount (_copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
+                                                                     new PayableRoundingAmountType (),
+                                                                     sDefaultCurrencyCode));
+        }
         if (aSTSHMS.hasDuePayableAmountEntries ())
           aUBLMonetaryTotal.setPayableAmount (_copyAmount (aSTSHMS.getDuePayableAmountAtIndex (0),
                                                            new PayableAmountType (),
