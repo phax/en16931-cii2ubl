@@ -30,14 +30,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.bdve.api.execute.ValidationExecutionManager;
-import com.helger.bdve.api.result.ValidationResult;
-import com.helger.bdve.api.result.ValidationResultList;
-import com.helger.bdve.en16931.EN16931Validation;
-import com.helger.bdve.engine.source.ValidationSourceXML;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.io.file.FilenameHelper;
 import com.helger.commons.io.resource.FileSystemResource;
+import com.helger.phive.api.execute.ValidationExecutionManager;
+import com.helger.phive.api.result.ValidationResult;
+import com.helger.phive.api.result.ValidationResultList;
+import com.helger.phive.en16931.EN16931Validation;
+import com.helger.phive.engine.source.ValidationSourceXML;
 import com.helger.ubl21.UBL21Writer;
 import com.helger.ubl21.UBL21WriterBuilder;
 

@@ -21,13 +21,13 @@ import java.io.File;
 
 import javax.annotation.Nonnull;
 
-import com.helger.bdve.api.executorset.ValidationExecutorSetRegistry;
-import com.helger.bdve.en16931.EN16931Validation;
-import com.helger.bdve.engine.source.IValidationSourceXML;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.phive.api.executorset.ValidationExecutorSetRegistry;
+import com.helger.phive.en16931.EN16931Validation;
+import com.helger.phive.engine.source.IValidationSourceXML;
 
 final class MockSettings
 {
