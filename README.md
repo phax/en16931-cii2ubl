@@ -73,6 +73,8 @@ CII to UBL Converter.
 
 # News and noteworthy
 
+* v1.2.5 - 2020-11-30
+    * Added Jakarta Activation dependency to the standalone CLI version (see [issue #6](https://github.com/phax/en16931-cii2ubl/issues/6))
 * v1.2.4 - 2020-10-20
     * Tested with EN 16031 validation rules 1.3.3
     * Not emitting the `LegalMonetaryTotal/PayableRoundingAmount` if the value is `0` as a work around for https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
