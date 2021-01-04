@@ -23,7 +23,6 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
@@ -34,6 +33,8 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.error.IError;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.io.file.FilenameHelper;
@@ -116,11 +117,9 @@ public class CIIToUBLConverter implements Callable <Integer>
   }
 
   @Nonnull
-  private List <File> _normalizeInputFiles (@Nonnull final List <File> files) throws IOException
+  private ICommonsList <File> _normalizeInputFiles (@Nonnull final List <File> files) throws IOException
   {
-    final List <File> ret = new ArrayList <> ();
-
-    List <File> dirFiles = new ArrayList <> ();
+    final ICommonsList <File> ret = new CommonsArrayList <> ();
     for (final File file : files)
     {
       if (file.isDirectory ())
@@ -128,12 +127,11 @@ public class CIIToUBLConverter implements Callable <Integer>
         if (LOGGER.isDebugEnabled ())
           LOGGER.debug ("Is a directory=" + file.toString ());
         // collecting readable and normalized absolute path files
-        dirFiles = Files.walk (file.toPath ())
-                        .filter (p -> Files.isReadable (p) && !Files.isDirectory (p))
-                        .map (p -> _normalizeFile (p))
-                        .peek (f -> LOGGER.debug ("Add file={}", f.toString ()))
-                        .collect (Collectors.toList ());
-        ret.addAll (dirFiles);
+        ret.addAll (Files.walk (file.toPath ())
+                         .filter (p -> Files.isReadable (p) && !Files.isDirectory (p))
+                         .map (p -> _normalizeFile (p))
+                         .peek (f -> LOGGER.debug ("Add file={}", f.toString ()))
+                         .collect (Collectors.toList ()));
       }
       else
         if (file.canRead ())
@@ -161,6 +159,7 @@ public class CIIToUBLConverter implements Callable <Integer>
         aConverter = new CIIToUBL22Converter ();
       else
         throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
+
     aConverter.setUBLCreationMode (m_eMode)
               .setVATScheme (m_sVATScheme)
               .setCustomizationID (m_sCustomizationID)
@@ -178,43 +177,45 @@ public class CIIToUBLConverter implements Callable <Integer>
       // TODO switch between versions
       final ErrorList aErrorList = new ErrorList ();
       final Serializable aUBL = aConverter.convertCIItoUBL (f, aErrorList);
-      final boolean bFormattedOutput = true;
-      if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType)
+      if (aErrorList.containsAtLeastOneError () || aUBL == null)
       {
-        UBL21Writer.invoice ()
-                   .setFormattedOutput (bFormattedOutput)
-                   .write ((oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType) aUBL, aDestFile);
+        LOGGER.error ("Failed to convert CII file '" + f.getAbsolutePath () + "' to UBL:");
+        for (final IError aError : aErrorList)
+          LOGGER.error (aError.getAsString (aErrorLocale));
       }
       else
-        if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType)
+      {
+        final boolean bFormattedOutput = true;
+        if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType)
         {
-          UBL21Writer.creditNote ()
+          UBL21Writer.invoice ()
                      .setFormattedOutput (bFormattedOutput)
-                     .write ((oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType) aUBL, aDestFile);
+                     .write ((oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType) aUBL, aDestFile);
         }
         else
-          if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType)
+          if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType)
           {
-            UBL22Writer.invoice ()
+            UBL21Writer.creditNote ()
                        .setFormattedOutput (bFormattedOutput)
-                       .write ((oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType) aUBL, aDestFile);
+                       .write ((oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType) aUBL, aDestFile);
           }
           else
-            if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType)
+            if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType)
             {
-              UBL22Writer.creditNote ()
+              UBL22Writer.invoice ()
                          .setFormattedOutput (bFormattedOutput)
-                         .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL, aDestFile);
+                         .write ((oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType) aUBL, aDestFile);
             }
             else
-            {
-              if (aUBL != null)
+              if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType)
+              {
+                UBL22Writer.creditNote ()
+                           .setFormattedOutput (bFormattedOutput)
+                           .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL, aDestFile);
+              }
+              else
                 throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");
-
-              LOGGER.error ("Failed to convert CII file '" + f.getAbsolutePath () + "' to UBL:");
-              for (final IError aError : aErrorList)
-                LOGGER.error (aError.getAsString (aErrorLocale));
-            }
+      }
     }
 
     return Integer.valueOf (0);
