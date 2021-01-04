@@ -63,7 +63,7 @@ public final class CIIToUBL21ConverterTest
   {
     for (final File aFile : MockSettings.getAllTestFiles ())
     {
-      LOGGER.info ("Converting " + aFile.getName () + " to UBL 2.1");
+      LOGGER.info ("Converting " + aFile.toString () + " to UBL 2.1");
 
       // Main conversion
       final ErrorList aErrorList = new ErrorList ();

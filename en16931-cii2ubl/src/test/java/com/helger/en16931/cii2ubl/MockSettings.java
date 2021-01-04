@@ -31,7 +31,7 @@ import com.helger.phive.engine.source.IValidationSourceXML;
 
 final class MockSettings
 {
-  private static final String BASE_TEST_DIR = "src/test/resources/cii/";
+  public static final String BASE_TEST_DIR = "src/test/resources/cii/";
   private static final String [] TEST_FILES_EN16931 = new String [] { "CII_business_example_01.xml",
                                                                       "CII_business_example_02.xml",
                                                                       "CII_example1.xml",
@@ -64,6 +64,25 @@ final class MockSettings
                                                                             "02.04a-INVOICE_uncefact.xml",
                                                                             // "03.01a-INVOICE_uncefact.xml",
                                                                             "03.02a-INVOICE_uncefact.xml" };
+  private static final String [] TEST_FILES_XRECHNUNG_200 = new String [] { "01.01a-INVOICE_uncefact.xml",
+                                                                            "01.02a-INVOICE_uncefact.xml",
+                                                                            "01.03a-INVOICE_uncefact.xml",
+                                                                            "01.04a-INVOICE_uncefact.xml",
+                                                                            "01.05a-INVOICE_uncefact.xml",
+                                                                            "01.06a-INVOICE_uncefact.xml",
+                                                                            "01.07a-INVOICE_uncefact.xml",
+                                                                            "01.08a-INVOICE_uncefact.xml",
+                                                                            "01.09a-INVOICE_uncefact.xml",
+                                                                            "01.10a-INVOICE_uncefact.xml",
+                                                                            "01.11a-INVOICE_uncefact.xml",
+                                                                            "01.12a-INVOICE_uncefact.xml",
+                                                                            "01.13a-INVOICE_uncefact.xml",
+                                                                            "01.14a-INVOICE_uncefact.xml",
+                                                                            "01.15a-INVOICE_uncefact.xml",
+                                                                            "02.01a-INVOICE_uncefact.xml",
+                                                                            "02.02a-INVOICE_uncefact.xml",
+                                                                            // "03.01a-INVOICE_uncefact.xml",
+                                                                            "03.02a-INVOICE_uncefact.xml" };
 
   static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
   static
@@ -81,6 +100,8 @@ final class MockSettings
       ret.add (new File (BASE_TEST_DIR, sFile));
     for (final String sFile : TEST_FILES_XRECHNUNG_122)
       ret.add (new File (BASE_TEST_DIR + "xrechnung/1.2.2", sFile));
+    for (final String sFile : TEST_FILES_XRECHNUNG_200)
+      ret.add (new File (BASE_TEST_DIR + "xrechnung/2.0.0", sFile));
     return ret;
   }
 }

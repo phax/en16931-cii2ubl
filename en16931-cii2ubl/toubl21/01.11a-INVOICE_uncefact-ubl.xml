@@ -7,7 +7,6 @@
   <cbc:DueDate>2016-03-08</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
-  <cbc:TaxCurrencyCode>EUR</cbc:TaxCurrencyCode>
   <cbc:BuyerReference>04011000-12352-27</cbc:BuyerReference>
   <cac:OrderReference>
     <cbc:ID></cbc:ID>
