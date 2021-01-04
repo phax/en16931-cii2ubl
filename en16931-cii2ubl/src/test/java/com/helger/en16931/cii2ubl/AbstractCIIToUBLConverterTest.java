@@ -29,6 +29,11 @@ import org.junit.Test;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.error.list.ErrorList;
 
+/**
+ * Test class for class {@link AbstractCIIToUBLConverter}.
+ *
+ * @author Philip Helger
+ */
 public final class AbstractCIIToUBLConverterTest
 {
   @Test
