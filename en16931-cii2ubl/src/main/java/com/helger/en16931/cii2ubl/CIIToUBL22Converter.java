@@ -105,7 +105,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     // IssueDate is optional
     final FormattedDateTimeType aFDT = aRD.getFormattedIssueDateTime ();
     if (aFDT != null)
-      ret.setIssueDate (_parseDateDDMMYYYY (aFDT.getDateTimeStringValue (), aErrorList));
+      ret.setIssueDate (_parseDate (aFDT.getDateTimeString (), aErrorList));
 
     // Name is optional
     for (final TextType aItem : aRD.getName ())
@@ -392,7 +392,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     {
       LocalDate aIssueDate = null;
       if (aED != null && aED.getIssueDateTime () != null)
-        aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue (), aErrorList);
+        aIssueDate = _parseDate (aED.getIssueDateTime ().getDateTimeString (), aErrorList);
 
       if (aIssueDate != null)
         aUBLInvoice.setIssueDate (aIssueDate);
@@ -404,7 +404,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
         if (aPaymentTerms.getDueDateDateTime () != null)
         {
-          aDueDate = _parseDateDDMMYYYY (aPaymentTerms.getDueDateDateTime ().getDateTimeStringValue (), aErrorList);
+          aDueDate = _parseDate (aPaymentTerms.getDueDateDateTime ().getDateTimeString (), aErrorList);
           if (aDueDate != null)
             break;
         }
@@ -426,7 +426,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     {
       if (aTradeTax.getTaxPointDate () != null)
       {
-        final LocalDate aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ().getDateStringValue (), aErrorList);
+        final LocalDate aTaxPointDate = _parseDate (aTradeTax.getTaxPointDate ().getDateString (), aErrorList);
         if (aTaxPointDate != null)
         {
           // Use the first tax point date only
@@ -475,8 +475,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         if (aStartDT != null && aEndDT != null)
         {
           final PeriodType aUBLPeriod = new PeriodType ();
-          aUBLPeriod.setStartDate (_parseDateDDMMYYYY (aStartDT.getDateTimeStringValue (), aErrorList));
-          aUBLPeriod.setEndDate (_parseDateDDMMYYYY (aEndDT.getDateTimeStringValue (), aErrorList));
+          aUBLPeriod.setStartDate (_parseDate (aStartDT.getDateTimeString (), aErrorList));
+          aUBLPeriod.setEndDate (_parseDate (aEndDT.getDateTimeString (), aErrorList));
           aUBLInvoice.addInvoicePeriod (aUBLPeriod);
         }
       }
@@ -704,7 +704,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         final DateTimeType aODT = aSCE.getOccurrenceDateTime ();
         if (aODT != null)
         {
-          aUBLDelivery.setActualDeliveryDate (_parseDateDDMMYYYY (aODT.getDateTimeStringValue (), aErrorList));
+          aUBLDelivery.setActualDeliveryDate (_parseDate (aODT.getDateTimeString (), aErrorList));
           bUseDelivery = true;
         }
       }
@@ -1067,9 +1067,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       {
         final PeriodType aUBLLinePeriod = new PeriodType ();
         if (aLineBillingPeriod.getStartDateTime () != null)
-          aUBLLinePeriod.setStartDate (_parseDateDDMMYYYY (aLineBillingPeriod.getStartDateTime ().getDateTimeStringValue (), aErrorList));
+          aUBLLinePeriod.setStartDate (_parseDate (aLineBillingPeriod.getStartDateTime ().getDateTimeString (), aErrorList));
         if (aLineBillingPeriod.getEndDateTime () != null)
-          aUBLLinePeriod.setEndDate (_parseDateDDMMYYYY (aLineBillingPeriod.getEndDateTime ().getDateTimeStringValue (), aErrorList));
+          aUBLLinePeriod.setEndDate (_parseDate (aLineBillingPeriod.getEndDateTime ().getDateTimeString (), aErrorList));
         aUBLInvoiceLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
@@ -1297,7 +1297,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     {
       LocalDate aIssueDate = null;
       if (aED != null && aED.getIssueDateTime () != null)
-        aIssueDate = _parseDateDDMMYYYY (aED.getIssueDateTime ().getDateTimeStringValue (), aErrorList);
+        aIssueDate = _parseDate (aED.getIssueDateTime ().getDateTimeString (), aErrorList);
 
       if (aIssueDate != null)
         aUBLCreditNote.setIssueDate (aIssueDate);
@@ -1309,7 +1309,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
         if (aPaymentTerms.getDueDateDateTime () != null)
         {
-          aDueDate = _parseDateDDMMYYYY (aPaymentTerms.getDueDateDateTime ().getDateTimeStringValue (), aErrorList);
+          aDueDate = _parseDate (aPaymentTerms.getDueDateDateTime ().getDateTimeString (), aErrorList);
           if (aDueDate != null)
             break;
         }
@@ -1331,7 +1331,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     {
       if (aTradeTax.getTaxPointDate () != null)
       {
-        final LocalDate aTaxPointDate = _parseDateDDMMYYYY (aTradeTax.getTaxPointDate ().getDateStringValue (), aErrorList);
+        final LocalDate aTaxPointDate = _parseDate (aTradeTax.getTaxPointDate ().getDateString (), aErrorList);
         if (aTaxPointDate != null)
         {
           // Use the first tax point date only
@@ -1380,8 +1380,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         if (aStartDT != null && aEndDT != null)
         {
           final PeriodType aUBLPeriod = new PeriodType ();
-          aUBLPeriod.setStartDate (_parseDateDDMMYYYY (aStartDT.getDateTimeStringValue (), aErrorList));
-          aUBLPeriod.setEndDate (_parseDateDDMMYYYY (aEndDT.getDateTimeStringValue (), aErrorList));
+          aUBLPeriod.setStartDate (_parseDate (aStartDT.getDateTimeString (), aErrorList));
+          aUBLPeriod.setEndDate (_parseDate (aEndDT.getDateTimeString (), aErrorList));
           aUBLCreditNote.addInvoicePeriod (aUBLPeriod);
         }
       }
@@ -1610,7 +1610,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           final DateTimeType aODT = aSCE.getOccurrenceDateTime ();
           if (aODT != null)
-            aUBLDelivery.setActualDeliveryDate (_parseDateDDMMYYYY (aODT.getDateTimeStringValue (), aErrorList));
+            aUBLDelivery.setActualDeliveryDate (_parseDate (aODT.getDateTimeString (), aErrorList));
         }
 
         final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType ();
@@ -1962,9 +1962,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       {
         final PeriodType aUBLLinePeriod = new PeriodType ();
         if (aLineBillingPeriod.getStartDateTime () != null)
-          aUBLLinePeriod.setStartDate (_parseDateDDMMYYYY (aLineBillingPeriod.getStartDateTime ().getDateTimeStringValue (), aErrorList));
+          aUBLLinePeriod.setStartDate (_parseDate (aLineBillingPeriod.getStartDateTime ().getDateTimeString (), aErrorList));
         if (aLineBillingPeriod.getEndDateTime () != null)
-          aUBLLinePeriod.setEndDate (_parseDateDDMMYYYY (aLineBillingPeriod.getEndDateTime ().getDateTimeStringValue (), aErrorList));
+          aUBLLinePeriod.setEndDate (_parseDate (aLineBillingPeriod.getEndDateTime ().getDateTimeString (), aErrorList));
         aUBLCreditNoteLine.addInvoicePeriod (aUBLLinePeriod);
       }
 

@@ -73,6 +73,8 @@ CII to UBL Converter.
 
 # News and noteworthy
 
+* v1.2.6 - work in progress
+    * Added support for different CII time formats (2, 3, 4, 101, 102, 103 and 105) where `102` is the default
 * v1.2.5 - 2020-11-30
     * Added Jakarta Activation dependency to the standalone CLI version (see [issue #6](https://github.com/phax/en16931-cii2ubl/issues/6))
 * v1.2.4 - 2020-10-20

@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 
 import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.error.IError;
 import com.helger.commons.error.SingleError;
@@ -150,17 +151,99 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
                       .build ();
   }
 
+  /**
+   * Get the pattern based on
+   * https://service.unece.org/trade/untdid/d16b/tred/tred2379.htm
+   *
+   * @param sFormat
+   *        Format to use. May be <code>null</code>.
+   * @param aErrorList
+   *        The error list to be filled if an unsupported format is provided.
+   * @return <code>null</code> if the format is unknown.
+   */
   @Nullable
-  protected static LocalDate _parseDateDDMMYYYY (@Nullable final String sDate, @Nonnull final IErrorList aErrorList)
+  public static String _getDatePattern (@Nonnull @Nonempty final String sFormat, @Nonnull final IErrorList aErrorList)
+  {
+    ValueEnforcer.notEmpty (sFormat, "Format");
+    ValueEnforcer.notNull (aErrorList, "ErrorList");
+
+    switch (sFormat)
+    {
+      // DDMMYY
+      case "2":
+        return "ddMMuu";
+      // MMDDYY
+      case "3":
+        return "MMdduu";
+      // DDMMCCYY
+      case "4":
+        return "ddMMuuuu";
+      // YYMMDD
+      case "101":
+        return "uuMMdd";
+      // CCYYMMDD
+      case "102":
+        return "uuuuMMdd";
+      // YYWWD
+      case "103":
+        return "YYwwee";
+      // YYDDD
+      case "105":
+        return "uuDDD";
+      default:
+        aErrorList.add (_buildError (null, "Unsupported date format '" + sFormat + "'"));
+        return "'error'";
+    }
+  }
+
+  @Nullable
+  protected static LocalDate _parseDate (@Nullable final String sDate, @Nullable final String sFormat, @Nonnull final IErrorList aErrorList)
   {
     if (StringHelper.hasNoText (sDate))
       return null;
 
-    final LocalDate aDate = PDTFromString.getLocalDateFromString (sDate, "uuuuMMdd");
+    // Default to 102
+    final String sRealFormat = StringHelper.getNotEmpty (sFormat, "102");
+    final String sPattern = _getDatePattern (sRealFormat, aErrorList);
+    if (sPattern == null)
+      return null;
+
+    // Try to parse it
+    final LocalDate aDate = PDTFromString.getLocalDateFromString (sDate, sPattern);
     if (aDate == null)
-      aErrorList.add (_buildError (null, "Failed to parse the date '" + sDate + "'"));
+      aErrorList.add (_buildError (null, "Failed to parse the date '" + sDate + "' using format '" + sRealFormat + "'"));
 
     return aDate;
+  }
+
+  @Nullable
+  protected static LocalDate _parseDate (@Nullable final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType.DateTimeString aDateObj,
+                                         @Nonnull final IErrorList aErrorList)
+  {
+    if (aDateObj == null)
+      return null;
+
+    return _parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
+  }
+
+  @Nullable
+  protected static LocalDate _parseDate (@Nullable final un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType.DateTimeString aDateObj,
+                                         @Nonnull final IErrorList aErrorList)
+  {
+    if (aDateObj == null)
+      return null;
+
+    return _parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
+  }
+
+  @Nullable
+  protected static LocalDate _parseDate (@Nullable final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType.DateString aDateObj,
+                                         @Nonnull final IErrorList aErrorList)
+  {
+    if (aDateObj == null)
+      return null;
+
+    return _parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
   }
 
   @Nonnull
