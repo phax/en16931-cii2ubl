@@ -352,8 +352,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
   }
 
   @Nullable
-  protected InvoiceType convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice, @Nonnull final ErrorList aErrorList)
+  public InvoiceType convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice, @Nonnull final ErrorList aErrorList)
   {
+    ValueEnforcer.notNull (aCIIInvoice, "CIIInvoice");
+    ValueEnforcer.notNull (aErrorList, "ErrorList");
+
     final ExchangedDocumentType aED = aCIIInvoice.getExchangedDocument ();
     final SupplyChainTradeTransactionType aSCTT = aCIIInvoice.getSupplyChainTradeTransaction ();
     if (aSCTT == null)
@@ -1257,8 +1260,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
   }
 
   @Nullable
-  protected CreditNoteType convertToCreditNote (@Nonnull final CrossIndustryInvoiceType aCIICreditNote, @Nonnull final ErrorList aErrorList)
+  public CreditNoteType convertToCreditNote (@Nonnull final CrossIndustryInvoiceType aCIICreditNote, @Nonnull final ErrorList aErrorList)
   {
+    ValueEnforcer.notNull (aCIICreditNote, "CIICreditNote");
+    ValueEnforcer.notNull (aErrorList, "ErrorList");
+
     final ExchangedDocumentType aED = aCIICreditNote.getExchangedDocument ();
     final SupplyChainTradeTransactionType aSCTT = aCIICreditNote.getSupplyChainTradeTransaction ();
     if (aSCTT == null)
@@ -2158,16 +2164,17 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     ValueEnforcer.notNull (aCIIInvoice, "CIIInvoice");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
 
-    final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
-    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
-    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
-                                                                                  : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
-    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null : aTotal.getDuePayableAmount ().get (0);
-
-    final boolean bWouldBeInvoice = aDuePayable == null || MathHelper.isGE0 (aDuePayable.getValue ());
     switch (getUBLCreationMode ())
     {
       case AUTOMATIC:
+        final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
+        final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
+        final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
+                                                                                      : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
+        final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null
+                                                                                                : aTotal.getDuePayableAmount ().get (0);
+
+        final boolean bWouldBeInvoice = aDuePayable == null || MathHelper.isGE0 (aDuePayable.getValue ());
         return bWouldBeInvoice ? convertToInvoice (aCIIInvoice, aErrorList) : convertToCreditNote (aCIIInvoice, aErrorList);
       case INVOICE:
         return convertToInvoice (aCIIInvoice, aErrorList);
