@@ -192,7 +192,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
         return "uuDDD";
       default:
         aErrorList.add (_buildError (null, "Unsupported date format '" + sFormat + "'"));
-        return "'error'";
+        return null;
     }
   }
 
