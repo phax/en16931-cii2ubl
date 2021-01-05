@@ -367,14 +367,34 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return ret;
   }
 
-  protected static boolean paymentMeansCodeRequiresPayeeFinancialAccountID (@Nullable final String s)
+  protected static boolean isPaymentMeansCodeCreditTransfer (@Nullable final String s)
   {
+    // the EN 16931 XSLT only checks for 30 and 58
     // in ebinterface-ubl-mapping this is 30, 31, 42 and 58
     // 30 = Credit transfer
     // 31 = Debit transfer
     // 42 = Payment to bank account
     // 58 = SEPA credit transfer
     return "30".equals (s) || "58".equals (s);
+  }
+
+  protected static boolean isPaymentMeansCodePaymentCard (@Nullable final String s)
+  {
+    // 48 = Bank card
+    return "48".equals (s);
+  }
+
+  protected static boolean isPaymentMeansCodeDirectDebit (@Nullable final String s)
+  {
+    // 49 = Direct debit (non-SEPA)
+    // 59 = SEPA direct debit
+    return "49".equals (s) || "59".equals (s);
+  }
+
+  protected static boolean isPaymentMeansCodeOtherKnown (@Nullable final String s)
+  {
+    // 57 = Standing agreement
+    return "57".equals (s);
   }
 
   protected static boolean isOriginatorDocumentReferenceTypeCode (@Nullable final String s)

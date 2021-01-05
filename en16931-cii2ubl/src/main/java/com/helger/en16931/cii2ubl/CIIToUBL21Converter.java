@@ -768,7 +768,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
           aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
         aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
 
-        final boolean bRequiresPayeeFinancialAccountID = paymentMeansCodeRequiresPayeeFinancialAccountID (aUBLPaymentMeansCode.getValue ());
+        final boolean bRequiresPayeeFinancialAccountID = isPaymentMeansCodeCreditTransfer (aUBLPaymentMeansCode.getValue ());
 
         for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
         {
@@ -1669,7 +1669,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
           aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
         aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
 
-        final boolean bRequiresPayeeFinancialAccountID = paymentMeansCodeRequiresPayeeFinancialAccountID (aUBLPaymentMeansCode.getValue ());
+        final boolean bRequiresPayeeFinancialAccountID = isPaymentMeansCodeCreditTransfer (aUBLPaymentMeansCode.getValue ());
 
         for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
         {
