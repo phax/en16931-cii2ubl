@@ -100,6 +100,25 @@
   </dependencies>
 
   <build>
+    <resources>
+      <!-- Don't specify the targetPath because this leads to a broken JAR file 
+        in combination with the bundle plugin (absolute file paths in ZIP file) -->
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+        </excludes>  
+      </resource>
+    </resources>
+    
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -110,6 +129,8 @@
             <Automatic-Module-Name>com.helger.en16931-cii2ubl</Automatic-Module-Name>
             <Export-Package>com.helger.en16931-cii2ubl.*</Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
+            <!-- The latter one has precedence -->
+            <Include-Resource>{maven-resources},cii2ubl-version.properties=target/classes/cii2ubl-version.properties</Include-Resource>
           </instructions>
         </configuration>
       </plugin>

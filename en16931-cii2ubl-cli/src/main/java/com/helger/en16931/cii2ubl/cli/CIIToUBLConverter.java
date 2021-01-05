@@ -42,6 +42,7 @@ import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverter;
 import com.helger.en16931.cii2ubl.CIIToUBL21Converter;
 import com.helger.en16931.cii2ubl.CIIToUBL22Converter;
 import com.helger.en16931.cii2ubl.CIIToUBL23Converter;
+import com.helger.en16931.cii2ubl.CIIToUBLVersion;
 import com.helger.en16931.cii2ubl.EUBLCreationMode;
 import com.helger.ubl21.UBL21Writer;
 import com.helger.ubl22.UBL22Writer;
@@ -70,7 +71,7 @@ public class CIIToUBLConverter implements Callable <Integer>
   private EUBLCreationMode m_eMode;
 
   @Option (names = { "-t", "--target" },
-           paramLabel = "director",
+           paramLabel = "directory",
            defaultValue = ".",
            description = "The target directory for result output (default: ${DEFAULT-VALUE})")
   private String m_sOutputDir;
@@ -242,7 +243,7 @@ public class CIIToUBLConverter implements Callable <Integer>
 
   public static void main (final String [] aArgs)
   {
-    LOGGER.info ("Starting CII to UBL Converter");
+    LOGGER.info ("Starting CII to UBL Converter v" + CIIToUBLVersion.BUILD_VERSION + " (build " + CIIToUBLVersion.BUILD_TIMESTAMP + ")");
     final CommandLine cmd = new CommandLine (new CIIToUBLConverter ());
     cmd.setCaseInsensitiveEnumValuesAllowed (true);
     final int nExitCode = cmd.execute (aArgs);
