@@ -91,6 +91,12 @@ final class MockSettings
   }
 
   @Nonnull
+  public static File getBaseDir ()
+  {
+    return new File (BASE_TEST_DIR);
+  }
+
+  @Nonnull
   @Nonempty
   @ReturnsMutableCopy
   public static ICommonsList <File> getAllTestFiles ()

@@ -61,6 +61,7 @@ public final class CIIToUBL23ConverterTest
   @Test
   public void testConvertAndValidateAll ()
   {
+    final String sBasePath = MockSettings.getBaseDir ().getAbsolutePath ();
     for (final File aFile : MockSettings.getAllTestFiles ())
     {
       LOGGER.info ("Converting " + aFile.toString () + " to UBL 2.3");
@@ -71,7 +72,8 @@ public final class CIIToUBL23ConverterTest
       assertTrue ("Errors: " + aErrorList.toString (), aErrorList.isEmpty ());
       assertNotNull (aInvoice);
 
-      final File aDestFile = new File ("toubl23", FilenameHelper.getBaseName (aFile.getName ()) + "-ubl.xml");
+      final File aDestFile = new File ("toubl23/" + aFile.getParentFile ().getAbsolutePath ().substring (sBasePath.length ()),
+                                       FilenameHelper.getBaseName (aFile.getName ()) + "-ubl.xml");
       final ValidationResultList aResultList;
 
       if (aInvoice instanceof InvoiceType)
