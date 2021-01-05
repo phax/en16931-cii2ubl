@@ -73,9 +73,11 @@ CII to UBL Converter.
 
 # News and noteworthy
 
-* v1.2.6 - work in progress
+* v1.3.0 - work in progress
     * Added support for different CII time formats (2, 3, 4, 101, 102, 103 and 105) where `102` is the default
     * The error handling for the commandline client was improved (checking errors before writing UBL) (see [issue #9](https://github.com/phax/en16931-cii2ubl/issues/9))
+    * Added the possibility to create UBL 2.3
+    * Made the API more open to directly convert to Invoice or CreditNote
 * v1.2.5 - 2020-11-30
     * Added Jakarta Activation dependency to the standalone CLI version (see [issue #6](https://github.com/phax/en16931-cii2ubl/issues/6))
 * v1.2.4 - 2020-10-20
