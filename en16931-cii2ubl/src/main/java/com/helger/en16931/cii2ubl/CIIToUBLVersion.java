@@ -30,6 +30,7 @@ import com.helger.commons.lang.PropertiesHelper;
  * Contains application wide constants.
  *
  * @author Philip Helger
+ * @since 1.3.0
  */
 @Immutable
 public final class CIIToUBLVersion

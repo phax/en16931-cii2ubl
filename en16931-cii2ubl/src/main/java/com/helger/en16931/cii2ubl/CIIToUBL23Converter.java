@@ -54,6 +54,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  * CII to UBL 2.3 converter.
  *
  * @author Philip Helger
+ * @since 1.3.0
  */
 public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Converter>
 {
