@@ -186,12 +186,13 @@
       <cac:PayeeFinancialAccount>
       <cbc:ID>DK1212341234123412</cbc:ID>
     </cac:PayeeFinancialAccount>
-      <cac:PaymentMandate>
-      <cbc:ID>123456</cbc:ID>
-          <cac:PayerFinancialAccount>
-        <cbc:ID>DK5678</cbc:ID>
-      </cac:PayerFinancialAccount>
-    </cac:PaymentMandate>
+  </cac:PaymentMeans>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>
+      <cbc:PaymentID>Payref1</cbc:PaymentID>
+      <cac:PayeeFinancialAccount>
+      <cbc:ID>DE07123412341234123412</cbc:ID>
+    </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
   <cac:PaymentTerms>
     <cbc:Note>50% prepaid, 50% within one month</cbc:Note>
