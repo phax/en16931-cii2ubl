@@ -54,6 +54,8 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  */
 public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Converter>
 {
+  private static final String UBL_VERSION = "2.2";
+
   public CIIToUBL22Converter ()
   {}
 
@@ -374,7 +376,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
     final InvoiceType aUBLInvoice = new InvoiceType ();
     if (false)
-      aUBLInvoice.setUBLVersionID ("2.2");
+      aUBLInvoice.setUBLVersionID (UBL_VERSION);
     aUBLInvoice.setCustomizationID (getCustomizationID ());
     aUBLInvoice.setProfileID (getProfileID ());
     if (aED != null)
@@ -1279,7 +1281,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
     final CreditNoteType aUBLCreditNote = new CreditNoteType ();
     if (false)
-      aUBLCreditNote.setUBLVersionID ("2.2");
+      aUBLCreditNote.setUBLVersionID (UBL_VERSION);
     aUBLCreditNote.setCustomizationID (getCustomizationID ());
     aUBLCreditNote.setProfileID (getProfileID ());
     if (aED != null)
