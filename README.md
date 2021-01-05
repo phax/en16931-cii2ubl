@@ -78,6 +78,7 @@ CII to UBL Converter.
     * The error handling for the commandline client was improved (checking errors before writing UBL) (see [issue #9](https://github.com/phax/en16931-cii2ubl/issues/9))
     * Added the possibility to create UBL 2.3
     * Made the API more open to directly convert to Invoice or CreditNote
+    * Improved the handling of payment means to be more EN compliant (see [issue #7](https://github.com/phax/en16931-cii2ubl/issues/7))
 * v1.2.5 - 2020-11-30
     * Added Jakarta Activation dependency to the standalone CLI version (see [issue #6](https://github.com/phax/en16931-cii2ubl/issues/6))
 * v1.2.4 - 2020-10-20
