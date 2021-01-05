@@ -41,9 +41,11 @@ import com.helger.commons.io.file.FilenameHelper;
 import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverter;
 import com.helger.en16931.cii2ubl.CIIToUBL21Converter;
 import com.helger.en16931.cii2ubl.CIIToUBL22Converter;
+import com.helger.en16931.cii2ubl.CIIToUBL23Converter;
 import com.helger.en16931.cii2ubl.EUBLCreationMode;
 import com.helger.ubl21.UBL21Writer;
 import com.helger.ubl22.UBL22Writer;
+import com.helger.ubl23.UBL23Writer;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -61,7 +63,7 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Option (names = "--ubl",
            paramLabel = "version",
            defaultValue = "2.1",
-           description = "Version of the target UBL Format (default: ${DEFAULT-VALUE})")
+           description = "Version of the target UBL Format: '2.1', '2.2' or '2.3' (default: ${DEFAULT-VALUE})")
   private String m_sUBLVersion;
 
   @Option (names = "--mode", paramLabel = "mode", defaultValue = "INVOICE", description = "Allowed values: ${COMPLETION-CANDIDATES}")
@@ -158,7 +160,10 @@ public class CIIToUBLConverter implements Callable <Integer>
       if ("2.2".equals (m_sUBLVersion))
         aConverter = new CIIToUBL22Converter ();
       else
-        throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
+        if ("2.3".equals (m_sUBLVersion))
+          aConverter = new CIIToUBL23Converter ();
+        else
+          throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
 
     aConverter.setUBLCreationMode (m_eMode)
               .setVATScheme (m_sVATScheme)
@@ -214,7 +219,21 @@ public class CIIToUBLConverter implements Callable <Integer>
                            .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL, aDestFile);
               }
               else
-                throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");
+                if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType)
+                {
+                  UBL23Writer.invoice ()
+                             .setFormattedOutput (bFormattedOutput)
+                             .write ((oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType) aUBL, aDestFile);
+                }
+                else
+                  if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType)
+                  {
+                    UBL23Writer.creditNote ()
+                               .setFormattedOutput (bFormattedOutput)
+                               .write ((oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType) aUBL, aDestFile);
+                  }
+                  else
+                    throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");
       }
     }
 
