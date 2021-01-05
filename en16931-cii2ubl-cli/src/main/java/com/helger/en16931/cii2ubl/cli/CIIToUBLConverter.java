@@ -56,7 +56,10 @@ import picocli.CommandLine.Parameters;
 /**
  * Main command line client
  */
-@Command (description = "CII to UBL Converter.", name = "CIItoUBLConverter", mixinStandardHelpOptions = true, separator = " ")
+@Command (description = "CII to UBL Converter for EN 16931 invoices",
+          name = "CIItoUBLConverter",
+          mixinStandardHelpOptions = true,
+          separator = " ")
 public class CIIToUBLConverter implements Callable <Integer>
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverter.class);
@@ -243,7 +246,7 @@ public class CIIToUBLConverter implements Callable <Integer>
 
   public static void main (final String [] aArgs)
   {
-    LOGGER.info ("Starting CII to UBL Converter v" + CIIToUBLVersion.BUILD_VERSION + " (build " + CIIToUBLVersion.BUILD_TIMESTAMP + ")");
+    LOGGER.info ("CII to UBL Converter v" + CIIToUBLVersion.BUILD_VERSION + " (build " + CIIToUBLVersion.BUILD_TIMESTAMP + ")");
     final CommandLine cmd = new CommandLine (new CIIToUBLConverter ());
     cmd.setCaseInsensitiveEnumValuesAllowed (true);
     final int nExitCode = cmd.execute (aArgs);
