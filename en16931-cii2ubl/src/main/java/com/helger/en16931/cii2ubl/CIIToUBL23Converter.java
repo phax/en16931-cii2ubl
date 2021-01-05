@@ -20,12 +20,15 @@ package com.helger.en16931.cii2ubl;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.CGlobal;
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.math.MathHelper;
@@ -184,6 +187,21 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     return aID == null ? null : _copyID (aID);
   }
 
+  private static void _addPartyID (@Nonnull final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID,
+                                   @Nonnull final PartyType aParty)
+  {
+    if (aUBLID != null)
+    {
+      // Avoid duplicate IDs
+      if (!CollectionHelper.containsAny (aParty.getPartyIdentification (), x -> EqualsHelper.equals (aUBLID, x.getID ())))
+      {
+        final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
+        aUBLPartyIdentification.setID (aUBLID);
+        aParty.addPartyIdentification (aUBLPartyIdentification);
+      }
+    }
+  }
+
   @Nonnull
   private static PartyType _convertParty (@Nonnull final TradePartyType aParty)
   {
@@ -195,13 +213,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       ret.setEndpointID (_copyID (UC.getURIID (), new EndpointIDType ()));
     }
 
-    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID = _extractPartyID (aParty);
-    if (aUBLID != null)
-    {
-      final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
-      aUBLPartyIdentification.setID (aUBLID);
-      ret.addPartyIdentification (aUBLPartyIdentification);
-    }
+    _addPartyID (_extractPartyID (aParty), ret);
 
     final TextType aName = aParty.getName ();
     if (aName != null)
@@ -349,6 +361,147 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
       aUBLAllowanceCharge.addTaxCategory (aUBLTaxCategory);
     }
+  }
+
+  private void _convertPaymentMeans (@Nonnull final HeaderTradeSettlementType aHeaderSettlement,
+                                     @Nonnull final TradeSettlementPaymentMeansType aPaymentMeans,
+                                     @Nonnull final Consumer <oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType> aSellerIDHandler,
+                                     @Nonnull final Consumer <PaymentMeansType> aPaymentMeansHandler,
+                                     @Nonnull final ErrorList aErrorList)
+  {
+    final String sTypeCode = aPaymentMeans.getTypeCodeValue ();
+
+    final PaymentMeansType aUBLPaymentMeans = new PaymentMeansType ();
+    final PaymentMeansCodeType aUBLPaymentMeansCode = new PaymentMeansCodeType ();
+
+    // BG-16 PAYMENT INSTRUCTIONS
+    // BT-81 TypeCode is mandatory
+    aUBLPaymentMeansCode.setValue (sTypeCode);
+
+    // BT-82
+    if (aPaymentMeans.hasInformationEntries ())
+      aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
+
+    // BT-83
+    aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
+
+    for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
+    {
+      final PaymentIDType aUBLPaymentID = new PaymentIDType ();
+      aUBLPaymentID.setValue (aPaymentRef.getValue ());
+      aUBLPaymentMeans.addPaymentID (aUBLPaymentID);
+    }
+
+    // BG-17 CREDIT TRANSFER
+    final boolean bIsBG17 = isPaymentMeansCodeCreditTransfer (sTypeCode);
+    if (bIsBG17)
+    {
+      final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
+      if (aAccount == null)
+        aErrorList.add (_buildError (null, "The element 'PayeePartyCreditorFinancialAccount' is missing for Credit Transfer"));
+      else
+      {
+        final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+
+        // BT-84 mandatory
+        // ID/@scheme ID must be empty for the EN16931 Schematrons
+        aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
+        if (aUBLFinancialAccount.getID () == null)
+          aUBLFinancialAccount.setID (_copyID (aAccount.getProprietaryID ()));
+
+        // BT-85
+        aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName (), new NameType ()));
+
+        // BT-86
+        final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
+        if (aInstitution != null)
+        {
+          final BranchType aUBLBranch = new BranchType ();
+          aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
+          aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
+        }
+
+        aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
+      }
+    }
+
+    // BG-18 PAYMENT CARD INFORMATION
+    final boolean bIsBG18 = isPaymentMeansCodePaymentCard (sTypeCode);
+    if (bIsBG18)
+    {
+      final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
+      if (aCard == null)
+        aErrorList.add (_buildError (null, "The element 'ApplicableTradeSettlementFinancialCard' is missing for Payment Card Information"));
+      else
+      {
+        final CardAccountType aUBLCardAccount = new CardAccountType ();
+
+        // BT-87 mandatory
+        aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
+
+        // No CII field present
+        aUBLCardAccount.setNetworkID (getCardAccountNetworkID ());
+
+        // BT-88
+        aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
+
+        if (StringHelper.hasNoText (aUBLCardAccount.getPrimaryAccountNumberIDValue ()))
+          aErrorList.add (_buildError (null, "The Payment card primary account number is missing"));
+        else
+          if (StringHelper.hasNoText (aUBLCardAccount.getNetworkIDValue ()))
+            aErrorList.add (_buildError (null, "The Payment card network ID is missing"));
+          else
+            aUBLPaymentMeans.addCardAccount (aUBLCardAccount);
+      }
+    }
+
+    // BG-19 DIRECT DEBIT
+    final boolean bIsBG19 = isPaymentMeansCodeDirectDebit (sTypeCode);
+    if (bIsBG19)
+    {
+      final PaymentMandateType aUBLPaymentMandate = new PaymentMandateType ();
+
+      // BT-89
+      for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
+        if (aPaymentTerms.hasDirectDebitMandateIDEntries ())
+        {
+          aUBLPaymentMandate.setID (_copyID (aPaymentTerms.getDirectDebitMandateIDAtIndex (0)));
+          if (aUBLPaymentMandate.getID () != null)
+            break;
+        }
+
+      // BT-90
+      // how to determine if it is the Seller or the Payee?
+      // For direct debit it's always assumed to be the seller
+      final IDType aCreditorRefID = aHeaderSettlement.getCreditorReferenceID ();
+      if (aCreditorRefID != null)
+      {
+        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aSellerID = _copyID (aCreditorRefID);
+        aSellerID.setSchemeID ("SEPA");
+        aSellerIDHandler.accept (aSellerID);
+      }
+
+      // BT-91
+      final DebtorFinancialAccountType aAccount = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
+      if (aAccount != null)
+      {
+        final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+        aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
+        // Name is not mapped
+        if (false)
+          aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName (), new NameType ()));
+
+        if (aUBLFinancialAccount.getID () != null)
+          aUBLPaymentMandate.setPayerFinancialAccount (aUBLFinancialAccount);
+      }
+
+      aUBLPaymentMeans.setPaymentMandate (aUBLPaymentMandate);
+    }
+
+    if (bIsBG17 || bIsBG18 || bIsBG19 || isPaymentMeansCodeOtherKnown (sTypeCode))
+      aPaymentMeansHandler.accept (aUBLPaymentMeans);
+    else
+      aErrorList.add (_buildError (null, "Failed to determine a supported Payment Means Type from code '" + sTypeCode + "'"));
   }
 
   @Nullable
@@ -758,102 +911,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     {
       for (final TradeSettlementPaymentMeansType aPaymentMeans : aHeaderSettlement.getSpecifiedTradeSettlementPaymentMeans ())
       {
-        final PaymentMeansType aUBLPaymentMeans = new PaymentMeansType ();
-
-        final PaymentMeansCodeType aUBLPaymentMeansCode = new PaymentMeansCodeType ();
-        aUBLPaymentMeansCode.setValue (aPaymentMeans.getTypeCodeValue ());
-        if (aPaymentMeans.hasInformationEntries ())
-          aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
-        aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
-
-        final boolean bRequiresPayeeFinancialAccountID = paymentMeansCodeRequiresPayeeFinancialAccountID (aUBLPaymentMeansCode.getValue ());
-
-        for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
-        {
-          final PaymentIDType aUBLPaymentID = new PaymentIDType ();
-          aUBLPaymentID.setValue (aPaymentRef.getValue ());
-          aUBLPaymentMeans.addPaymentID (aUBLPaymentID);
-        }
-
-        final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
-        if (aCard != null)
-        {
-          final CardAccountType aUBLCardAccount = new CardAccountType ();
-          aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
-          // No CII field present
-          aUBLCardAccount.setNetworkID (getCardAccountNetworkID ());
-          aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
-          aUBLPaymentMeans.addCardAccount (aUBLCardAccount);
-        }
-
-        {
-          final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
-
-          final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
-          if (aAccount != null)
-          {
-            aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
-            aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName (), new NameType ()));
-          }
-          else
-          {
-            // For PaymentMeansCode 58
-            final DebtorFinancialAccountType aAccount2 = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
-            if (aAccount2 != null)
-            {
-              aUBLFinancialAccount.setID (_copyID (aAccount2.getIBANID ()));
-              aUBLFinancialAccount.setName (_copyName (aAccount2.getAccountName (), new NameType ()));
-            }
-          }
-
-          if (bRequiresPayeeFinancialAccountID && aUBLFinancialAccount.getID () == null)
-          {
-            // Ignore PaymentMeans because required IBAN is missing
-            continue;
-          }
-
-          final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
-          if (aInstitution != null)
-          {
-            final BranchType aUBLBranch = new BranchType ();
-            aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
-            aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
-          }
-
-          if (aUBLFinancialAccount.getID () != null ||
-              aUBLFinancialAccount.getName () != null ||
-              aUBLFinancialAccount.getFinancialInstitutionBranch () != null)
-            aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
-        }
-
-        {
-          boolean bUseMandate = false;
-          final PaymentMandateType aUBLPaymentMandate = new PaymentMandateType ();
-
-          for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
-          {
-            if (aPaymentTerms.hasDirectDebitMandateIDEntries ())
-            {
-              aUBLPaymentMandate.setID (_copyID (aPaymentTerms.getDirectDebitMandateIDAtIndex (0)));
-              bUseMandate = true;
-              break;
-            }
-          }
-
-          final IDType aCreditorRefID = aHeaderSettlement.getCreditorReferenceID ();
-          if (aCreditorRefID != null)
-          {
-            final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
-            aUBLFinancialAccount.setID (_copyID (aCreditorRefID));
-            aUBLPaymentMandate.setPayerFinancialAccount (aUBLFinancialAccount);
-            bUseMandate = true;
-          }
-
-          if (bUseMandate)
-            aUBLPaymentMeans.setPaymentMandate (aUBLPaymentMandate);
-        }
-
-        aUBLInvoice.addPaymentMeans (aUBLPaymentMeans);
+        _convertPaymentMeans (aHeaderSettlement,
+                              aPaymentMeans,
+                              x -> _addPartyID (x, aUBLInvoice.getAccountingSupplierParty ().getParty ()),
+                              aUBLInvoice::addPaymentMeans,
+                              aErrorList);
 
         // Allowed again in 1.2.1: exactly 2
         if (false)
@@ -1656,102 +1718,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     {
       for (final TradeSettlementPaymentMeansType aPaymentMeans : aHeaderSettlement.getSpecifiedTradeSettlementPaymentMeans ())
       {
-        final PaymentMeansType aUBLPaymentMeans = new PaymentMeansType ();
-
-        final PaymentMeansCodeType aUBLPaymentMeansCode = new PaymentMeansCodeType ();
-        aUBLPaymentMeansCode.setValue (aPaymentMeans.getTypeCodeValue ());
-        if (aPaymentMeans.hasInformationEntries ())
-          aUBLPaymentMeansCode.setName (aPaymentMeans.getInformationAtIndex (0).getValue ());
-        aUBLPaymentMeans.setPaymentMeansCode (aUBLPaymentMeansCode);
-
-        final boolean bRequiresPayeeFinancialAccountID = paymentMeansCodeRequiresPayeeFinancialAccountID (aUBLPaymentMeansCode.getValue ());
-
-        for (final TextType aPaymentRef : aHeaderSettlement.getPaymentReference ())
-        {
-          final PaymentIDType aUBLPaymentID = new PaymentIDType ();
-          aUBLPaymentID.setValue (aPaymentRef.getValue ());
-          aUBLPaymentMeans.addPaymentID (aUBLPaymentID);
-        }
-
-        final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
-        if (aCard != null)
-        {
-          final CardAccountType aUBLCardAccount = new CardAccountType ();
-          aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
-          // No CII field present
-          aUBLCardAccount.setNetworkID (getCardAccountNetworkID ());
-          aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
-          aUBLPaymentMeans.addCardAccount (aUBLCardAccount);
-        }
-
-        {
-          final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
-
-          final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
-          if (aAccount != null)
-          {
-            aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
-            aUBLFinancialAccount.setName (_copyName (aAccount.getAccountName (), new NameType ()));
-          }
-          else
-          {
-            // For PaymentMeansCode 58
-            final DebtorFinancialAccountType aAccount2 = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
-            if (aAccount2 != null)
-            {
-              aUBLFinancialAccount.setID (_copyID (aAccount2.getIBANID ()));
-              aUBLFinancialAccount.setName (_copyName (aAccount2.getAccountName (), new NameType ()));
-            }
-          }
-
-          if (bRequiresPayeeFinancialAccountID && aUBLFinancialAccount.getID () == null)
-          {
-            // Ignore PaymentMeans because required IBAN is missing
-            continue;
-          }
-
-          final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
-          if (aInstitution != null)
-          {
-            final BranchType aUBLBranch = new BranchType ();
-            aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
-            aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
-          }
-
-          if (aUBLFinancialAccount.getID () != null ||
-              aUBLFinancialAccount.getName () != null ||
-              aUBLFinancialAccount.getFinancialInstitutionBranch () != null)
-            aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
-        }
-
-        {
-          boolean bUseMandate = false;
-          final PaymentMandateType aUBLPaymentMandate = new PaymentMandateType ();
-
-          for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
-          {
-            if (aPaymentTerms.hasDirectDebitMandateIDEntries ())
-            {
-              aUBLPaymentMandate.setID (_copyID (aPaymentTerms.getDirectDebitMandateIDAtIndex (0)));
-              bUseMandate = true;
-              break;
-            }
-          }
-
-          final IDType aCreditorRefID = aHeaderSettlement.getCreditorReferenceID ();
-          if (aCreditorRefID != null)
-          {
-            final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
-            aUBLFinancialAccount.setID (_copyID (aCreditorRefID));
-            aUBLPaymentMandate.setPayerFinancialAccount (aUBLFinancialAccount);
-            bUseMandate = true;
-          }
-
-          if (bUseMandate)
-            aUBLPaymentMeans.setPaymentMandate (aUBLPaymentMandate);
-        }
-
-        aUBLCreditNote.addPaymentMeans (aUBLPaymentMeans);
+        _convertPaymentMeans (aHeaderSettlement,
+                              aPaymentMeans,
+                              x -> _addPartyID (x, aUBLCreditNote.getAccountingSupplierParty ().getParty ()),
+                              aUBLCreditNote::addPaymentMeans,
+                              aErrorList);
 
         // Allowed again in 1.2.1: exactly 2
         if (false)
