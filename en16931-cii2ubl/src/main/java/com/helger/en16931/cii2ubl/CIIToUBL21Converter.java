@@ -799,7 +799,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
           }
           else
           {
-            // For PaymentMeansCode 58
+            // For PaymentMeansCodes 30 and 58
             final DebtorFinancialAccountType aAccount2 = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
             if (aAccount2 != null)
             {
@@ -1700,7 +1700,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
           }
           else
           {
-            // For PaymentMeansCode 58
+            // For PaymentMeansCodes 30 and 58
             final DebtorFinancialAccountType aAccount2 = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
             if (aAccount2 != null)
             {

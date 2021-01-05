@@ -370,6 +370,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static boolean paymentMeansCodeRequiresPayeeFinancialAccountID (@Nullable final String s)
   {
     // in ebinterface-ubl-mapping this is 30, 31, 42 and 58
+    // 30 = Credit transfer
+    // 31 = Debit transfer
+    // 42 = Payment to bank account
+    // 58 = SEPA credit transfer
     return "30".equals (s) || "58".equals (s);
   }
 
