@@ -1,8 +1,10 @@
 # en16931-cii2ubl
 
-Converter for unidirectional EN16931 invoices from CII D16B to UBL 2.1 and 2.2.
+Converter for unidirectional EN16931 invoices from CII D16B to UBL 2.1, 2.2 or 2.3.
 
-This is a Java 1.8+ library that converts a Cross Industry Invoice (CII) into a Universal Business Language (UBL) document following the rules of the European Norm (EN) 16931 that defines a common semantic data model for electronic invoices in Europe.  
+This is a Java 1.8+ library that converts a Cross Industry Invoice (CII) into a Universal Business Language (UBL) document following the rules of the European Norm (EN) 16931 that defines a common semantic data model for electronic invoices in Europe.
+
+Special care was given to XRechnung invoices - all the CII examples of them translate to UBL that is valid according to the EN 16931 validation rules.
 
 See https://peppol.helger.com/public/locale-en_US/menuitem-tools-rest-api#cii2ubl for a service implementation using this library.
 
@@ -11,14 +13,16 @@ This library is licensed under the Apache License Version 2.0.
 # Usage
 
 This is a pure Java library and not a self-contained conversion tool.
-You can convert CII D16B invoices following the EN 16931 rules to both UBL 2.1 and UBL 2.2.
+You can convert CII D16B invoices following the EN 16931 rules to different UBL versions.
 The entrance classes are:
-* `com.helger.en16931.cii2ubl.CIIToUBL21Converter`
-* `com.helger.en16931.cii2ubl.CIIToUBL22Converter`
+* Create UBL 2.1: `com.helger.en16931.cii2ubl.CIIToUBL21Converter`
+* Create UBL 2.2: `com.helger.en16931.cii2ubl.CIIToUBL22Converter`
+* Create UBL 2.3: `com.helger.en16931.cii2ubl.CIIToUBL23Converter` (since v1.3.0)
 
 The main conversion method is called `convertCIItoUBL` and takes either a `File` as input or a pre-parsed `un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType` object (that reading is done with class `com.helger.cii.d16b.CIID16BReader` from [ph-cii](https://github.com/phax/ph-cii)).
 Additionally an `ErrorList` object must be provided as a container for all the errors that occur.
 
+The conversion is deemed successful, if a non-`null` object is returned **and** if the error list contains no error (`errorList.containsNoError ()`).
 
 ## Maven usage
 
@@ -36,21 +40,22 @@ Replace `x.y.z` with the effective version you want to use:
 
 The CLI interface was introduced in v1.2.0.
 
-Call it via `java -jar en16931-cii2ubl-cli-1.2.0-full.jar`
-
+Call it via `java -jar en16931-cii2ubl-cli-1.3.0-full.jar`
 
 ```
-Missing required parameter: source files
-Usage: CIItoUBLConverter [-hV] [--mode mode] [-t director] [--ubl version]
+[INFO] CII to UBL Converter v1.3.0 (build 2021-01-05T20:55:24Z)
+Missing required parameter: 'source files'
+Usage: CIItoUBLConverter [-hV] [--mode mode] [-t directory] [--ubl version]
                          [--ubl-cardaccountnetworkid ID] [--ubl-customizationid
                          ID] [--ubl-profileid ID] [--ubl-vatscheme vat scheme]
                          source files...
-CII to UBL Converter.
+CII to UBL Converter for EN 16931 invoices
       source files...      One or more CII file(s)
   -h, --help               Show this help message and exit.
       --mode mode          Allowed values: AUTOMATIC, INVOICE, CREDIT_NOTE
-  -t, --target director    The target directory for result output (default: .)
-      --ubl version        Version of the target UBL Format (default: 2.1)
+  -t, --target directory   The target directory for result output (default: .)
+      --ubl version        Version of the target UBL Format: '2.1', '2.2' or
+                             '2.3' (default: 2.1)
       --ubl-cardaccountnetworkid ID
                            The UBL CardAccount network ID to be used (default:
                              mapped-from-cii)
