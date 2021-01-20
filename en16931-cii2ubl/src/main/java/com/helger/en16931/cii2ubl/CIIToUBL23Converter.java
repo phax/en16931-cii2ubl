@@ -1072,6 +1072,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         {
           // Work around
           // https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
+          // Fixed in release 1.3.4 of EN rules, but check left in for
+          // compatibility
           if (MathHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
             aUBLMonetaryTotal.setPayableRoundingAmount (_copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
                                                                      new PayableRoundingAmountType (),
@@ -1879,6 +1881,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         {
           // Work around
           // https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
+          // Fixed in release 1.3.4 of EN rules, but check left in for
+          // compatibility
           if (MathHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
             aUBLMonetaryTotal.setPayableRoundingAmount (_copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
                                                                      new PayableRoundingAmountType (),
