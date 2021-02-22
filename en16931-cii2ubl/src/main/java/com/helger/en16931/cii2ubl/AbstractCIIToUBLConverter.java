@@ -162,7 +162,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    * @return <code>null</code> if the format is unknown.
    */
   @Nullable
-  public static String _getDatePattern (@Nonnull @Nonempty final String sFormat, @Nonnull final IErrorList aErrorList)
+  protected static String _getDatePattern (@Nonnull @Nonempty final String sFormat, @Nonnull final IErrorList aErrorList)
   {
     ValueEnforcer.notEmpty (sFormat, "Format");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
