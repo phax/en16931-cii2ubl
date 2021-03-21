@@ -78,6 +78,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v1.3.1 - work in progress
+    * Updated to ph-commons 10
 * v1.3.0 - 2021-01-05
     * Added support for different CII time formats (2, 3, 4, 101, 102, 103 and 105) where `102` is the default
     * The error handling for the commandline client was improved (checking errors before writing UBL) (see [issue #9](https://github.com/phax/en16931-cii2ubl/issues/9))
