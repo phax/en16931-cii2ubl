@@ -3,14 +3,14 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>INV000013</cbc:ID>
-  <cbc:IssueDate>2013-08-25</cbc:IssueDate>
-  <cbc:DueDate>2013-05-10</cbc:DueDate>
+  <cbc:IssueDate>2013-08-25Z</cbc:IssueDate>
+  <cbc:DueDate>2013-05-10Z</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>TEXT</cbc:Note>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
   <cac:InvoicePeriod>
-    <cbc:StartDate>2013-01-01</cbc:StartDate>
-      <cbc:EndDate>2013-04-01</cbc:EndDate>
+    <cbc:StartDate>2013-01-01Z</cbc:StartDate>
+      <cbc:EndDate>2013-04-01Z</cbc:EndDate>
   </cac:InvoicePeriod>
   <cac:ContractDocumentReference>
     <cbc:ID>SUBSCR571</cbc:ID>

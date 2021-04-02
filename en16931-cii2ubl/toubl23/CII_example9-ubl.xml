@@ -3,8 +3,8 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>20150483</cbc:ID>
-  <cbc:IssueDate>2015-04-01</cbc:IssueDate>
-  <cbc:DueDate>2015-04-15</cbc:DueDate>
+  <cbc:IssueDate>2015-04-01Z</cbc:IssueDate>
+  <cbc:DueDate>2015-04-15Z</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>Vriendelijk verzoeken wij u ervoor te zorgen dat het bedrag voor de vervaldatum op onze rekening staat onder vermelding van
 het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Bluem te Amersfoort. Reclames gaarne binnen
@@ -103,8 +103,8 @@ het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Blue
       <cbc:InvoicedQuantity unitCode="MON">3</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">147</cbc:LineExtensionAmount>
       <cac:InvoicePeriod>
-      <cbc:StartDate>2016-04-01</cbc:StartDate>
-          <cbc:EndDate>2016-04-01</cbc:EndDate>
+      <cbc:StartDate>2016-04-01Z</cbc:StartDate>
+          <cbc:EndDate>2016-04-01Z</cbc:EndDate>
     </cac:InvoicePeriod>
       <cac:Item>
       <cbc:Name>IExpress licentiekosten</cbc:Name>

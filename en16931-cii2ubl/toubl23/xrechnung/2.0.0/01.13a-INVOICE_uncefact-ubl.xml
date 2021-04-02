@@ -3,8 +3,8 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>Rechnungsnummer</cbc:ID>
-  <cbc:IssueDate>2015-01-09</cbc:IssueDate>
-  <cbc:DueDate>2015-01-24</cbc:DueDate>
+  <cbc:IssueDate>2015-01-09Z</cbc:IssueDate>
+  <cbc:DueDate>2015-01-24Z</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>Bearbeitungszeitraum: Dezember 2014/ 5.01.-09.01.2015 Abschlagsrechnung A 9</cbc:Note>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>

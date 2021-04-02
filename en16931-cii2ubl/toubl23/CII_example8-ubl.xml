@@ -3,8 +3,8 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>1100512149</cbc:ID>
-  <cbc:IssueDate>2014-11-10</cbc:IssueDate>
-  <cbc:DueDate>2014-11-24</cbc:DueDate>
+  <cbc:IssueDate>2014-11-10Z</cbc:IssueDate>
+  <cbc:DueDate>2014-11-24Z</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>Periodieke afrekening
 U vindt een toelichting op uw factuur via www.enexis.nl/factuur_grootzakelijk
@@ -13,8 +13,8 @@ transport grootverbruik elektriciteit, respectievelijk gas van toepassing
 www.enexis.nl</cbc:Note>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
   <cac:InvoicePeriod>
-    <cbc:StartDate>2014-08-01</cbc:StartDate>
-      <cbc:EndDate>2014-08-31</cbc:EndDate>
+    <cbc:StartDate>2014-08-01Z</cbc:StartDate>
+      <cbc:EndDate>2014-08-31Z</cbc:EndDate>
   </cac:InvoicePeriod>
   <cac:AdditionalDocumentReference>
     <cbc:ID>871694831000290806</cbc:ID>

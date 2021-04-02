@@ -3,13 +3,13 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>INVOICE_test_7</cbc:ID>
-  <cbc:IssueDate>2013-05-13</cbc:IssueDate>
+  <cbc:IssueDate>2013-05-13Z</cbc:IssueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>Testscenario 7</cbc:Note>
   <cbc:DocumentCurrencyCode>SEK</cbc:DocumentCurrencyCode>
   <cac:InvoicePeriod>
-    <cbc:StartDate>2013-01-01</cbc:StartDate>
-      <cbc:EndDate>2013-12-31</cbc:EndDate>
+    <cbc:StartDate>2013-01-01Z</cbc:StartDate>
+      <cbc:EndDate>2013-12-31Z</cbc:EndDate>
   </cac:InvoicePeriod>
   <cac:OrderReference>
     <cbc:ID>Order_9988_x</cbc:ID>
