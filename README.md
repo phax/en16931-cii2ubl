@@ -78,6 +78,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v1.4.1 - work in progress
+    * Tested output against EN 16931 rules v1.3.5 - no changes necessary
 * v1.4.0 - 2021-03-22
     * Updated to ph-commons 10
 * v1.3.0 - 2021-01-05
