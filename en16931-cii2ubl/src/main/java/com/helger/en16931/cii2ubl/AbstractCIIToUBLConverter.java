@@ -162,8 +162,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    * @return <code>null</code> if the format is unknown.
    */
   @Nullable
-  protected static String _getDatePattern (@Nonnull @Nonempty final String sFormat,
-                                           @Nonnull final IErrorList aErrorList)
+  protected static String _getDatePattern (@Nonnull @Nonempty final String sFormat, @Nonnull final IErrorList aErrorList)
   {
     ValueEnforcer.notEmpty (sFormat, "Format");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
@@ -198,9 +197,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate _parseDate (@Nullable final String sDate,
-                                         @Nullable final String sFormat,
-                                         @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (@Nullable final String sDate, @Nullable final String sFormat, @Nonnull final IErrorList aErrorList)
   {
     if (StringHelper.hasNoText (sDate))
       return null;
@@ -214,8 +211,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     // Try to parse it
     final LocalDate aDate = PDTFromString.getLocalDateFromString (sDate, sPattern);
     if (aDate == null)
-      aErrorList.add (_buildError (null,
-                                   "Failed to parse the date '" + sDate + "' using format '" + sRealFormat + "'"));
+      aErrorList.add (_buildError (null, "Failed to parse the date '" + sDate + "' using format '" + sRealFormat + "'"));
 
     return aDate;
   }
@@ -227,7 +223,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aDateObj == null)
       return null;
 
-    return _parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
+    return parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
   }
 
   @Nullable
@@ -237,7 +233,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aDateObj == null)
       return null;
 
-    return _parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
+    return parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
   }
 
   @Nullable
@@ -247,12 +243,11 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aDateObj == null)
       return null;
 
-    return _parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
+    return parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
   }
 
   @Nonnull
-  protected static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator,
-                                              @Nonnull final IErrorList aErrorList)
+  protected static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator, @Nonnull final IErrorList aErrorList)
   {
     if (aIndicator == null)
       return ETriState.UNDEFINED;
@@ -272,8 +267,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       if ("false".equals (sIndicator))
         return ETriState.FALSE;
 
-      aErrorList.add (_buildError (null,
-                                   "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
+      aErrorList.add (_buildError (null, "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
       return ETriState.UNDEFINED;
     }
 
@@ -444,6 +438,5 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    *         <code>null</code> in case of error.
    */
   @Nullable
-  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice,
-                                                @Nonnull ErrorList aErrorList);
+  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice, @Nonnull ErrorList aErrorList);
 }
