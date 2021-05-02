@@ -3,17 +3,17 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>1234567</cbc:ID>
-  <cbc:IssueDate>2018-04-13Z</cbc:IssueDate>
-  <cbc:DueDate>2018-04-13Z</cbc:DueDate>
+  <cbc:IssueDate>2018-04-13</cbc:IssueDate>
+  <cbc:DueDate>2018-04-13</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>Invoice Note Description</cbc:Note>
-  <cbc:TaxPointDate>2018-04-13Z</cbc:TaxPointDate>
+  <cbc:TaxPointDate>2018-04-13</cbc:TaxPointDate>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
   <cbc:TaxCurrencyCode>GBP</cbc:TaxCurrencyCode>
   <cbc:BuyerReference>90000000-03083-12</cbc:BuyerReference>
   <cac:InvoicePeriod>
-    <cbc:StartDate>2018-04-13Z</cbc:StartDate>
-      <cbc:EndDate>2018-04-13Z</cbc:EndDate>
+    <cbc:StartDate>2018-04-13</cbc:StartDate>
+      <cbc:EndDate>2018-04-13</cbc:EndDate>
   </cac:InvoicePeriod>
   <cac:OrderReference>
     <cbc:ID>65002278</cbc:ID>
@@ -143,7 +143,7 @@
     </cac:PartyTaxScheme>
   </cac:TaxRepresentativeParty>
   <cac:Delivery>
-    <cbc:ActualDeliveryDate>2018-04-13Z</cbc:ActualDeliveryDate>
+    <cbc:ActualDeliveryDate>2018-04-13</cbc:ActualDeliveryDate>
       <cac:DeliveryLocation>
       <cbc:ID>68</cbc:ID>
           <cac:Address>
@@ -251,8 +251,8 @@
       <cbc:InvoicedQuantity unitCode="XPP">30</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">0</cbc:LineExtensionAmount>
       <cac:InvoicePeriod>
-      <cbc:StartDate>2016-01-01Z</cbc:StartDate>
-          <cbc:EndDate>2016-12-31Z</cbc:EndDate>
+      <cbc:StartDate>2016-01-01</cbc:StartDate>
+          <cbc:EndDate>2016-12-31</cbc:EndDate>
     </cac:InvoicePeriod>
       <cac:OrderLineReference>
       <cbc:LineID>6171175.1</cbc:LineID>

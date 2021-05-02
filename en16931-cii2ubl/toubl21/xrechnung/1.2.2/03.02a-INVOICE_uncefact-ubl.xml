@@ -3,8 +3,8 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>0000123456</cbc:ID>
-  <cbc:IssueDate>2017-12-11Z</cbc:IssueDate>
-  <cbc:DueDate>2018-01-10Z</cbc:DueDate>
+  <cbc:IssueDate>2017-12-11</cbc:IssueDate>
+  <cbc:DueDate>2018-01-10</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>[Invoice note]</cbc:Note>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>

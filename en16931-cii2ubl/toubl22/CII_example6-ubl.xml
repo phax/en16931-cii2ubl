@@ -3,8 +3,8 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>TOSL110</cbc:ID>
-  <cbc:IssueDate>2013-04-10Z</cbc:IssueDate>
-  <cbc:DueDate>2013-05-10Z</cbc:DueDate>
+  <cbc:IssueDate>2013-04-10</cbc:IssueDate>
+  <cbc:DueDate>2013-05-10</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:DocumentCurrencyCode>DKK</cbc:DocumentCurrencyCode>
   <cac:AccountingSupplierParty>

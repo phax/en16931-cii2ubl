@@ -3,16 +3,16 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>TOSL108</cbc:ID>
-  <cbc:IssueDate>2013-06-30Z</cbc:IssueDate>
-  <cbc:DueDate>2013-07-20Z</cbc:DueDate>
+  <cbc:IssueDate>2013-06-30</cbc:IssueDate>
+  <cbc:DueDate>2013-07-20</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>Ordered in our booth at the convention</cbc:Note>
-  <cbc:TaxPointDate>2013-06-30Z</cbc:TaxPointDate>
+  <cbc:TaxPointDate>2013-06-30</cbc:TaxPointDate>
   <cbc:DocumentCurrencyCode>NOK</cbc:DocumentCurrencyCode>
   <cbc:AccountingCost>Project cost code 123</cbc:AccountingCost>
   <cac:InvoicePeriod>
-    <cbc:StartDate>2013-06-01Z</cbc:StartDate>
-      <cbc:EndDate>2013-06-30Z</cbc:EndDate>
+    <cbc:StartDate>2013-06-01</cbc:StartDate>
+      <cbc:EndDate>2013-06-30</cbc:EndDate>
   </cac:InvoicePeriod>
   <cac:OrderReference>
     <cbc:ID>123</cbc:ID>
@@ -130,7 +130,7 @@
     </cac:PartyTaxScheme>
   </cac:TaxRepresentativeParty>
   <cac:Delivery>
-    <cbc:ActualDeliveryDate>2013-06-15Z</cbc:ActualDeliveryDate>
+    <cbc:ActualDeliveryDate>2013-06-15</cbc:ActualDeliveryDate>
       <cac:DeliveryLocation>
       <cbc:ID schemeID="0088">6754238987643</cbc:ID>
           <cac:Address>
@@ -244,8 +244,8 @@ Penalty percentage 10% from due date</cbc:Note>
       <cbc:LineExtensionAmount currencyID="NOK">1273</cbc:LineExtensionAmount>
       <cbc:AccountingCost>BookingCode001</cbc:AccountingCost>
       <cac:InvoicePeriod>
-      <cbc:StartDate>2013-06-01Z</cbc:StartDate>
-          <cbc:EndDate>2013-06-01Z</cbc:EndDate>
+      <cbc:StartDate>2013-06-01</cbc:StartDate>
+          <cbc:EndDate>2013-06-01</cbc:EndDate>
     </cac:InvoicePeriod>
       <cac:OrderLineReference>
       <cbc:LineID>1</cbc:LineID>

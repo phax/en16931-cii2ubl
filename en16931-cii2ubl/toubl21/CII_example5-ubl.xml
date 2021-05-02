@@ -3,18 +3,18 @@
   <cbc:CustomizationID>urn:cen.eu:en16931:2017:extended:urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
   <cbc:ID>TOSL110</cbc:ID>
-  <cbc:IssueDate>2013-04-10Z</cbc:IssueDate>
-  <cbc:DueDate>2013-05-10Z</cbc:DueDate>
+  <cbc:IssueDate>2013-04-10</cbc:IssueDate>
+  <cbc:DueDate>2013-05-10</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:Note>Ordered through our website</cbc:Note>
-  <cbc:TaxPointDate>2013-04-10Z</cbc:TaxPointDate>
+  <cbc:TaxPointDate>2013-04-10</cbc:TaxPointDate>
   <cbc:DocumentCurrencyCode>DKK</cbc:DocumentCurrencyCode>
   <cbc:TaxCurrencyCode>EUR</cbc:TaxCurrencyCode>
   <cbc:AccountingCost>67543</cbc:AccountingCost>
   <cbc:BuyerReference>qwerty</cbc:BuyerReference>
   <cac:InvoicePeriod>
-    <cbc:StartDate>2013-03-10Z</cbc:StartDate>
-      <cbc:EndDate>2013-04-10Z</cbc:EndDate>
+    <cbc:StartDate>2013-03-10</cbc:StartDate>
+      <cbc:EndDate>2013-04-10</cbc:EndDate>
   </cac:InvoicePeriod>
   <cac:OrderReference>
     <cbc:ID>PO4711</cbc:ID>
@@ -23,7 +23,7 @@
   <cac:BillingReference>
     <cac:InvoiceDocumentReference>
       <cbc:ID>TOSL109</cbc:ID>
-          <cbc:IssueDate>2013-03-10Z</cbc:IssueDate>
+          <cbc:IssueDate>2013-03-10</cbc:IssueDate>
     </cac:InvoiceDocumentReference>
   </cac:BillingReference>
   <cac:DespatchDocumentReference>
@@ -160,7 +160,7 @@
     </cac:PartyTaxScheme>
   </cac:TaxRepresentativeParty>
   <cac:Delivery>
-    <cbc:ActualDeliveryDate>2013-04-15Z</cbc:ActualDeliveryDate>
+    <cbc:ActualDeliveryDate>2013-04-15</cbc:ActualDeliveryDate>
       <cac:DeliveryLocation>
       <cbc:ID schemeID="0088">5790000436068</cbc:ID>
           <cac:Address>
@@ -271,8 +271,8 @@
       <cbc:LineExtensionAmount currencyID="DKK">1000</cbc:LineExtensionAmount>
       <cbc:AccountingCost>ACC7654</cbc:AccountingCost>
       <cac:InvoicePeriod>
-      <cbc:StartDate>2013-03-10Z</cbc:StartDate>
-          <cbc:EndDate>2013-03-10Z</cbc:EndDate>
+      <cbc:StartDate>2013-03-10</cbc:StartDate>
+          <cbc:EndDate>2013-03-10</cbc:EndDate>
     </cac:InvoicePeriod>
       <cac:OrderLineReference>
       <cbc:LineID>1</cbc:LineID>
@@ -335,8 +335,8 @@
       <cbc:LineExtensionAmount currencyID="DKK">500</cbc:LineExtensionAmount>
       <cbc:AccountingCost>ACC7654</cbc:AccountingCost>
       <cac:InvoicePeriod>
-      <cbc:StartDate>2013-03-10Z</cbc:StartDate>
-          <cbc:EndDate>2013-03-10Z</cbc:EndDate>
+      <cbc:StartDate>2013-03-10</cbc:StartDate>
+          <cbc:EndDate>2013-03-10</cbc:EndDate>
     </cac:InvoicePeriod>
       <cac:OrderLineReference>
       <cbc:LineID>2</cbc:LineID>
