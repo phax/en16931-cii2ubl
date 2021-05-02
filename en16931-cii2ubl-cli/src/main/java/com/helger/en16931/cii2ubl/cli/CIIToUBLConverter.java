@@ -127,6 +127,8 @@ public class CIIToUBLConverter implements Callable <Integer>
             LOGGER.debug ("Is a file={}", file.toString ());
           ret.add (_normalizeFile (file.toPath ()));
         }
+        else
+          LOGGER.warn ("Ignoring non-existing file " + file.getAbsolutePath ());
     }
     return ret;
 

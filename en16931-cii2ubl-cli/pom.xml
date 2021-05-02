@@ -105,7 +105,7 @@
         <configuration>
           <createDependencyReducedPom>false</createDependencyReducedPom>
           <shadedArtifactAttached>true</shadedArtifactAttached>
-          <shadedClassifierName>full</shadedClassifierName>
+          <finalName>${artifactId}-full</finalName>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
             <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
