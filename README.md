@@ -78,7 +78,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v1.4.2 - work in progress
+* v1.4.2 - 2021-06-10
     * Changed the default customization ID to `urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0`
     * If the UBL `LineExtensionAmount` is negative, but the line `Quantity` is positive, the `Quantity` will be changed to negative. Customizable via `setSwapQuantitySignIfNeeded(boolean)`
 * v1.4.1 - 2021-05-02
