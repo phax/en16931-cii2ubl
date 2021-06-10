@@ -62,12 +62,14 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   public static final String DEFAULT_CUSTOMIZATION_ID = "urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0";
   public static final String DEFAULT_PROFILE_ID = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
+  public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
 
   private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
   private String m_sVATScheme = DEFAULT_VAT_SCHEME;
   private String m_sCustomizationID = DEFAULT_CUSTOMIZATION_ID;
   private String m_sProfileID = DEFAULT_PROFILE_ID;
   private String m_sCardAccountNetworkID = DEFAULT_CARD_ACCOUNT_NETWORK_ID;
+  private boolean m_bSwapQuantitySignIfNeeded = DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED;
 
   protected AbstractCIIToUBLConverter ()
   {}
@@ -139,6 +141,18 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   {
     ValueEnforcer.notNull (sCardAccountNetworkID, "CardAccountNetworkID");
     m_sCardAccountNetworkID = sCardAccountNetworkID;
+    return thisAsT ();
+  }
+
+  public final boolean isSwapQuantitySignIfNeeded ()
+  {
+    return m_bSwapQuantitySignIfNeeded;
+  }
+
+  @Nonnull
+  public final IMPLTYPE setSwapQuantitySignIfNeeded (final boolean bSwapQuantitySignIfNeeded)
+  {
+    m_bSwapQuantitySignIfNeeded = bSwapQuantitySignIfNeeded;
     return thisAsT ();
   }
 

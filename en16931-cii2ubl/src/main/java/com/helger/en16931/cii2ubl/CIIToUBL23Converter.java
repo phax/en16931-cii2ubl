@@ -1099,6 +1099,21 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
         aUBLInvoiceLine.addNote (_copyNote (aLineNote));
 
+      // Line extension amount
+      boolean bLineExtensionAmountIsNegative = false;
+      final LineTradeSettlementType aLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
+      final TradeSettlementLineMonetarySummationType aSTSLMS = aLineSettlement.getSpecifiedTradeSettlementLineMonetarySummation ();
+      if (aSTSLMS != null)
+      {
+        if (aSTSLMS.hasLineTotalAmountEntries ())
+        {
+          aUBLInvoiceLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
+                                                               new LineExtensionAmountType (),
+                                                               sDefaultCurrencyCode));
+          bLineExtensionAmountIsNegative = MathHelper.isLE0 (aUBLInvoiceLine.getLineExtensionAmountValue ());
+        }
+      }
+
       // Invoiced quantity
       final LineTradeDeliveryType aLineDelivery = aLineItem.getSpecifiedLineTradeDelivery ();
       if (aLineDelivery != null)
@@ -1107,18 +1122,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         if (aBilledQuantity != null)
         {
           aUBLInvoiceLine.setInvoicedQuantity (_copyQuantity (aBilledQuantity, new InvoicedQuantityType ()));
+          if (bLineExtensionAmountIsNegative &&
+              MathHelper.isGT0 (aUBLInvoiceLine.getInvoicedQuantityValue ()) &&
+              isSwapQuantitySignIfNeeded ())
+            aUBLInvoiceLine.setInvoicedQuantity (aUBLInvoiceLine.getInvoicedQuantityValue ().negate ());
         }
-      }
-
-      // Line extension amount
-      final LineTradeSettlementType aLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
-      final TradeSettlementLineMonetarySummationType aSTSLMS = aLineSettlement.getSpecifiedTradeSettlementLineMonetarySummation ();
-      if (aSTSLMS != null)
-      {
-        if (aSTSLMS.hasLineTotalAmountEntries ())
-          aUBLInvoiceLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
-                                                               new LineExtensionAmountType (),
-                                                               sDefaultCurrencyCode));
       }
 
       // Accounting cost
@@ -1908,6 +1916,21 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
         aUBLCreditNoteLine.addNote (_copyNote (aLineNote));
 
+      // Line extension amount
+      boolean bLineExtensionAmountIsNegative = false;
+      final LineTradeSettlementType aLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
+      final TradeSettlementLineMonetarySummationType aSTSLMS = aLineSettlement.getSpecifiedTradeSettlementLineMonetarySummation ();
+      if (aSTSLMS != null)
+      {
+        if (aSTSLMS.hasLineTotalAmountEntries ())
+        {
+          aUBLCreditNoteLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
+                                                                  new LineExtensionAmountType (),
+                                                                  sDefaultCurrencyCode));
+          bLineExtensionAmountIsNegative = MathHelper.isLE0 (aUBLCreditNoteLine.getLineExtensionAmountValue ());
+        }
+      }
+
       // CreditNoted quantity
       final LineTradeDeliveryType aLineDelivery = aLineItem.getSpecifiedLineTradeDelivery ();
       if (aLineDelivery != null)
@@ -1916,18 +1939,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         if (aBilledQuantity != null)
         {
           aUBLCreditNoteLine.setCreditedQuantity (_copyQuantity (aBilledQuantity, new CreditedQuantityType ()));
+          if (bLineExtensionAmountIsNegative &&
+              MathHelper.isGT0 (aUBLCreditNoteLine.getCreditedQuantityValue ()) &&
+              isSwapQuantitySignIfNeeded ())
+            aUBLCreditNoteLine.setCreditedQuantity (aUBLCreditNoteLine.getCreditedQuantityValue ().negate ());
         }
-      }
-
-      // Line extension amount
-      final LineTradeSettlementType aLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
-      final TradeSettlementLineMonetarySummationType aSTSLMS = aLineSettlement.getSpecifiedTradeSettlementLineMonetarySummation ();
-      if (aSTSLMS != null)
-      {
-        if (aSTSLMS.hasLineTotalAmountEntries ())
-          aUBLCreditNoteLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
-                                                                  new LineExtensionAmountType (),
-                                                                  sDefaultCurrencyCode));
       }
 
       // Accounting cost
