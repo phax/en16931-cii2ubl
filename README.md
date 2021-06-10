@@ -78,6 +78,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v1.4.2 - work in progress
+    * Changed the default customization ID to `urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0`
 * v1.4.1 - 2021-05-02
     * Updated to ph-commons 10.1
     * Tested output against EN 16931 rules v1.3.5 - no changes necessary
