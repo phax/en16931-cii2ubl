@@ -10,6 +10,8 @@ See https://peppol.helger.com/public/locale-en_US/menuitem-tools-rest-api#cii2ub
 
 This library is licensed under the Apache License Version 2.0.
 
+The binary releases are available on Maven Central at https://repo1.maven.org/maven2/com/helger/en16931-cii2ubl/ and below.
+
 # Usage
 
 This is a pure Java library and not a self-contained conversion tool.
@@ -40,7 +42,7 @@ Replace `x.y.z` with the effective version you want to use:
 
 The CLI interface was introduced in v1.2.0.
 
-Call it via `java -jar en16931-cii2ubl-cli-1.3.0-full.jar`
+Call it via `java -jar en16931-cii2ubl-cli-x.y.y-full.jar` (where `x.y.z` denotes the version number)
 
 ```
 [INFO] CII to UBL Converter v1.3.0 (build 2021-01-05T20:55:24Z)
