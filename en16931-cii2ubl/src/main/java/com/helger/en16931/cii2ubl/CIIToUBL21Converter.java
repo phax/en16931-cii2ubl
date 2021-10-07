@@ -2162,15 +2162,10 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     switch (getUBLCreationMode ())
     {
       case AUTOMATIC:
-        final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
-        final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
-        final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
-                                                                                      : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
-        final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null
-                                                                                                : aTotal.getDuePayableAmount ().get (0);
-
-        final boolean bWouldBeInvoice = aDuePayable == null || MathHelper.isGE0 (aDuePayable.getValue ());
-        return bWouldBeInvoice ? convertToInvoice (aCIIInvoice, aErrorList) : convertToCreditNote (aCIIInvoice, aErrorList);
+        final ETriState eIsInvoice = isInvoiceType (aCIIInvoice);
+        // Default to invoice
+        return eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList)
+                                                   : convertToCreditNote (aCIIInvoice, aErrorList);
       case INVOICE:
         return convertToInvoice (aCIIInvoice, aErrorList);
       case CREDIT_NOTE:

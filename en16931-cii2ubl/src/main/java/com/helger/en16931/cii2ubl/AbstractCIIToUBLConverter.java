@@ -24,14 +24,19 @@ import java.time.LocalDate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.error.IError;
 import com.helger.commons.error.SingleError;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.error.list.IErrorList;
+import com.helger.commons.math.MathHelper;
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.traits.IGenericImplTrait;
@@ -40,6 +45,10 @@ import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
@@ -63,6 +72,21 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   public static final String DEFAULT_PROFILE_ID = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
   public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverter.class);
+
+  // Source: EN 16931 validation artefacts
+  private static final ICommonsSet <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                                    "81 83 261 262 296 308 381 396 420 458 532");
+  private static final ICommonsSet <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                                "80 82 84 130 202 203 204 211 295 325 326 380 383 384 385 386 387 388 389 390 393 394 395 456 457 527 575 623 633 751 780 935");
+  static
+  {
+    // XRechnung 2.1 extensions
+    INVOICE_TYPE_CODES.add ("875");
+    INVOICE_TYPE_CODES.add ("876");
+    INVOICE_TYPE_CODES.add ("877");
+  }
 
   private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
   private String m_sVATScheme = DEFAULT_VAT_SCHEME;
@@ -414,6 +438,45 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static boolean isOriginatorDocumentReferenceTypeCode (@Nullable final String s)
   {
     return "50".equals (s);
+  }
+
+  @Nonnull
+  protected static ETriState isInvoiceType (@Nonnull final CrossIndustryInvoiceType aCIIInvoice)
+  {
+    ETriState eIsInvoice = ETriState.UNDEFINED;
+
+    // First check TypeCode
+    final ExchangedDocumentType aExchangedDoc = aCIIInvoice.getExchangedDocument ();
+    if (aExchangedDoc != null)
+    {
+      if (INVOICE_TYPE_CODES.contains (aExchangedDoc.getTypeCodeValue ()))
+        eIsInvoice = ETriState.TRUE;
+      else
+        if (CREDIT_NOTE_TYPE_CODES.contains (aExchangedDoc.getTypeCodeValue ()))
+          eIsInvoice = ETriState.FALSE;
+    }
+
+    if (eIsInvoice.isUndefined ())
+    {
+      // Check total
+      final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
+      final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
+      final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
+                                                                                    : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
+      final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null
+                                                                                              : aTotal.getDuePayableAmount ().get (0);
+
+      if (aDuePayable != null)
+        eIsInvoice = ETriState.valueOf (MathHelper.isGE0 (aDuePayable.getValue ()));
+    }
+
+    if (eIsInvoice.isUndefined ())
+      LOGGER.warn ("Could not determine, if the provided CII document is an Invoice or a CreditNote");
+    else
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Determined the provided CII document to be " + (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
+
+    return eIsInvoice;
   }
 
   /**
