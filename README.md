@@ -80,7 +80,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v1.4.3 - work in progress
+* v1.4.3 - 2021-10-07
     * Tested output against EN 16931 rules v1.3.6 - no changes necessary
     * Changed determination if Invoice or CreditNote primarily to `rsm:ExchangedDocument/ram:TypeCode` instead of the payable amount
 * v1.4.2 - 2021-06-10
