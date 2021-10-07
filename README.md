@@ -82,6 +82,7 @@ CII to UBL Converter for EN 16931 invoices
 
 * v1.4.3 - work in progress
     * Tested output against EN 16931 rules v1.3.6 - no changes necessary
+    * Changed determination if Invoice or CreditNote primarily to `rsm:ExchangedDocument/ram:TypeCode` instead of the payable amount
 * v1.4.2 - 2021-06-10
     * Changed the default customization ID to `urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0`
     * If the UBL `LineExtensionAmount` is negative, but the line `Quantity` is positive, the `Quantity` will be changed to negative. Customizable via `setSwapQuantitySignIfNeeded(boolean)`
