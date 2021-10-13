@@ -1111,7 +1111,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
           aUBLInvoiceLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
                                                                new LineExtensionAmountType (),
                                                                sDefaultCurrencyCode));
-          bLineExtensionAmountIsNegative = MathHelper.isLE0 (aUBLInvoiceLine.getLineExtensionAmountValue ());
+          if (MathHelper.isLE0 (aUBLInvoiceLine.getLineExtensionAmountValue ()))
+            bLineExtensionAmountIsNegative = true;
         }
       }
 
@@ -1123,10 +1124,6 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         if (aBilledQuantity != null)
         {
           aUBLInvoiceLine.setInvoicedQuantity (_copyQuantity (aBilledQuantity, new InvoicedQuantityType ()));
-          if (bLineExtensionAmountIsNegative &&
-              MathHelper.isGT0 (aUBLInvoiceLine.getInvoicedQuantityValue ()) &&
-              isSwapQuantitySignIfNeeded ())
-            aUBLInvoiceLine.setInvoicedQuantity (aUBLInvoiceLine.getInvoicedQuantityValue ().negate ());
         }
       }
 
@@ -1295,6 +1292,12 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
           }
         }
       }
+
+      if (bLineExtensionAmountIsNegative &&
+          areBothPresentAndHaveEqualSign (aUBLInvoiceLine.getInvoicedQuantityValue (),
+                                          bUsePrice ? aUBLPrice.getPriceAmountValue () : null) &&
+          isSwapQuantitySignIfNeeded ())
+        aUBLInvoiceLine.setInvoicedQuantity (aUBLInvoiceLine.getInvoicedQuantityValue ().negate ());
 
       // Allowance charge
       final TradePriceType aTradePrice = aLineAgreement.getNetPriceProductTradePrice ();
@@ -1930,7 +1933,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
           aUBLCreditNoteLine.setLineExtensionAmount (_copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
                                                                   new LineExtensionAmountType (),
                                                                   sDefaultCurrencyCode));
-          bLineExtensionAmountIsNegative = MathHelper.isLE0 (aUBLCreditNoteLine.getLineExtensionAmountValue ());
+          if (MathHelper.isLE0 (aUBLCreditNoteLine.getLineExtensionAmountValue ()))
+            bLineExtensionAmountIsNegative = true;
         }
       }
 
@@ -1942,10 +1946,6 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         if (aBilledQuantity != null)
         {
           aUBLCreditNoteLine.setCreditedQuantity (_copyQuantity (aBilledQuantity, new CreditedQuantityType ()));
-          if (bLineExtensionAmountIsNegative &&
-              MathHelper.isGT0 (aUBLCreditNoteLine.getCreditedQuantityValue ()) &&
-              isSwapQuantitySignIfNeeded ())
-            aUBLCreditNoteLine.setCreditedQuantity (aUBLCreditNoteLine.getCreditedQuantityValue ().negate ());
         }
       }
 
@@ -2114,6 +2114,12 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
           }
         }
       }
+
+      if (bLineExtensionAmountIsNegative &&
+          areBothPresentAndHaveEqualSign (aUBLCreditNoteLine.getCreditedQuantityValue (),
+                                          bUsePrice ? aUBLPrice.getPriceAmountValue () : null) &&
+          isSwapQuantitySignIfNeeded ())
+        aUBLCreditNoteLine.setCreditedQuantity (aUBLCreditNoteLine.getCreditedQuantityValue ().negate ());
 
       // Allowance charge
       final TradePriceType aTradePrice = aLineAgreement.getNetPriceProductTradePrice ();

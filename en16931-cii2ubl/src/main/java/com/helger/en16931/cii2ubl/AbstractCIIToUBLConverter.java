@@ -19,6 +19,7 @@ package com.helger.en16931.cii2ubl;
 
 import java.io.File;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import javax.annotation.Nonnull;
@@ -438,6 +439,21 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static boolean isOriginatorDocumentReferenceTypeCode (@Nullable final String s)
   {
     return "50".equals (s);
+  }
+
+  protected static boolean areBothPresentAndHaveEqualSign (@Nonnull final BigDecimal aQuantity, @Nullable final BigDecimal aPriceAmount)
+  {
+    if (false)
+    {
+      // Original version
+      return MathHelper.isGT0 (aQuantity);
+    }
+
+    if (aPriceAmount == null)
+      return false;
+    final boolean bQuantityPositive = MathHelper.isGE0 (aQuantity);
+    final boolean bPricePositive = MathHelper.isGE0 (aPriceAmount);
+    return bQuantityPositive == bPricePositive;
   }
 
   @Nonnull
