@@ -1281,7 +1281,6 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       boolean bUsePrice = false;
       if (aLineAgreement != null)
       {
-
         final TradePriceType aNPPTP = aLineAgreement.getNetPriceProductTradePrice ();
         if (aNPPTP != null)
         {
@@ -2098,7 +2097,6 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       boolean bUsePrice = false;
       if (aLineAgreement != null)
       {
-
         final TradePriceType aNPPTP = aLineAgreement.getNetPriceProductTradePrice ();
         if (aNPPTP != null)
         {
