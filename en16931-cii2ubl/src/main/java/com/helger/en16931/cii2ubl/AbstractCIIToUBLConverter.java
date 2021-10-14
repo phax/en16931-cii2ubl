@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -73,6 +74,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   public static final String DEFAULT_PROFILE_ID = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
   public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
+  public static final boolean DEFAULT_SWAP_PRICE_SIGN_IF_NEEDED = true;
 
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverter.class);
 
@@ -95,6 +97,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   private String m_sProfileID = DEFAULT_PROFILE_ID;
   private String m_sCardAccountNetworkID = DEFAULT_CARD_ACCOUNT_NETWORK_ID;
   private boolean m_bSwapQuantitySignIfNeeded = DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED;
+  private boolean m_bSwapPriceSignIfNeeded = DEFAULT_SWAP_PRICE_SIGN_IF_NEEDED;
 
   protected AbstractCIIToUBLConverter ()
   {}
@@ -178,6 +181,18 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   public final IMPLTYPE setSwapQuantitySignIfNeeded (final boolean bSwapQuantitySignIfNeeded)
   {
     m_bSwapQuantitySignIfNeeded = bSwapQuantitySignIfNeeded;
+    return thisAsT ();
+  }
+
+  public final boolean isSwapPriceSignIfNeeded ()
+  {
+    return m_bSwapPriceSignIfNeeded;
+  }
+
+  @Nonnull
+  public final IMPLTYPE setSwapPriceSignIfNeeded (final boolean bSwapPriceSignIfNeeded)
+  {
+    m_bSwapPriceSignIfNeeded = bSwapPriceSignIfNeeded;
     return thisAsT ();
   }
 
@@ -441,19 +456,132 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return "50".equals (s);
   }
 
-  protected static boolean areBothPresentAndHaveEqualSign (@Nonnull final BigDecimal aQuantity, @Nullable final BigDecimal aPriceAmount)
+  protected static boolean isLT0Strict (@Nullable final BigDecimal aBD)
   {
-    if (false)
-    {
-      // Original version
-      return MathHelper.isGT0 (aQuantity);
-    }
+    return aBD != null && MathHelper.isLT0 (aBD);
+  }
 
-    if (aPriceAmount == null)
-      return false;
-    final boolean bQuantityPositive = MathHelper.isGE0 (aQuantity);
-    final boolean bPricePositive = MathHelper.isGE0 (aPriceAmount);
-    return bQuantityPositive == bPricePositive;
+  /**
+   * The goal is to have a positive price, because of EN validation rule BT-146.
+   * This method fiddles with Quantity and Price to align this as best as
+   * possible.
+   *
+   * @param bLineExtensionAmountIsNegative
+   *        is the line sum negative?
+   * @param aQuantity
+   *        Existing line quantity.
+   * @param aQuantitySetter
+   *        Setter to change line quantity
+   * @param aPriceAmount
+   *        Optional line price amount
+   * @param aPriceAmountSetter
+   *        Optional setter to change line price amount
+   */
+  protected void swapQuantityAndPriceIfNeeded (final boolean bLineExtensionAmountIsNegative,
+                                               @Nonnull final BigDecimal aQuantity,
+                                               @Nonnull final Consumer <BigDecimal> aQuantitySetter,
+                                               @Nullable final BigDecimal aPriceAmount,
+                                               @Nullable final Consumer <BigDecimal> aPriceAmountSetter)
+  {
+    final boolean bHasPrice = aPriceAmount != null && aPriceAmountSetter != null;
+
+    if (bLineExtensionAmountIsNegative)
+    {
+      // We have a negative line amount
+      final boolean bPosQuantity = MathHelper.isGE0 (aQuantity);
+      final boolean bNegQuantity = !bPosQuantity;
+
+      if (bHasPrice)
+      {
+        final boolean bNegPrice = MathHelper.isLT0 (aPriceAmount);
+
+        if (bNegQuantity == bNegPrice)
+        {
+          // If both are positive, or if both are negative
+          // This looks like an inconsistency
+          LOGGER.warn ("A negative line extension amount with quantity " +
+                       aQuantity +
+                       " and price " +
+                       aPriceAmount +
+                       " looks interesting.");
+        }
+        else
+          if (bNegPrice)
+          {
+            // Non-negative quantity and negative price
+            // We need to swap quantity and price
+            if (isSwapQuantitySignIfNeeded ())
+              aQuantitySetter.accept (aQuantity.negate ());
+            else
+              LOGGER.info ("Swapping of the quantity sign is disabled, so not doing it");
+
+            if (isSwapPriceSignIfNeeded ())
+              aPriceAmountSetter.accept (aPriceAmount.negate ());
+            else
+              LOGGER.info ("Swapping of the price sign is disabled, so not doing it");
+          }
+          else
+            if (bNegQuantity)
+            {
+              // Negative quantity and non-negative price
+              // No action needed
+            }
+      }
+      else
+      {
+        // We only have the quantity
+        if (bPosQuantity)
+        {
+          // This looks like an inconsistency
+          LOGGER.warn ("A negative line extension amount with quantity " + aQuantity + " looks interesting.");
+        }
+      }
+    }
+    else
+    {
+      // We have a positive line amount
+      final boolean bNegQuantity = MathHelper.isLT0 (aQuantity);
+
+      if (bHasPrice)
+      {
+        final boolean bNegPrice = MathHelper.isLT0 (aPriceAmount);
+
+        if (bNegQuantity && bNegPrice)
+        {
+          // If both are negative, swap both signs to make them positive
+          if (isSwapQuantitySignIfNeeded ())
+            aQuantitySetter.accept (aQuantity.negate ());
+          else
+            LOGGER.info ("Swapping of the quantity sign is disabled, so not doing it");
+
+          if (isSwapPriceSignIfNeeded ())
+            aPriceAmountSetter.accept (aPriceAmount.negate ());
+          else
+            LOGGER.info ("Swapping of the price sign is disabled, so not doing it");
+        }
+        else
+          if (bNegQuantity || bNegPrice)
+          {
+            // Only one value is negative
+            // This looks like an inconsistency
+            LOGGER.warn ("A positive line extension amount with quantity " +
+                         aQuantity +
+                         " and price " +
+                         aPriceAmount +
+                         " looks interesting.");
+          }
+        // If both values are positive, no action needed
+      }
+      else
+      {
+        // We only have the quantity
+        if (bNegQuantity)
+        {
+          // This looks like an inconsistency
+          LOGGER.warn ("A positive line extension amount with quantity " + aQuantity + " looks interesting.");
+        }
+      }
+    }
   }
 
   @Nonnull
@@ -462,32 +590,39 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     ETriState eIsInvoice = ETriState.UNDEFINED;
 
     // First check TypeCode
+    final String sTypeCode;
     final ExchangedDocumentType aExchangedDoc = aCIIInvoice.getExchangedDocument ();
     if (aExchangedDoc != null)
     {
-      if (INVOICE_TYPE_CODES.contains (aExchangedDoc.getTypeCodeValue ()))
+      sTypeCode = StringHelper.trim (aExchangedDoc.getTypeCodeValue ());
+      if (INVOICE_TYPE_CODES.contains (sTypeCode))
         eIsInvoice = ETriState.TRUE;
       else
-        if (CREDIT_NOTE_TYPE_CODES.contains (aExchangedDoc.getTypeCodeValue ()))
+        if (CREDIT_NOTE_TYPE_CODES.contains (sTypeCode))
           eIsInvoice = ETriState.FALSE;
+    }
+    else
+      sTypeCode = null;
+
+    // Check total
+    final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
+    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
+    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
+                                                                                  : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
+    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null : aTotal.getDuePayableAmount ().get (0);
+
+    if (eIsInvoice.isUndefined () && aDuePayable != null)
+    {
+      eIsInvoice = ETriState.valueOf (MathHelper.isGE0 (aDuePayable.getValue ()));
     }
 
     if (eIsInvoice.isUndefined ())
     {
-      // Check total
-      final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
-      final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
-      final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
-                                                                                    : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
-      final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null
-                                                                                              : aTotal.getDuePayableAmount ().get (0);
-
-      if (aDuePayable != null)
-        eIsInvoice = ETriState.valueOf (MathHelper.isGE0 (aDuePayable.getValue ()));
+      LOGGER.warn ("Could not determine, if the provided CII document is an Invoice or a CreditNote. TypeCode =is '" +
+                   sTypeCode +
+                   "'; DuePayable = " +
+                   aDuePayable);
     }
-
-    if (eIsInvoice.isUndefined ())
-      LOGGER.warn ("Could not determine, if the provided CII document is an Invoice or a CreditNote");
     else
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Determined the provided CII document to be " + (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));

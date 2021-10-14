@@ -35,6 +35,7 @@ final class MockSettings
   private static final String [] TEST_FILES_EN16931 = new String [] { "CII_business_example_01.xml",
                                                                       "CII_business_example_02.xml",
                                                                       "CII_example1.xml",
+                                                                      "CII_example1a.xml",
                                                                       "CII_example2.xml",
                                                                       "CII_example3.xml",
                                                                       "CII_example4.xml",

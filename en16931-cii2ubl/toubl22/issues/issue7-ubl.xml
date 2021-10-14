@@ -503,7 +503,7 @@
   </cac:InvoiceLine>
   <cac:InvoiceLine>
     <cbc:ID>20</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="H87">-6</cbc:InvoicedQuantity>
+      <cbc:InvoicedQuantity unitCode="H87">6</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">-109.98</cbc:LineExtensionAmount>
       <cac:Item>
       <cbc:Name>FRITUUR VET 10 KG RETOUR </cbc:Name>
