@@ -1158,11 +1158,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final LineTradeAgreementType aLineAgreement = aLineItem.getSpecifiedLineTradeAgreement ();
       if (aLineAgreement != null)
       {
-        final ReferencedDocumentType aOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
-        if (aOrderReference != null)
+        final ReferencedDocumentType aBuyerOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
+        if (aBuyerOrderReference != null && StringHelper.hasText (aBuyerOrderReference.getLineIDValue ()))
         {
           final OrderLineReferenceType aUBLOrderLineReference = new OrderLineReferenceType ();
-          aUBLOrderLineReference.setLineID (_copyID (aOrderReference.getLineID (), new LineIDType ()));
+          aUBLOrderLineReference.setLineID (_copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
           aUBLInvoiceLine.addOrderLineReference (aUBLOrderLineReference);
         }
       }
@@ -1961,11 +1961,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final LineTradeAgreementType aLineAgreement = aLineItem.getSpecifiedLineTradeAgreement ();
       if (aLineAgreement != null)
       {
-        final ReferencedDocumentType aOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
-        if (aOrderReference != null)
+        final ReferencedDocumentType aBuyerOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
+        if (aBuyerOrderReference != null && StringHelper.hasText (aBuyerOrderReference.getLineIDValue ()))
         {
           final OrderLineReferenceType aUBLOrderLineReference = new OrderLineReferenceType ();
-          aUBLOrderLineReference.setLineID (_copyID (aOrderReference.getLineID (), new LineIDType ()));
+          aUBLOrderLineReference.setLineID (_copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
           aUBLCreditNoteLine.addOrderLineReference (aUBLOrderLineReference);
         }
       }
