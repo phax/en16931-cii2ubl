@@ -506,6 +506,30 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
   }
 
   @Nullable
+  private static OrderReferenceType _createUBLOrderRef (@Nullable final ReferencedDocumentType aBuyerOrderRef,
+                                                        @Nullable final ReferencedDocumentType aSellerOrderRef)
+  {
+    final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
+    if (aBuyerOrderRef != null)
+      aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
+    if (aSellerOrderRef != null)
+    {
+      if (aUBLOrderRef.getIDValue () == null)
+      {
+        // Mandatory element
+        aUBLOrderRef.setID ("");
+      }
+      aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
+    }
+
+    // Set if any field is set
+    if (aUBLOrderRef.getIDValue () != null || aUBLOrderRef.getSalesOrderIDValue () != null)
+      return aUBLOrderRef;
+
+    return null;
+  }
+
+  @Nullable
   public InvoiceType convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice, @Nonnull final ErrorList aErrorList)
   {
     ValueEnforcer.notNull (aCIIInvoice, "CIIInvoice");
@@ -640,24 +664,9 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
 
     // OrderReference
     {
-      final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
-      final ReferencedDocumentType aBuyerOrderRef = aHeaderAgreement.getBuyerOrderReferencedDocument ();
-      if (aBuyerOrderRef != null)
-        aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
-      final ReferencedDocumentType aSellerOrderRef = aHeaderAgreement.getSellerOrderReferencedDocument ();
-      if (aSellerOrderRef != null)
-      {
-        if (aUBLOrderRef.getIDValue () == null)
-        {
-          // Mandatory element
-          aUBLOrderRef.setID ("");
-        }
-        aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
-      }
-
-      // Set if any field is set
-      if (aUBLOrderRef.getIDValue () != null || aUBLOrderRef.getSalesOrderIDValue () != null)
-        aUBLInvoice.setOrderReference (aUBLOrderRef);
+      final OrderReferenceType aUBLOrderRef = _createUBLOrderRef (aHeaderAgreement.getBuyerOrderReferencedDocument (),
+                                                                  aHeaderAgreement.getSellerOrderReferencedDocument ());
+      aUBLInvoice.setOrderReference (aUBLOrderRef);
     }
 
     // BillingReference
@@ -1468,24 +1477,9 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
 
     // OrderReference
     {
-      final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
-      final ReferencedDocumentType aBuyerOrderRef = aHeaderAgreement.getBuyerOrderReferencedDocument ();
-      if (aBuyerOrderRef != null)
-        aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
-      final ReferencedDocumentType aSellerOrderRef = aHeaderAgreement.getSellerOrderReferencedDocument ();
-      if (aSellerOrderRef != null)
-      {
-        if (aUBLOrderRef.getIDValue () == null)
-        {
-          // Mandatory element
-          aUBLOrderRef.setID ("");
-        }
-        aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
-      }
-
-      // Set if any field is set
-      if (aUBLOrderRef.getIDValue () != null || aUBLOrderRef.getSalesOrderIDValue () != null)
-        aUBLCreditNote.setOrderReference (aUBLOrderRef);
+      final OrderReferenceType aUBLOrderRef = _createUBLOrderRef (aHeaderAgreement.getBuyerOrderReferencedDocument (),
+                                                                  aHeaderAgreement.getSellerOrderReferencedDocument ());
+      aUBLCreditNote.setOrderReference (aUBLOrderRef);
     }
 
     // BillingReference
