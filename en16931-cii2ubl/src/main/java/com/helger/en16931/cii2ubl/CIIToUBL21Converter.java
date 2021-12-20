@@ -1215,7 +1215,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aBuyerAssignedID));
-          aUBLItem.setBuyersItemIdentification (aUBLID);
+          if (StringHelper.hasText (aUBLID.getIDValue ()))
+            aUBLItem.setBuyersItemIdentification (aUBLID);
         }
 
         final IDType aSellerAssignedID = aLineProduct.getSellerAssignedID ();
@@ -1223,7 +1224,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aSellerAssignedID));
-          aUBLItem.setSellersItemIdentification (aUBLID);
+          if (StringHelper.hasText (aUBLID.getIDValue ()))
+            aUBLItem.setSellersItemIdentification (aUBLID);
         }
 
         final IDType aGlobalID = aLineProduct.getGlobalID ();
@@ -1231,7 +1233,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aGlobalID));
-          aUBLItem.setStandardItemIdentification (aUBLID);
+          if (StringHelper.hasText (aUBLID.getIDValue ()))
+            aUBLItem.setStandardItemIdentification (aUBLID);
         }
 
         final TradeCountryType aOriginCountry = aLineProduct.getOriginTradeCountry ();
@@ -2022,7 +2025,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aBuyerAssignedID));
-          aUBLItem.setBuyersItemIdentification (aUBLID);
+          if (StringHelper.hasText (aUBLID.getIDValue ()))
+            aUBLItem.setBuyersItemIdentification (aUBLID);
         }
 
         final IDType aSellerAssignedID = aLineProduct.getSellerAssignedID ();
@@ -2030,7 +2034,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aSellerAssignedID));
-          aUBLItem.setSellersItemIdentification (aUBLID);
+          if (StringHelper.hasText (aUBLID.getIDValue ()))
+            aUBLItem.setSellersItemIdentification (aUBLID);
         }
 
         final IDType aGlobalID = aLineProduct.getGlobalID ();
@@ -2038,7 +2043,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aGlobalID));
-          aUBLItem.setStandardItemIdentification (aUBLID);
+          if (StringHelper.hasText (aUBLID.getIDValue ()))
+            aUBLItem.setStandardItemIdentification (aUBLID);
         }
 
         final TradeCountryType aOriginCountry = aLineProduct.getOriginTradeCountry ();
