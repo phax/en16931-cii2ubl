@@ -26,7 +26,7 @@
     <version>1.11.4</version>
   </parent>
   <artifactId>en16931-cii2ubl-parent-pom</artifactId>
-  <version>1.4.5</version>
+  <version>1.4.6-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>en16931-cii2ubl-parent-pom</name>
   <inceptionYear>2019</inceptionYear>
@@ -44,7 +44,7 @@
     <connection>scm:git:git@github.com:phax/en16931-cii2ubl.git</connection>
     <developerConnection>scm:git:git@github.com:phax/en16931-cii2ubl.git</developerConnection>
     <url>http://github.com/phax/en16931-cii2ubl</url>
-    <tag>en16931-cii2ubl-parent-pom-1.4.5</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
