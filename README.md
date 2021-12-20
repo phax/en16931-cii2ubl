@@ -82,6 +82,7 @@ CII to UBL Converter for EN 16931 invoices
 
 * v1.4.5 - work in progress
     * Tested output against EN 16931 rules v1.3.7 - no changes necessary
+    * Fixed creating invalid UBL if `SellerAssignedID` is empty. See [issue #12](https://github.com/phax/en16931-cii2ubl/issues/12) - thanks @DerHamm
 * v1.4.4 - 2021-10-14
     * Improved sign swapping of Quantity and Price to avoid negative prices (BT-146)
 * v1.4.3 - 2021-10-07
@@ -100,10 +101,10 @@ CII to UBL Converter for EN 16931 invoices
     * The error handling for the commandline client was improved (checking errors before writing UBL) (see [issue #9](https://github.com/phax/en16931-cii2ubl/issues/9))
     * Added the possibility to create UBL 2.3
     * Made the API more open to directly convert to Invoice or CreditNote
-    * Improved the handling of payment means to be more EN compliant (see [issue #7](https://github.com/phax/en16931-cii2ubl/issues/7))
+    * Improved the handling of payment means to be more EN compliant. See [issue #7](https://github.com/phax/en16931-cii2ubl/issues/7).
     * Added a possibility to retrieve the internal converter version number
 * v1.2.5 - 2020-11-30
-    * Added Jakarta Activation dependency to the standalone CLI version (see [issue #6](https://github.com/phax/en16931-cii2ubl/issues/6))
+    * Added Jakarta Activation dependency to the standalone CLI version. See [issue #6](https://github.com/phax/en16931-cii2ubl/issues/6).
 * v1.2.4 - 2020-10-20
     * Tested with EN 16031 validation rules 1.3.3
     * Not emitting the `LegalMonetaryTotal/PayableRoundingAmount` if the value is `0` as a work around for https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
@@ -117,10 +118,10 @@ CII to UBL Converter for EN 16931 invoices
     * Updated to new Maven groupIds
 * v1.2.0 - 2020-03-09
     * Verified against EN 16931 validation artefacts 1.3.0 - no changes in the output
-    * Added commandline interface (CLI) - (see [PR #3](https://github.com/phax/en16931-cii2ubl/pull/3)) - thanks to [@rkottmann](https://github.com/rkottmann)
+    * Added commandline interface (CLI). See [PR #3](https://github.com/phax/en16931-cii2ubl/pull/3). Thanks to @rkottmann
     * Fixed creating invalid UBL if `SellerOrderReferencedDocument` is present but `BuyerOrderReferencedDocument` is not set (see [issue #5](https://github.com/phax/en16931-cii2ubl/issues/5))
-    * Made default VAT scheme, UBL `CustomizationID`, UBL `ProfileID` and the `PaymentMeans/CardAccount/NetworkID` customizable (see [issue #1](https://github.com/phax/en16931-cii2ubl/issues/1) and [issue #2](https://github.com/phax/en16931-cii2ubl/issues/2))
-    * Fixed embedded attachment mapping (see [issue #4](https://github.com/phax/en16931-cii2ubl/issues/4))
+    * Made default VAT scheme, UBL `CustomizationID`, UBL `ProfileID` and the `PaymentMeans/CardAccount/NetworkID` customizable. See [issue #1](https://github.com/phax/en16931-cii2ubl/issues/1) and [issue #2](https://github.com/phax/en16931-cii2ubl/issues/2).
+    * Fixed embedded attachment mapping. See [issue #4](https://github.com/phax/en16931-cii2ubl/issues/4).
 * v1.1.5 - 2019-09-13
     * Added possibility to enforce invoice creation
     * Verified against EN 16931 validation artefacts 1.3.0
