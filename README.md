@@ -80,7 +80,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v1.4.5 - work in progress
+* v1.4.5 - 2021-12-20
     * Tested output against EN 16931 rules v1.3.7 - no changes necessary
     * Fixed creating invalid UBL if `SellerAssignedID` is empty. See [issue #12](https://github.com/phax/en16931-cii2ubl/issues/12) - thanks @DerHamm
 * v1.4.4 - 2021-10-14
