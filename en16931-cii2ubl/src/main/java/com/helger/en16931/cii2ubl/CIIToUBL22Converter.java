@@ -561,7 +561,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     if (false)
       aUBLInvoice.setUBLVersionID (UBL_VERSION);
     aUBLInvoice.setCustomizationID (getCustomizationID ());
-    aUBLInvoice.setProfileID (getProfileID ());
+    if (StringHelper.hasText (getProfileID ()))
+      aUBLInvoice.setProfileID (getProfileID ());
     if (aED != null)
       aUBLInvoice.setID (aED.getIDValue ());
 
@@ -1378,7 +1379,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     if (false)
       aUBLCreditNote.setUBLVersionID (UBL_VERSION);
     aUBLCreditNote.setCustomizationID (getCustomizationID ());
-    aUBLCreditNote.setProfileID (getProfileID ());
+    if (StringHelper.hasText (getProfileID ()))
+      aUBLCreditNote.setProfileID (getProfileID ());
     if (aED != null)
       aUBLCreditNote.setID (aED.getIDValue ());
 
