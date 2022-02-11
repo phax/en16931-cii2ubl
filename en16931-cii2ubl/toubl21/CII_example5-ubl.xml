@@ -6,7 +6,7 @@
   <cbc:IssueDate>2013-04-10</cbc:IssueDate>
   <cbc:DueDate>2013-05-10</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
-  <cbc:Note>Ordered through our website</cbc:Note>
+  <cbc:Note>#AAI#Ordered through our website</cbc:Note>
   <cbc:TaxPointDate>2013-04-10</cbc:TaxPointDate>
   <cbc:DocumentCurrencyCode>DKK</cbc:DocumentCurrencyCode>
   <cbc:TaxCurrencyCode>EUR</cbc:TaxCurrencyCode>

@@ -6,7 +6,7 @@
   <cbc:IssueDate>2013-08-25</cbc:IssueDate>
   <cbc:DueDate>2013-05-10</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
-  <cbc:Note>TEXT</cbc:Note>
+  <cbc:Note>#REG#TEXT</cbc:Note>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
   <cac:InvoicePeriod>
     <cbc:StartDate>2013-01-01</cbc:StartDate>

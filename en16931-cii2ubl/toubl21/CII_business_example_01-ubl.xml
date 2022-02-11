@@ -6,7 +6,7 @@
   <cbc:IssueDate>2015-01-09</cbc:IssueDate>
   <cbc:DueDate>2015-01-09</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
-  <cbc:Note>This is an example invoice based on data that is used in real business.Sehr geehrter Herr xxx,
+  <cbc:Note>#AAR#This is an example invoice based on data that is used in real business.Sehr geehrter Herr xxx,
 
         für die Unterstützung im September stellen wir Ihnen gemäß Auftrag foldende Rechnung.
 

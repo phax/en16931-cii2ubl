@@ -6,7 +6,7 @@
   <cbc:IssueDate>2021-03-31</cbc:IssueDate>
   <cbc:DueDate>2021-04-28</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
-  <cbc:Note>Das ist lediglich eine Testrechnung des XRechnungsgenerators der Nortal AG. 
+  <cbc:Note>#ADU#Das ist lediglich eine Testrechnung des XRechnungsgenerators der Nortal AG. 
         Wussten Sie, dass sich Ihre XRechnungen jetzt auch ganz einfach mit unserem XRechnungs-Viewer visualisieren lassen? 
         Hier können Sie den praktischen Dienst gleich kostenlos testen: https://xr-viewer.nortal.com/</cbc:Note>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>

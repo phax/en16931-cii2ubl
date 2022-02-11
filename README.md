@@ -82,8 +82,9 @@ CII to UBL Converter for EN 16931 invoices
 
 * v1.4.6 - 2022-02-11
     * Allowing the additional Payment Means Type Codes `1`, `42` and `68`
-    * For decimal values, trailing zeroes are no longer emitted.
-    * Improved not creating empty UBL elements.
+    * For decimal values, trailing zeroes are no longer emitted
+    * Improved not creating empty UBL elements
+    * The `SubjectCode` of `IncludedNote` elements is copied over
 * v1.4.5 - 2021-12-20
     * Tested output against EN 16931 rules v1.3.7 - no changes necessary
     * Fixed creating invalid UBL if `SellerAssignedID` is empty. See [issue #12](https://github.com/phax/en16931-cii2ubl/issues/12) - thanks @DerHamm

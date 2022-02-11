@@ -76,11 +76,17 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
 
     final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType ();
     final StringBuilder aSB = new StringBuilder ();
+
+    if (StringHelper.hasText (aNote.getSubjectCodeValue ()))
+      aSB.append ('#').append (aNote.getSubjectCodeValue ()).append ('#');
+
+    boolean bFirst = true;
     for (final TextType aText : aNote.getContent ())
     {
-      if (aSB.length () > 0)
+      if (aSB.length () > 0 && !bFirst)
         aSB.append ('\n');
       aSB.append (aText.getValue ());
+      bFirst = false;
     }
     aUBLNote.setValue (aSB.toString ());
     return aUBLNote;
