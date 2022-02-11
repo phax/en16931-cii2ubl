@@ -527,11 +527,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
     }
 
-    // Set if any field is set
-    if (aUBLOrderRef.getIDValue () != null || aUBLOrderRef.getSalesOrderIDValue () != null)
-      return aUBLOrderRef;
+    // Ignore defacto empty elements
+    if (StringHelper.hasNoText (aUBLOrderRef.getIDValue ()) && StringHelper.hasNoText (aUBLOrderRef.getSalesOrderIDValue ()))
+      return null;
 
-    return null;
+    return aUBLOrderRef;
   }
 
   @Nullable

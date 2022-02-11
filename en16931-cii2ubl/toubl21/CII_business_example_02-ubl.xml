@@ -114,8 +114,7 @@
       <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">1.26</cbc:LineExtensionAmount>
       <cac:Item>
-      <cbc:Description></cbc:Description>
-          <cbc:Name>BPW21</cbc:Name>
+      <cbc:Name>BPW21</cbc:Name>
           <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
               <cbc:Percent>19</cbc:Percent>
@@ -133,8 +132,7 @@
       <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">1.26</cbc:LineExtensionAmount>
       <cac:Item>
-      <cbc:Description></cbc:Description>
-          <cbc:Name>Poti 100k</cbc:Name>
+      <cbc:Name>Poti 100k</cbc:Name>
           <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
               <cbc:Percent>19</cbc:Percent>
@@ -152,8 +150,7 @@
       <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">7.48</cbc:LineExtensionAmount>
       <cac:Item>
-      <cbc:Description></cbc:Description>
-          <cbc:Name>LCD Display 3.5</cbc:Name>
+      <cbc:Name>LCD Display 3.5</cbc:Name>
           <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
               <cbc:Percent>19</cbc:Percent>

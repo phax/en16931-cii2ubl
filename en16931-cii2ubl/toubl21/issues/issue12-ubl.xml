@@ -11,9 +11,6 @@
         Hier können Sie den praktischen Dienst gleich kostenlos testen: https://xr-viewer.nortal.com/</cbc:Note>
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
   <cbc:BuyerReference>36 5 88914 - 34578 - 33</cbc:BuyerReference>
-  <cac:OrderReference>
-    <cbc:ID></cbc:ID>
-  </cac:OrderReference>
   <cac:AccountingSupplierParty>
     <cac:Party>
       <cac:PartyIdentification>
@@ -77,9 +74,7 @@
       </cac:FinancialInstitutionBranch>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
-  <cac:PaymentTerms>
-    <cbc:Note></cbc:Note>
-  </cac:PaymentTerms>
+  <cac:PaymentTerms />
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="EUR">2850</cbc:TaxAmount>
       <cac:TaxSubtotal>
@@ -105,8 +100,7 @@
       <cbc:InvoicedQuantity unitCode="XPP">1</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">15000</cbc:LineExtensionAmount>
       <cac:Item>
-      <cbc:Description></cbc:Description>
-          <cbc:Name>Homepage</cbc:Name>
+      <cbc:Name>Homepage</cbc:Name>
           <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
               <cbc:Percent>19</cbc:Percent>

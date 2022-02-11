@@ -343,6 +343,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   {
     if (aCIIID == null)
       return null;
+
+    // Avoid empty element
     if (StringHelper.hasNoText (aCIIID.getValue ()))
       return null;
 
@@ -364,6 +366,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aName == null)
       return null;
 
+    // Avoid empty element
+    if (StringHelper.hasNoText (aName.getValue ()))
+      return null;
+
     ret.setValue (aName.getValue ());
     ret.setLanguageID (aName.getLanguageID ());
     ret.setLanguageLocaleID (aName.getLanguageLocaleID ());
@@ -375,6 +381,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
                                                                                            @Nonnull final T ret)
   {
     if (aCode == null)
+      return null;
+
+    // Avoid empty element
+    if (StringHelper.hasNoText (aCode.getValue ()))
       return null;
 
     ret.setValue (aCode.getValue ());
@@ -397,6 +407,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aQuantity == null)
       return null;
 
+    // Avoid empty element
+    if (aQuantity.getValue () == null)
+      return null;
+
     ret.setValue (MathHelper.getWithoutTrailingZeroes (aQuantity.getValue ()));
     ret.setUnitCode (aQuantity.getUnitCode ());
     ret.setUnitCodeListID (aQuantity.getUnitCodeListID ());
@@ -411,6 +425,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
                                                                                                @Nullable final String sDefaultCurrencyCode)
   {
     if (aAmount == null)
+      return null;
+
+    // Avoid empty element
+    if (aAmount.getValue () == null)
       return null;
 
     ret.setValue (MathHelper.getWithoutTrailingZeroes (aAmount.getValue ()));
