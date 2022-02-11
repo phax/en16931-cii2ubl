@@ -397,7 +397,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aQuantity == null)
       return null;
 
-    ret.setValue (aQuantity.getValue ());
+    ret.setValue (MathHelper.getWithoutTrailingZeroes (aQuantity.getValue ()));
     ret.setUnitCode (aQuantity.getUnitCode ());
     ret.setUnitCodeListID (aQuantity.getUnitCodeListID ());
     ret.setUnitCodeListAgencyID (aQuantity.getUnitCodeListAgencyID ());
@@ -413,7 +413,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aAmount == null)
       return null;
 
-    ret.setValue (aAmount.getValue ());
+    ret.setValue (MathHelper.getWithoutTrailingZeroes (aAmount.getValue ()));
     ret.setCurrencyID (aAmount.getCurrencyID ());
     if (StringHelper.hasNoText (ret.getCurrencyID ()))
       ret.setCurrencyID (sDefaultCurrencyCode);

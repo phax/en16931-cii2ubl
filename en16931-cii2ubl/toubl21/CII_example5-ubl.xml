@@ -228,7 +228,7 @@
     </cac:TaxCategory>
   </cac:AllowanceCharge>
   <cac:TaxTotal>
-    <cbc:TaxAmount currencyID="DKK">675.00</cbc:TaxAmount>
+    <cbc:TaxAmount currencyID="DKK">675</cbc:TaxAmount>
       <cac:TaxSubtotal>
       <cbc:TaxableAmount currencyID="DKK">1500</cbc:TaxableAmount>
           <cbc:TaxAmount currencyID="DKK">375</cbc:TaxAmount>
@@ -256,7 +256,7 @@
     <cbc:TaxAmount currencyID="EUR">628.62</cbc:TaxAmount>
   </cac:TaxTotal>
   <cac:LegalMonetaryTotal>
-    <cbc:LineExtensionAmount currencyID="DKK">4000.00</cbc:LineExtensionAmount>
+    <cbc:LineExtensionAmount currencyID="DKK">4000</cbc:LineExtensionAmount>
       <cbc:TaxExclusiveAmount currencyID="DKK">4000</cbc:TaxExclusiveAmount>
       <cbc:TaxInclusiveAmount currencyID="DKK">4675</cbc:TaxInclusiveAmount>
       <cbc:AllowanceTotalAmount currencyID="DKK">150</cbc:AllowanceTotalAmount>

@@ -85,7 +85,7 @@
           <cbc:TaxAmount currencyID="EUR">2221.84</cbc:TaxAmount>
           <cac:TaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19.00</cbc:Percent>
+              <cbc:Percent>19</cbc:Percent>
               <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
@@ -100,7 +100,7 @@
   </cac:LegalMonetaryTotal>
   <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="C62">1.000</cbc:InvoicedQuantity>
+      <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">12122.59</cbc:LineExtensionAmount>
       <cac:Item>
       <cbc:Description>Neues DSL Portfolio 2016</cbc:Description>
@@ -110,14 +110,14 @@
       </cac:SellersItemIdentification>
           <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19.00</cbc:Percent>
+              <cbc:Percent>19</cbc:Percent>
               <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">12122.5900</cbc:PriceAmount>
+      <cbc:PriceAmount currencyID="EUR">12122.59</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -131,19 +131,19 @@
       </cac:SellersItemIdentification>
           <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19.00</cbc:Percent>
+              <cbc:Percent>19</cbc:Percent>
               <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">606.1300</cbc:PriceAmount>
+      <cbc:PriceAmount currencyID="EUR">606.13</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
     <cbc:ID>16</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="C62">1.000</cbc:InvoicedQuantity>
+      <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
       <cbc:LineExtensionAmount currencyID="EUR">177.41</cbc:LineExtensionAmount>
       <cac:Item>
       <cbc:Name>zzgl. </cbc:Name>
@@ -152,14 +152,14 @@
       </cac:SellersItemIdentification>
           <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19.00</cbc:Percent>
+              <cbc:Percent>19</cbc:Percent>
               <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">1.5000</cbc:PriceAmount>
+      <cbc:PriceAmount currencyID="EUR">1.5</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>
 </Invoice>

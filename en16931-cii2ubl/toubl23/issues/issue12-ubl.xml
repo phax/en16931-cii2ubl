@@ -81,10 +81,10 @@
     <cbc:Note></cbc:Note>
   </cac:PaymentTerms>
   <cac:TaxTotal>
-    <cbc:TaxAmount currencyID="EUR">2850.00</cbc:TaxAmount>
+    <cbc:TaxAmount currencyID="EUR">2850</cbc:TaxAmount>
       <cac:TaxSubtotal>
-      <cbc:TaxableAmount currencyID="EUR">15000.00</cbc:TaxableAmount>
-          <cbc:TaxAmount currencyID="EUR">2850.00</cbc:TaxAmount>
+      <cbc:TaxableAmount currencyID="EUR">15000</cbc:TaxableAmount>
+          <cbc:TaxAmount currencyID="EUR">2850</cbc:TaxAmount>
           <cac:TaxCategory>
         <cbc:ID>S</cbc:ID>
               <cbc:Percent>19</cbc:Percent>
@@ -95,15 +95,15 @@
     </cac:TaxSubtotal>
   </cac:TaxTotal>
   <cac:LegalMonetaryTotal>
-    <cbc:LineExtensionAmount currencyID="EUR">15000.00</cbc:LineExtensionAmount>
-      <cbc:TaxExclusiveAmount currencyID="EUR">15000.00</cbc:TaxExclusiveAmount>
-      <cbc:TaxInclusiveAmount currencyID="EUR">17850.00</cbc:TaxInclusiveAmount>
-      <cbc:PayableAmount currencyID="EUR">17850.00</cbc:PayableAmount>
+    <cbc:LineExtensionAmount currencyID="EUR">15000</cbc:LineExtensionAmount>
+      <cbc:TaxExclusiveAmount currencyID="EUR">15000</cbc:TaxExclusiveAmount>
+      <cbc:TaxInclusiveAmount currencyID="EUR">17850</cbc:TaxInclusiveAmount>
+      <cbc:PayableAmount currencyID="EUR">17850</cbc:PayableAmount>
   </cac:LegalMonetaryTotal>
   <cac:InvoiceLine>
     <cbc:ID>0</cbc:ID>
       <cbc:InvoicedQuantity unitCode="XPP">1</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">15000.00</cbc:LineExtensionAmount>
+      <cbc:LineExtensionAmount currencyID="EUR">15000</cbc:LineExtensionAmount>
       <cac:Item>
       <cbc:Description></cbc:Description>
           <cbc:Name>Homepage</cbc:Name>
@@ -116,7 +116,7 @@
       </cac:ClassifiedTaxCategory>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">15000.00</cbc:PriceAmount>
+      <cbc:PriceAmount currencyID="EUR">15000</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>
 </Invoice>

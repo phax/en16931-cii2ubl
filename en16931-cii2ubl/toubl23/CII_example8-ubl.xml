@@ -121,7 +121,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
   <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
       <cbc:InvoicedQuantity unitCode="KWH">16000</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">140.80</cbc:LineExtensionAmount>
+      <cbc:LineExtensionAmount currencyID="EUR">140.8</cbc:LineExtensionAmount>
       <cac:Item>
       <cbc:Name>Getransporteerde kWh’s</cbc:Name>
           <cac:ClassifiedTaxCategory>
@@ -149,8 +149,8 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
       </cac:AdditionalItemProperty>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">0.00880</cbc:PriceAmount>
-          <cbc:BaseQuantity unitCode="KWH">0.00880</cbc:BaseQuantity>
+      <cbc:PriceAmount currencyID="EUR">0.0088</cbc:PriceAmount>
+          <cbc:BaseQuantity unitCode="KWH">0.0088</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -219,8 +219,8 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
       </cac:AdditionalItemProperty>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">15.24000</cbc:PriceAmount>
-          <cbc:BaseQuantity unitCode="KWT">15.24000</cbc:BaseQuantity>
+      <cbc:PriceAmount currencyID="EUR">15.24</cbc:PriceAmount>
+          <cbc:BaseQuantity unitCode="KWT">15.24</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -254,8 +254,8 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
       </cac:AdditionalItemProperty>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">1.530000</cbc:PriceAmount>
-          <cbc:BaseQuantity unitCode="KWT">1.530000</cbc:BaseQuantity>
+      <cbc:PriceAmount currencyID="EUR">1.53</cbc:PriceAmount>
+          <cbc:BaseQuantity unitCode="KWT">1.53</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -296,7 +296,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
   <cac:InvoiceLine>
     <cbc:ID>6</cbc:ID>
       <cbc:InvoicedQuantity unitCode="MON">1</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">56.50</cbc:LineExtensionAmount>
+      <cbc:LineExtensionAmount currencyID="EUR">56.5</cbc:LineExtensionAmount>
       <cac:Item>
       <cbc:Name>Vastrecht Aansluitdienst</cbc:Name>
           <cac:ClassifiedTaxCategory>
@@ -343,8 +343,8 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">83.340000</cbc:PriceAmount>
-          <cbc:BaseQuantity unitCode="MON">83.340000</cbc:BaseQuantity>
+      <cbc:PriceAmount currencyID="EUR">83.34</cbc:PriceAmount>
+          <cbc:BaseQuantity unitCode="MON">83.34</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -362,8 +362,8 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">190.310000</cbc:PriceAmount>
-          <cbc:BaseQuantity unitCode="MON">190.310000</cbc:BaseQuantity>
+      <cbc:PriceAmount currencyID="EUR">190.31</cbc:PriceAmount>
+          <cbc:BaseQuantity unitCode="MON">190.31</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -381,8 +381,8 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">64.210000</cbc:PriceAmount>
-          <cbc:BaseQuantity unitCode="MON">64.210000</cbc:BaseQuantity>
+      <cbc:PriceAmount currencyID="EUR">64.21</cbc:PriceAmount>
+          <cbc:BaseQuantity unitCode="MON">64.21</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -400,8 +400,8 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
       <cac:Price>
-      <cbc:PriceAmount currencyID="EUR">64.46000</cbc:PriceAmount>
-          <cbc:BaseQuantity unitCode="MON">64.46000</cbc:BaseQuantity>
+      <cbc:PriceAmount currencyID="EUR">64.46</cbc:PriceAmount>
+          <cbc:BaseQuantity unitCode="MON">64.46</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
 </Invoice>

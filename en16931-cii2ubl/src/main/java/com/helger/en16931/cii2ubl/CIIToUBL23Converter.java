@@ -359,7 +359,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
       aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
       if (aTradeTax.getRateApplicablePercentValue () != null)
-        aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+        aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
       final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
       aUBLTaxScheme.setID (getVATScheme ());
       aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -1032,7 +1032,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
-          aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+          aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
         if (StringHelper.hasText (aTradeTax.getExemptionReasonCodeValue ()))
           aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
         if (aTradeTax.getExemptionReason () != null)
@@ -1268,7 +1268,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
-          aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+          aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -1839,7 +1839,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
-          aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+          aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
         if (StringHelper.hasText (aTradeTax.getExemptionReasonCodeValue ()))
           aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
         if (aTradeTax.getExemptionReason () != null)
@@ -2075,7 +2075,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
-          aUBLTaxCategory.setPercent (aTradeTax.getRateApplicablePercentValue ());
+          aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
