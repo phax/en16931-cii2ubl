@@ -13,10 +13,7 @@
         <cbc:Name>SellerCompany</cbc:Name>
       </cac:PartyName>
           <cac:PostalAddress>
-        <cbc:StreetName />
-              <cbc:CityName />
-              <cbc:PostalZone />
-              <cac:Country>
+        <cac:Country>
           <cbc:IdentificationCode>DK</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
@@ -37,10 +34,7 @@
         <cbc:Name>Buyercompany ltd</cbc:Name>
       </cac:PartyName>
           <cac:PostalAddress>
-        <cbc:StreetName />
-              <cbc:CityName />
-              <cbc:PostalZone />
-              <cac:Country>
+        <cac:Country>
           <cbc:IdentificationCode>DK</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>

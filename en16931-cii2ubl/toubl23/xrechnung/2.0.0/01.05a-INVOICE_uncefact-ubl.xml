@@ -70,8 +70,7 @@
   <cac:Delivery>
     <cac:DeliveryLocation>
       <cac:Address>
-        <cbc:StreetName />
-              <cbc:CityName>Schulungsort</cbc:CityName>
+        <cbc:CityName>Schulungsort</cbc:CityName>
               <cbc:PostalZone>12345</cbc:PostalZone>
               <cac:Country>
           <cbc:IdentificationCode>DE</cbc:IdentificationCode>
