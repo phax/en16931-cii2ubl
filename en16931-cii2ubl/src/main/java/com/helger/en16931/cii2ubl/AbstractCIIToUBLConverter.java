@@ -429,7 +429,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     // 31 = Debit transfer
     // 42 = Payment to bank account
     // 58 = SEPA credit transfer
-    return "30".equals (s) || "58".equals (s);
+    return "30".equals (s) || "42".equals (s) || "58".equals (s);
   }
 
   protected static boolean isPaymentMeansCodePaymentCard (@Nullable final String s)
@@ -448,10 +448,9 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static boolean isPaymentMeansCodeOtherKnown (@Nullable final String s)
   {
     // 1 = Instrument not defined
-    // 42 = Payment to bank account
     // 57 = Standing agreement
     // 68 = Online payment service
-    return "1".equals (s) || "42".equals (s) || "57".equals (s) || "68".equals (s);
+    return "1".equals (s) || "57".equals (s) || "68".equals (s);
   }
 
   protected static boolean isOriginatorDocumentReferenceTypeCode (@Nullable final String s)

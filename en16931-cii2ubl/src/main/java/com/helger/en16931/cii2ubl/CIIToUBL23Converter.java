@@ -151,7 +151,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
   private static AddressType _convertPostalAddress (@Nonnull final TradeAddressType aPostalAddress)
   {
     final AddressType ret = new AddressType ();
-    ret.setStreetName (aPostalAddress.getLineOneValue ());
+    if (StringHelper.hasText (aPostalAddress.getLineOneValue ()))
+      ret.setStreetName (aPostalAddress.getLineOneValue ());
     if (StringHelper.hasText (aPostalAddress.getLineTwoValue ()))
       ret.setAdditionalStreetName (aPostalAddress.getLineTwoValue ());
     if (StringHelper.hasText (aPostalAddress.getLineThreeValue ()))
@@ -160,8 +161,10 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       aUBLAddressLine.setLine (aPostalAddress.getLineThreeValue ());
       ret.addAddressLine (aUBLAddressLine);
     }
-    ret.setCityName (aPostalAddress.getCityNameValue ());
-    ret.setPostalZone (aPostalAddress.getPostcodeCodeValue ());
+    if (StringHelper.hasText (aPostalAddress.getCityNameValue ()))
+      ret.setCityName (aPostalAddress.getCityNameValue ());
+    if (StringHelper.hasText (aPostalAddress.getPostcodeCodeValue ()))
+      ret.setPostalZone (aPostalAddress.getPostcodeCodeValue ());
     if (aPostalAddress.hasCountrySubDivisionNameEntries ())
       ret.setCountrySubentity (aPostalAddress.getCountrySubDivisionNameAtIndex (0).getValue ());
     if (StringHelper.hasText (aPostalAddress.getCountryIDValue ()))
