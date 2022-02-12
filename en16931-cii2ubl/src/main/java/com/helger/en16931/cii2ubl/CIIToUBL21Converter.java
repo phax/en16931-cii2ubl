@@ -582,7 +582,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     final InvoiceType aUBLInvoice = new InvoiceType ();
     if (false)
       aUBLInvoice.setUBLVersionID (UBL_VERSION);
-    aUBLInvoice.setCustomizationID (getCustomizationID ());
+    if (StringHelper.hasText (getCustomizationID ()))
+      aUBLInvoice.setCustomizationID (getCustomizationID ());
     if (StringHelper.hasText (getProfileID ()))
       aUBLInvoice.setProfileID (getProfileID ());
     if (aED != null)
@@ -1399,7 +1400,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     final CreditNoteType aUBLCreditNote = new CreditNoteType ();
     if (false)
       aUBLCreditNote.setUBLVersionID (UBL_VERSION);
-    aUBLCreditNote.setCustomizationID (getCustomizationID ());
+    if (StringHelper.hasText (getCustomizationID ()))
+      aUBLCreditNote.setCustomizationID (getCustomizationID ());
     if (StringHelper.hasText (getProfileID ()))
       aUBLCreditNote.setProfileID (getProfileID ());
     if (aED != null)
