@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import com.helger.cii.d16b.CIID16BReader;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.error.IError;
@@ -50,6 +52,7 @@ import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryIn
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
@@ -479,6 +482,24 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static boolean isLT0Strict (@Nullable final BigDecimal aBD)
   {
     return aBD != null && MathHelper.isLT0 (aBD);
+  }
+
+  protected static boolean canUseGlobalID (@Nonnull final TradePartyType aParty)
+  {
+    // GloablID, if global identifier exists and can be stated in @schemeID, ID
+    // else
+    if (aParty.hasGlobalIDEntries ())
+      for (final IDType aID : aParty.getGlobalID ())
+        if (StringHelper.hasText (aID.getValue ()) && StringHelper.hasText (aID.getSchemeID ()))
+          return true;
+    return false;
+  }
+
+  @Nonnull
+  protected static ICommonsList <IDType> getAllUsableGlobalIDs (@Nonnull final TradePartyType aParty)
+  {
+    return CommonsArrayList.createFiltered (aParty.getGlobalID (),
+                                            x -> StringHelper.hasText (x.getValue ()) && StringHelper.hasText (x.getSchemeID ()));
   }
 
   /**

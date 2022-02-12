@@ -183,7 +183,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
   }
 
   @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType _extractPartyID (@Nonnull final TradePartyType aParty)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType _extractFirstPartyID (@Nonnull final TradePartyType aParty)
   {
     IDType aID;
     if (aParty.hasGlobalIDEntries ())
@@ -195,6 +195,16 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         aID = null;
 
     return aID == null ? null : _copyID (aID);
+  }
+
+  private static void _extractAllPartyIDs (@Nonnull final TradePartyType aParty,
+                                           @Nonnull final Consumer <? super oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType> aIDConsumer)
+  {
+    if (canUseGlobalID (aParty))
+      getAllUsableGlobalIDs (aParty).forEach (x -> aIDConsumer.accept (_copyID (x)));
+    else
+      for (final IDType aID : aParty.getID ())
+        aIDConsumer.accept (_copyID (aID));
   }
 
   private static void _addPartyID (@Nonnull final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID,
@@ -213,7 +223,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
   }
 
   @Nonnull
-  private static PartyType _convertParty (@Nonnull final TradePartyType aParty)
+  private static PartyType _convertParty (@Nonnull final TradePartyType aParty, final boolean bMultiID)
   {
     final PartyType ret = new PartyType ();
 
@@ -223,7 +233,10 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       ret.setEndpointID (_copyID (UC.getURIID (), new EndpointIDType ()));
     }
 
-    _addPartyID (_extractPartyID (aParty), ret);
+    if (bMultiID)
+      _extractAllPartyIDs (aParty, x -> _addPartyID (x, ret));
+    else
+      _addPartyID (_extractFirstPartyID (aParty), ret);
 
     final TextType aName = aParty.getName ();
     if (aName != null)
@@ -761,7 +774,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TradePartyType aSellerParty = aHeaderAgreement.getSellerTradeParty ();
       if (aSellerParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aSellerParty);
+        final PartyType aUBLParty = _convertParty (aSellerParty, true);
 
         for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
         {
@@ -787,7 +800,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TradePartyType aBuyerParty = aHeaderAgreement.getBuyerTradeParty ();
       if (aBuyerParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aBuyerParty);
+        final PartyType aUBLParty = _convertParty (aBuyerParty, false);
 
         for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
         {
@@ -813,7 +826,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TradePartyType aPayeeParty = aHeaderSettlement.getPayeeTradeParty ();
       if (aPayeeParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aPayeeParty);
+        final PartyType aUBLParty = _convertParty (aPayeeParty, false);
 
         for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
         {
@@ -843,7 +856,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TradePartyType aTaxRepresentativeParty = aHeaderAgreement.getSellerTaxRepresentativeTradeParty ();
       if (aTaxRepresentativeParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty);
+        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty, false);
 
         for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
         {
@@ -890,7 +903,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_23.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_23.LocationType ();
         boolean bUseLocation = false;
 
-        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID = _extractPartyID (aShipToParty);
+        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID = _extractFirstPartyID (aShipToParty);
         if (aUBLID != null)
         {
           aUBLDeliveryLocation.setID (aUBLID);
@@ -1578,7 +1591,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TradePartyType aSellerParty = aHeaderAgreement.getSellerTradeParty ();
       if (aSellerParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aSellerParty);
+        final PartyType aUBLParty = _convertParty (aSellerParty, true);
 
         for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
         {
@@ -1604,7 +1617,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TradePartyType aBuyerParty = aHeaderAgreement.getBuyerTradeParty ();
       if (aBuyerParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aBuyerParty);
+        final PartyType aUBLParty = _convertParty (aBuyerParty, false);
 
         for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
         {
@@ -1630,7 +1643,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TradePartyType aPayeeParty = aHeaderSettlement.getPayeeTradeParty ();
       if (aPayeeParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aPayeeParty);
+        final PartyType aUBLParty = _convertParty (aPayeeParty, false);
 
         for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
         {
@@ -1660,7 +1673,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       final TradePartyType aTaxRepresentativeParty = aHeaderAgreement.getSellerTaxRepresentativeTradeParty ();
       if (aTaxRepresentativeParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty);
+        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty, false);
 
         for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
         {
@@ -1703,7 +1716,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_23.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_23.LocationType ();
         boolean bUseLocation = false;
 
-        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID = _extractPartyID (aShipToParty);
+        final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID = _extractFirstPartyID (aShipToParty);
         if (aUBLID != null)
         {
           aUBLDeliveryLocation.setID (aUBLID);

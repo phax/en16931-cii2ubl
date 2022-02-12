@@ -59,7 +59,7 @@
     <ram:ApplicableHeaderTradeAgreement>
       <ram:BuyerReference>36 5 88914 - 34578 - 33</ram:BuyerReference>
       <ram:SellerTradeParty>
-        <ram:GlobalID>Homepage Design GmbH</ram:GlobalID>
+        <ram:GlobalID schemeID="0088">Homepage Design GmbH</ram:GlobalID>
         <ram:Name>Homepage Design GmbH</ram:Name>
         <ram:DefinedTradeContact>
           <ram:PersonName>Anna Blume </ram:PersonName>

@@ -14,7 +14,7 @@
   <cac:AccountingSupplierParty>
     <cac:Party>
       <cac:PartyIdentification>
-        <cbc:ID>Homepage Design GmbH</cbc:ID>
+        <cbc:ID schemeID="0088">Homepage Design GmbH</cbc:ID>
       </cac:PartyIdentification>
           <cac:PartyName>
         <cbc:Name>Homepage Design GmbH</cbc:Name>
