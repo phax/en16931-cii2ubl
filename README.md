@@ -80,6 +80,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v1.4.7 - 2022-02-14
+    * Further improved `null`/empty handling to avoid creation of empty elements
 * v1.4.6 - 2022-02-12
     * Allowing the additional Payment Means Type Codes `1`, `42` and `68`. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
     * For decimal values, trailing zeroes are no longer emitted. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
