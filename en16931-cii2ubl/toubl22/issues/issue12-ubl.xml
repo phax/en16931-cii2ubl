@@ -74,7 +74,6 @@
       </cac:FinancialInstitutionBranch>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
-  <cac:PaymentTerms />
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="EUR">2850</cbc:TaxAmount>
       <cac:TaxSubtotal>

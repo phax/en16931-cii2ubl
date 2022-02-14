@@ -207,7 +207,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         aIDConsumer.accept (_copyID (aID));
   }
 
-  private static void _addPartyID (@Nonnull final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID,
+  private static void _addPartyID (@Nullable final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType aUBLID,
                                    @Nonnull final PartyType aParty)
   {
     if (aUBLID != null)
@@ -243,7 +243,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     {
       final PartyNameType aUBLPartyName = new PartyNameType ();
       aUBLPartyName.setName (_copyName (aName, new NameType ()));
-      ret.addPartyName (aUBLPartyName);
+      if (aUBLPartyName.getName () != null)
+        ret.addPartyName (aUBLPartyName);
     }
 
     final TradeAddressType aPostalAddress = aParty.getPostalTradeAddress ();
@@ -316,28 +317,20 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
 
     final TradeContactType aDTC = aTradeParty.getDefinedTradeContactAtIndex (0);
     final ContactType aUBLContact = new ContactType ();
-    boolean bUseContact = false;
-    if (aDTC.getPersonName () != null)
-    {
-      aUBLContact.setName (_copyName (aDTC.getPersonName (), new NameType ()));
-      bUseContact = true;
-    }
+
+    aUBLContact.setName (_copyName (aDTC.getPersonName (), new NameType ()));
 
     final UniversalCommunicationType aTel = aDTC.getTelephoneUniversalCommunication ();
     if (aTel != null)
-    {
-      aUBLContact.setTelephone (aTel.getCompleteNumberValue ());
-      bUseContact = true;
-    }
+      ifNotEmpty (aUBLContact::setTelephone, aTel.getCompleteNumberValue ());
 
     final UniversalCommunicationType aEmail = aDTC.getEmailURIUniversalCommunication ();
     if (aEmail != null)
-    {
-      aUBLContact.setElectronicMail (aEmail.getURIIDValue ());
-      bUseContact = true;
-    }
+      ifNotEmpty (aUBLContact::setElectronicMail, aEmail.getURIIDValue ());
 
-    return bUseContact ? aUBLContact : null;
+    if (aUBLContact.getName () == null && aUBLContact.getTelephone () == null && aUBLContact.getElectronicMail () == null)
+      return null;
+    return aUBLContact;
   }
 
   @Nullable
@@ -441,7 +434,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         {
           final BranchType aUBLBranch = new BranchType ();
           aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
-          aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
+          if (aUBLBranch.getID () != null)
+            aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
         }
 
         aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
@@ -463,10 +457,12 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         aUBLCardAccount.setPrimaryAccountNumberID (_copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
 
         // No CII field present
-        aUBLCardAccount.setNetworkID (getCardAccountNetworkID ());
+        if (StringHelper.hasText (getCardAccountNetworkID ()))
+          aUBLCardAccount.setNetworkID (getCardAccountNetworkID ());
 
         // BT-88
-        aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
+        if (StringHelper.hasText (aCard.getCardholderNameValue ()))
+          aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
 
         if (StringHelper.hasNoText (aUBLCardAccount.getPrimaryAccountNumberIDValue ()))
           aErrorList.add (_buildError (null, "The Payment card primary account number is missing"));
@@ -541,7 +537,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         // Mandatory element
         aUBLOrderRef.setID ("");
       }
-      aUBLOrderRef.setSalesOrderID (aSellerOrderRef.getIssuerAssignedIDValue ());
+      ifNotEmpty (aUBLOrderRef::setSalesOrderID, aSellerOrderRef.getIssuerAssignedIDValue ());
     }
 
     // Ignore defacto empty elements
@@ -623,7 +619,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     // Note
     if (aED != null)
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
-        aUBLInvoice.addNote (_copyNote (aEDNote));
+        ifNotNull (aUBLInvoice::addNote, _copyNote (aEDNote));
 
     // TaxPointDate
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
@@ -963,16 +959,12 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     {
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
       {
-        boolean bUsePaymenTerms = false;
         final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
 
         for (final TextType aDesc : aPaymentTerms.getDescription ())
-        {
-          aUBLPaymenTerms.addNote (_copyNote (aDesc));
-          bUsePaymenTerms = true;
-        }
+          ifNotNull (aUBLPaymenTerms::addNote, _copyNote (aDesc));
 
-        if (bUsePaymenTerms)
+        if (aUBLPaymenTerms.hasNoteEntries ())
           aUBLInvoice.addPaymentTerms (aUBLPaymenTerms);
       }
     }
@@ -1130,7 +1122,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
 
       // Note
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
-        aUBLInvoiceLine.addNote (_copyNote (aLineNote));
+        ifNotNull (aUBLInvoiceLine::addNote, _copyNote (aLineNote));
 
       // Line extension amount
       boolean bLineExtensionAmountIsNegative = false;
@@ -1228,7 +1220,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       {
         final TextType aDescription = aLineProduct.getDescription ();
         if (aDescription != null)
-          aUBLItem.addDescription (_copyName (aDescription, new DescriptionType ()));
+          ifNotNull (aUBLItem::addDescription, _copyName (aDescription, new DescriptionType ()));
 
         if (aLineProduct.hasNameEntries ())
           aUBLItem.setName (_copyName (aLineProduct.getNameAtIndex (0), new NameType ()));
@@ -1278,7 +1270,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           {
             final CommodityClassificationType aUBLCommodityClassification = new CommodityClassificationType ();
             aUBLCommodityClassification.setItemClassificationCode (_copyCode (aClassCode, new ItemClassificationCodeType ()));
-            aUBLItem.addCommodityClassification (aUBLCommodityClassification);
+            if (aUBLCommodityClassification.getItemClassificationCode () != null)
+              aUBLItem.addCommodityClassification (aUBLCommodityClassification);
           }
         }
       }
@@ -1304,7 +1297,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
             aUBLAdditionalItem.setName (_copyName (aAPC.getDescriptionAtIndex (0), new NameType ()));
             if (aAPC.hasValueEntries ())
               aUBLAdditionalItem.setValue (aAPC.getValueAtIndex (0).getValue ());
-            aUBLItem.addAdditionalItemProperty (aUBLAdditionalItem);
+            if (aUBLAdditionalItem.getName () != null)
+              aUBLItem.addAdditionalItemProperty (aUBLAdditionalItem);
           }
       }
 
@@ -1327,6 +1321,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           }
         }
       }
+
       swapQuantityAndPriceIfNeeded (bLineExtensionAmountIsNegative,
                                     aUBLInvoiceLine.getInvoicedQuantityValue (),
                                     aUBLInvoiceLine::setInvoicedQuantity,
@@ -1441,7 +1436,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     // Note
     if (aED != null)
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
-        aUBLCreditNote.addNote (_copyNote (aEDNote));
+        ifNotNull (aUBLCreditNote::addNote, _copyNote (aEDNote));
 
     // TaxPointDate
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
@@ -1771,16 +1766,12 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     {
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
       {
-        boolean bUsePaymenTerms = false;
         final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
 
         for (final TextType aDesc : aPaymentTerms.getDescription ())
-        {
-          aUBLPaymenTerms.addNote (_copyNote (aDesc));
-          bUsePaymenTerms = true;
-        }
+          ifNotNull (aUBLPaymenTerms::addNote, _copyNote (aDesc));
 
-        if (bUsePaymenTerms)
+        if (aUBLPaymenTerms.hasNoteEntries ())
           aUBLCreditNote.addPaymentTerms (aUBLPaymenTerms);
       }
     }
@@ -1938,7 +1929,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
 
       // Note
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
-        aUBLCreditNoteLine.addNote (_copyNote (aLineNote));
+        ifNotNull (aUBLCreditNoteLine::addNote, _copyNote (aLineNote));
 
       // Line extension amount
       boolean bLineExtensionAmountIsNegative = false;
@@ -2036,7 +2027,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       {
         final TextType aDescription = aLineProduct.getDescription ();
         if (aDescription != null)
-          aUBLItem.addDescription (_copyName (aDescription, new DescriptionType ()));
+          ifNotNull (aUBLItem::addDescription, _copyName (aDescription, new DescriptionType ()));
 
         if (aLineProduct.hasNameEntries ())
           aUBLItem.setName (_copyName (aLineProduct.getNameAtIndex (0), new NameType ()));
@@ -2086,7 +2077,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           {
             final CommodityClassificationType aUBLCommodityClassification = new CommodityClassificationType ();
             aUBLCommodityClassification.setItemClassificationCode (_copyCode (aClassCode, new ItemClassificationCodeType ()));
-            aUBLItem.addCommodityClassification (aUBLCommodityClassification);
+            if (aUBLCommodityClassification.getItemClassificationCode () != null)
+              aUBLItem.addCommodityClassification (aUBLCommodityClassification);
           }
         }
       }
@@ -2112,7 +2104,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
             aUBLAdditionalItem.setName (_copyName (aAPC.getDescriptionAtIndex (0), new NameType ()));
             if (aAPC.hasValueEntries ())
               aUBLAdditionalItem.setValue (aAPC.getValueAtIndex (0).getValue ());
-            aUBLItem.addAdditionalItemProperty (aUBLAdditionalItem);
+            if (aUBLAdditionalItem.getName () != null)
+              aUBLItem.addAdditionalItemProperty (aUBLAdditionalItem);
           }
       }
 

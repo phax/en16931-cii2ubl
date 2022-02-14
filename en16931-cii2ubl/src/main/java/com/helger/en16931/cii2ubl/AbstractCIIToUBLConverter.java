@@ -105,6 +105,22 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected AbstractCIIToUBLConverter ()
   {}
 
+  protected static <T> boolean ifNotNull (@Nonnull final Consumer <? super T> aConsumer, @Nullable final T aObj)
+  {
+    if (aObj == null)
+      return false;
+    aConsumer.accept (aObj);
+    return true;
+  }
+
+  protected static boolean ifNotEmpty (@Nonnull final Consumer <? super String> aConsumer, @Nullable final String aObj)
+  {
+    if (aObj == null)
+      return false;
+    aConsumer.accept (aObj);
+    return true;
+  }
+
   @Nonnull
   public final EUBLCreationMode getUBLCreationMode ()
   {
