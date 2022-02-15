@@ -23,7 +23,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>en16931-cii2ubl-parent-pom</artifactId>
-    <version>1.4.7</version>
+    <version>1.4.8-SNAPSHOT</version>
   </parent>
   <artifactId>en16931-cii2ubl-cli</artifactId>
   <packaging>bundle</packaging>
