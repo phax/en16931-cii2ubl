@@ -184,9 +184,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
   @Nullable
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType _extractFirstPartyID (@Nonnull final TradePartyType aParty)
   {
-    IDType aID;
-    if (aParty.hasGlobalIDEntries ())
-      aID = aParty.getGlobalIDAtIndex (0);
+    final IDType aID;
+    if (canUseGlobalID (aParty))
+    {
+      // Use the first matching one
+      aID = getAllUsableGlobalIDs (aParty).getFirst ();
+    }
     else
       if (aParty.hasIDEntries ())
         aID = aParty.getIDAtIndex (0);

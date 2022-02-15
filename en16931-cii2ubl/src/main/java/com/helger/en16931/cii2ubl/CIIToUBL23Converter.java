@@ -185,10 +185,13 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
   @Nullable
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_23.IDType _extractFirstPartyID (@Nonnull final TradePartyType aParty)
   {
-    IDType aID;
-    if (aParty.hasGlobalIDEntries ())
-      aID = aParty.getGlobalIDAtIndex (0);
-    else
+    final IDType aID;
+    if (canUseGlobalID (aParty))
+    {
+      // Use the first matching one
+      aID = getAllUsableGlobalIDs (aParty).getFirst ();
+    }
+     else
       if (aParty.hasIDEntries ())
         aID = aParty.getIDAtIndex (0);
       else
@@ -470,7 +473,10 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           if (StringHelper.hasNoText (aUBLCardAccount.getNetworkIDValue ()))
             aErrorList.add (_buildError (null, "The Payment card network ID is missing"));
           else
+          {
+            // UBL 2.3 supports multiple
             aUBLPaymentMeans.addCardAccount (aUBLCardAccount);
+          }
       }
     }
 
