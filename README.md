@@ -80,6 +80,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v1.4.8 - work in progress
+    * Added new option `--output-suffix` to customize the output file suffix, that is currently hard coded to `-ubl`
 * v1.4.7 - 2022-02-15
     * Further improved `null`/empty handling to avoid creation of empty elements
 * v1.4.6 - 2022-02-12

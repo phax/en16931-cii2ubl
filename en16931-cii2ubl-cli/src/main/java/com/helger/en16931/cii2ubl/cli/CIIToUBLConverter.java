@@ -79,6 +79,12 @@ public class CIIToUBLConverter implements Callable <Integer>
            description = "The target directory for result output (default: ${DEFAULT-VALUE})")
   private String m_sOutputDir;
 
+  @Option (names = "--output-suffix",
+           paramLabel = "filename part",
+           defaultValue = "-ubl",
+           description = "The suffix added to the output filename (default: ${DEFAULT-VALUE})")
+  private String m_sOutputFileSuffix;
+
   @Option (names = "--ubl-vatscheme",
            paramLabel = "vat scheme",
            defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME,
@@ -106,7 +112,8 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more CII file(s)")
   private List <File> m_aSourceFiles;
 
-  private static String _normalizeOutputDirectory (final String dir)
+  @Nonnull
+  private static String _normalizeOutputDirectory (@Nonnull final String dir)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("CLI option output directory=" + dir);
@@ -123,19 +130,19 @@ public class CIIToUBLConverter implements Callable <Integer>
   }
 
   @Nonnull
-  private ICommonsList <File> _normalizeInputFiles (@Nonnull final List <File> files)
+  private ICommonsList <File> _normalizeInputFiles (@Nonnull final List <File> aFiles)
   {
     final ICommonsList <File> ret = new CommonsArrayList <> ();
-    for (final File file : files)
+    for (final File aFile : aFiles)
     {
-      if (file.isDirectory ())
+      if (aFile.isDirectory ())
       {
         if (LOGGER.isDebugEnabled ())
-          LOGGER.debug ("Is a directory=" + file.toString ());
+          LOGGER.debug ("Is a directory=" + aFile.toString ());
         // collecting readable and normalized absolute path files
-        for (final File f : new FileSystemIterator (file))
+        for (final File aChildFile : new FileSystemIterator (aFile))
         {
-          final Path p = f.toPath ();
+          final Path p = aChildFile.toPath ();
           if (Files.isReadable (p) && !Files.isDirectory (p))
           {
             ret.add (_normalizeFile (p));
@@ -145,14 +152,14 @@ public class CIIToUBLConverter implements Callable <Integer>
         }
       }
       else
-        if (file.canRead ())
+        if (aFile.canRead ())
         {
           if (LOGGER.isDebugEnabled ())
-            LOGGER.debug ("Is a file={}", file.toString ());
-          ret.add (_normalizeFile (file.toPath ()));
+            LOGGER.debug ("Is a file=" + aFile.toString ());
+          ret.add (_normalizeFile (aFile.toPath ()));
         }
         else
-          LOGGER.warn ("Ignoring non-existing file " + file.getAbsolutePath ());
+          LOGGER.warn ("Ignoring non-existing file " + aFile.getAbsolutePath ());
     }
     return ret;
 
@@ -188,14 +195,15 @@ public class CIIToUBLConverter implements Callable <Integer>
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Converting file=" + f.getAbsolutePath ());
 
-      final File aDestFile = new File (m_sOutputDir, FilenameHelper.getBaseName (f) + "-ubl.xml");
+      final File aDestFile = new File (m_sOutputDir, FilenameHelper.getBaseName (f) + m_sOutputFileSuffix + ".xml");
 
       // TODO switch between versions
       final ErrorList aErrorList = new ErrorList ();
       final Serializable aUBL = aConverter.convertCIItoUBL (f, aErrorList);
       if (aErrorList.containsAtLeastOneError () || aUBL == null)
       {
-        LOGGER.error ("Failed to convert CII file '" + f.getAbsolutePath () + "' to UBL:");
+        if (LOGGER.isErrorEnabled ())
+          LOGGER.error ("Failed to convert CII file '" + f.getAbsolutePath () + "' to UBL:");
         for (final IError aError : aErrorList)
           LOGGER.error (aError.getAsString (aErrorLocale));
       }
@@ -248,9 +256,15 @@ public class CIIToUBLConverter implements Callable <Integer>
                     throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");
 
         if (eSuccess.isSuccess ())
-          LOGGER.info ("Successfully wrote UBL file " + aDestFile.getAbsolutePath ());
+        {
+          if (LOGGER.isInfoEnabled ())
+            LOGGER.info ("Successfully wrote UBL file " + aDestFile.getAbsolutePath ());
+        }
         else
-          LOGGER.error ("Failed to write UBL file " + aDestFile.getAbsolutePath ());
+        {
+          if (LOGGER.isErrorEnabled ())
+            LOGGER.error ("Failed to write UBL file " + aDestFile.getAbsolutePath ());
+        }
       }
     }
 
@@ -259,7 +273,9 @@ public class CIIToUBLConverter implements Callable <Integer>
 
   public static void main (final String [] aArgs)
   {
-    LOGGER.info ("CII to UBL Converter v" + CIIToUBLVersion.BUILD_VERSION + " (build " + CIIToUBLVersion.BUILD_TIMESTAMP + ")");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("CII to UBL Converter v" + CIIToUBLVersion.BUILD_VERSION + " (build " + CIIToUBLVersion.BUILD_TIMESTAMP + ")");
+
     final CommandLine cmd = new CommandLine (new CIIToUBLConverter ());
     cmd.setCaseInsensitiveEnumValuesAllowed (true);
     final int nExitCode = cmd.execute (aArgs);
