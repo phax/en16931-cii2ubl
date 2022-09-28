@@ -80,7 +80,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v1.4.8 - work in progress
+* v1.4.8 - 2022-09-28
     * Added new option `--output-suffix` to customize the output file suffix, that is currently hard coded to `-ubl`
     * Fixed a problem with the mapping of BT-147, BT-148, BT-149 and BT-150. See [issue #15](https://github.com/phax/en16931-cii2ubl/issues/15). Thanks to @cambid for pointing that out
 * v1.4.7 - 2022-02-15
