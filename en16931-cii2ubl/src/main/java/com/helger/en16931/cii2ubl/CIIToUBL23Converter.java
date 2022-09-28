@@ -191,7 +191,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       // Use the first matching one
       aID = getAllUsableGlobalIDs (aParty).getFirst ();
     }
-     else
+    else
       if (aParty.hasIDEntries ())
         aID = aParty.getIDAtIndex (0);
       else
@@ -1335,7 +1335,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
                                     bUsePrice ? aUBLPrice::setPriceAmount : null);
 
       // Allowance charge
-      final TradePriceType aTradePrice = aLineAgreement.getNetPriceProductTradePrice ();
+      final TradePriceType aTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
       if (aTradePrice != null)
         for (final TradeAllowanceChargeType aPriceAllowanceCharge : aTradePrice.getAppliedTradeAllowanceCharge ())
         {

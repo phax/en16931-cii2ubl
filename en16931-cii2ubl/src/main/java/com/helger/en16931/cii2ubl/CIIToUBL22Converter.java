@@ -1334,7 +1334,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                     bUsePrice ? aUBLPrice::setPriceAmount : null);
 
       // Allowance charge
-      final TradePriceType aTradePrice = aLineAgreement.getNetPriceProductTradePrice ();
+      final TradePriceType aTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
       if (aTradePrice != null)
         for (final TradeAllowanceChargeType aPriceAllowanceCharge : aTradePrice.getAppliedTradeAllowanceCharge ())
         {

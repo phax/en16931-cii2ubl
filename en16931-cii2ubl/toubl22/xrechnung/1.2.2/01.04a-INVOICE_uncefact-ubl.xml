@@ -14,30 +14,30 @@
       <cac:PartyName>
         <cbc:Name>[Seller name]</cbc:Name>
       </cac:PartyName>
-          <cac:PostalAddress>
+      <cac:PostalAddress>
         <cbc:StreetName>[Seller address line 1]</cbc:StreetName>
-              <cbc:AdditionalStreetName>[Seller address line 2]</cbc:AdditionalStreetName>
-              <cbc:CityName>[Seller city]</cbc:CityName>
-              <cbc:PostalZone>12345</cbc:PostalZone>
-              <cac:Country>
+        <cbc:AdditionalStreetName>[Seller address line 2]</cbc:AdditionalStreetName>
+        <cbc:CityName>[Seller city]</cbc:CityName>
+        <cbc:PostalZone>12345</cbc:PostalZone>
+        <cac:Country>
           <cbc:IdentificationCode>DE</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-          <cac:PartyTaxScheme>
+      <cac:PartyTaxScheme>
         <cbc:CompanyID>12/345/67890</cbc:CompanyID>
-              <cac:TaxScheme>
+        <cac:TaxScheme>
           <cbc:ID>FC</cbc:ID>
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
-          <cac:PartyLegalEntity>
+      <cac:PartyLegalEntity>
         <cbc:RegistrationName>[Seller trading name]</cbc:RegistrationName>
-              <cbc:CompanyID>VR 12345 Nz</cbc:CompanyID>
-              <cbc:CompanyLegalForm>Vorstand: [...] (Vorsitzender), […] (Stellvertreterin), Dr. […] (Schatzmeister); Beirat: […] (Vorsitzender); Geschäftsführung: […], AG […], FA für Körperschaften […]</cbc:CompanyLegalForm>
+        <cbc:CompanyID>VR 12345 Nz</cbc:CompanyID>
+        <cbc:CompanyLegalForm>Vorstand: [...] (Vorsitzender), […] (Stellvertreterin), Dr. […] (Schatzmeister); Beirat: […] (Vorsitzender); Geschäftsführung: […], AG […], FA für Körperschaften […]</cbc:CompanyLegalForm>
       </cac:PartyLegalEntity>
-          <cac:Contact>
+      <cac:Contact>
         <cbc:Name>[…]</cbc:Name>
-              <cbc:Telephone>+49 (0)12-345678-90</cbc:Telephone>
-              <cbc:ElectronicMail>mail@seller.eu</cbc:ElectronicMail>
+        <cbc:Telephone>+49 (0)12-345678-90</cbc:Telephone>
+        <cbc:ElectronicMail>mail@seller.eu</cbc:ElectronicMail>
       </cac:Contact>
     </cac:Party>
   </cac:AccountingSupplierParty>
@@ -46,26 +46,26 @@
       <cac:PartyName>
         <cbc:Name>[Buyer name]</cbc:Name>
       </cac:PartyName>
-          <cac:PostalAddress>
+      <cac:PostalAddress>
         <cbc:StreetName>[Buyer address line 1]</cbc:StreetName>
-              <cbc:AdditionalStreetName>[Buyer address line 2]</cbc:AdditionalStreetName>
-              <cbc:CityName>[Buyer city]</cbc:CityName>
-              <cbc:PostalZone>12345</cbc:PostalZone>
-              <cac:Country>
+        <cbc:AdditionalStreetName>[Buyer address line 2]</cbc:AdditionalStreetName>
+        <cbc:CityName>[Buyer city]</cbc:CityName>
+        <cbc:PostalZone>12345</cbc:PostalZone>
+        <cac:Country>
           <cbc:IdentificationCode>DE</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-          <cac:PartyLegalEntity>
+      <cac:PartyLegalEntity>
         <cbc:RegistrationName>[Buyer name]</cbc:RegistrationName>
       </cac:PartyLegalEntity>
-          <cac:Contact>
+      <cac:Contact>
         <cbc:Name>[Buyer contact person]</cbc:Name>
       </cac:Contact>
     </cac:Party>
   </cac:AccountingCustomerParty>
   <cac:PaymentMeans>
     <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-      <cac:PayeeFinancialAccount>
+    <cac:PayeeFinancialAccount>
       <cbc:ID>DE12345678912345678912</cbc:ID>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
@@ -74,14 +74,14 @@
   </cac:PaymentTerms>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="EUR">0</cbc:TaxAmount>
-      <cac:TaxSubtotal>
+    <cac:TaxSubtotal>
       <cbc:TaxableAmount currencyID="EUR">120</cbc:TaxableAmount>
-          <cbc:TaxAmount currencyID="EUR">0</cbc:TaxAmount>
-          <cac:TaxCategory>
+      <cbc:TaxAmount currencyID="EUR">0</cbc:TaxAmount>
+      <cac:TaxCategory>
         <cbc:ID>O</cbc:ID>
-              <cbc:Percent>0</cbc:Percent>
-              <cbc:TaxExemptionReason>als gemeinnützig anerkannt</cbc:TaxExemptionReason>
-              <cac:TaxScheme>
+        <cbc:Percent>0</cbc:Percent>
+        <cbc:TaxExemptionReason>als gemeinnützig anerkannt</cbc:TaxExemptionReason>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:TaxCategory>
@@ -89,25 +89,25 @@
   </cac:TaxTotal>
   <cac:LegalMonetaryTotal>
     <cbc:LineExtensionAmount currencyID="EUR">120</cbc:LineExtensionAmount>
-      <cbc:TaxExclusiveAmount currencyID="EUR">120</cbc:TaxExclusiveAmount>
-      <cbc:TaxInclusiveAmount currencyID="EUR">120</cbc:TaxInclusiveAmount>
-      <cbc:PayableAmount currencyID="EUR">120</cbc:PayableAmount>
+    <cbc:TaxExclusiveAmount currencyID="EUR">120</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="EUR">120</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="EUR">120</cbc:PayableAmount>
   </cac:LegalMonetaryTotal>
   <cac:InvoiceLine>
     <cbc:ID>Teilnahmegebühr</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="XPP">1</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">120</cbc:LineExtensionAmount>
-      <cac:Item>
+    <cbc:InvoicedQuantity unitCode="XPP">1</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">120</cbc:LineExtensionAmount>
+    <cac:Item>
       <cbc:Description>Anmeldung von […]</cbc:Description>
-          <cbc:Name>Teilnahmegebühr</cbc:Name>
-          <cac:ClassifiedTaxCategory>
+      <cbc:Name>Teilnahmegebühr</cbc:Name>
+      <cac:ClassifiedTaxCategory>
         <cbc:ID>O</cbc:ID>
-              <cac:TaxScheme>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
-      <cac:Price>
+    <cac:Price>
       <cbc:PriceAmount currencyID="EUR">120</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>

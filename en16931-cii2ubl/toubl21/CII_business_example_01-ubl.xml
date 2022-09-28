@@ -24,23 +24,23 @@
       <cac:PartyName>
         <cbc:Name>XXX AG</cbc:Name>
       </cac:PartyName>
-          <cac:PostalAddress>
+      <cac:PostalAddress>
         <cbc:StreetName>Storkower Straße 207</cbc:StreetName>
-              <cbc:CityName>Berlin</cbc:CityName>
-              <cbc:PostalZone>10369</cbc:PostalZone>
-              <cac:Country>
+        <cbc:CityName>Berlin</cbc:CityName>
+        <cbc:PostalZone>10369</cbc:PostalZone>
+        <cac:Country>
           <cbc:IdentificationCode>DE</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-          <cac:PartyTaxScheme>
+      <cac:PartyTaxScheme>
         <cbc:CompanyID>DE37/302/30168</cbc:CompanyID>
-              <cac:TaxScheme>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
-          <cac:PartyLegalEntity>
+      <cac:PartyLegalEntity>
         <cbc:RegistrationName>XXX AG</cbc:RegistrationName>
-              <cbc:CompanyID>57151520</cbc:CompanyID>
+        <cbc:CompanyID>57151520</cbc:CompanyID>
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingSupplierParty>
@@ -49,21 +49,21 @@
       <cac:PartyIdentification>
         <cbc:ID>10202</cbc:ID>
       </cac:PartyIdentification>
-          <cac:PartyName>
+      <cac:PartyName>
         <cbc:Name>XXX AG</cbc:Name>
       </cac:PartyName>
-          <cac:PostalAddress>
+      <cac:PostalAddress>
         <cbc:StreetName>Storkower Straße 207</cbc:StreetName>
-              <cbc:CityName>Berlin</cbc:CityName>
-              <cbc:PostalZone>10369</cbc:PostalZone>
-              <cac:Country>
+        <cbc:CityName>Berlin</cbc:CityName>
+        <cbc:PostalZone>10369</cbc:PostalZone>
+        <cac:Country>
           <cbc:IdentificationCode>DE</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-          <cac:PartyLegalEntity>
+      <cac:PartyLegalEntity>
         <cbc:RegistrationName>XXX AG</cbc:RegistrationName>
       </cac:PartyLegalEntity>
-          <cac:Contact>
+      <cac:Contact>
         <cbc:Name>XXXX</cbc:Name>
       </cac:Contact>
     </cac:Party>
@@ -73,20 +73,20 @@
   </cac:Delivery>
   <cac:PaymentMeans>
     <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-      <cbc:PaymentID>2016166</cbc:PaymentID>
-      <cac:PayeeFinancialAccount>
+    <cbc:PaymentID>2016166</cbc:PaymentID>
+    <cac:PayeeFinancialAccount>
       <cbc:ID>DE12500105170648489890</cbc:ID>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="EUR">2221.84</cbc:TaxAmount>
-      <cac:TaxSubtotal>
+    <cac:TaxSubtotal>
       <cbc:TaxableAmount currencyID="EUR">11693.87</cbc:TaxableAmount>
-          <cbc:TaxAmount currencyID="EUR">2221.84</cbc:TaxAmount>
-          <cac:TaxCategory>
+      <cbc:TaxAmount currencyID="EUR">2221.84</cbc:TaxAmount>
+      <cac:TaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19</cbc:Percent>
-              <cac:TaxScheme>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:TaxCategory>
@@ -94,71 +94,71 @@
   </cac:TaxTotal>
   <cac:LegalMonetaryTotal>
     <cbc:LineExtensionAmount currencyID="EUR">11693.87</cbc:LineExtensionAmount>
-      <cbc:TaxExclusiveAmount currencyID="EUR">11693.87</cbc:TaxExclusiveAmount>
-      <cbc:TaxInclusiveAmount currencyID="EUR">13915.71</cbc:TaxInclusiveAmount>
-      <cbc:PayableAmount currencyID="EUR">13915.71</cbc:PayableAmount>
+    <cbc:TaxExclusiveAmount currencyID="EUR">11693.87</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="EUR">13915.71</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="EUR">13915.71</cbc:PayableAmount>
   </cac:LegalMonetaryTotal>
   <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">12122.59</cbc:LineExtensionAmount>
-      <cac:Item>
+    <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">12122.59</cbc:LineExtensionAmount>
+    <cac:Item>
       <cbc:Description>Neues DSL Portfolio 2016</cbc:Description>
-          <cbc:Name>Festpreis</cbc:Name>
-          <cac:SellersItemIdentification>
+      <cbc:Name>Festpreis</cbc:Name>
+      <cac:SellersItemIdentification>
         <cbc:ID>846</cbc:ID>
       </cac:SellersItemIdentification>
-          <cac:ClassifiedTaxCategory>
+      <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19</cbc:Percent>
-              <cac:TaxScheme>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
-      <cac:Price>
+    <cac:Price>
       <cbc:PriceAmount currencyID="EUR">12122.59</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
     <cbc:ID>2</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="C62">-1</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">-606.13</cbc:LineExtensionAmount>
-      <cac:Item>
+    <cbc:InvoicedQuantity unitCode="C62">-1</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">-606.13</cbc:LineExtensionAmount>
+    <cac:Item>
       <cbc:Name>Abzug</cbc:Name>
-          <cac:SellersItemIdentification>
+      <cac:SellersItemIdentification>
         <cbc:ID>832</cbc:ID>
       </cac:SellersItemIdentification>
-          <cac:ClassifiedTaxCategory>
+      <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19</cbc:Percent>
-              <cac:TaxScheme>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
-      <cac:Price>
+    <cac:Price>
       <cbc:PriceAmount currencyID="EUR">606.13</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
     <cbc:ID>16</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">177.41</cbc:LineExtensionAmount>
-      <cac:Item>
+    <cbc:InvoicedQuantity unitCode="C62">1</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">177.41</cbc:LineExtensionAmount>
+    <cac:Item>
       <cbc:Name>zzgl. </cbc:Name>
-          <cac:SellersItemIdentification>
+      <cac:SellersItemIdentification>
         <cbc:ID>870</cbc:ID>
       </cac:SellersItemIdentification>
-          <cac:ClassifiedTaxCategory>
+      <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19</cbc:Percent>
-              <cac:TaxScheme>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
-      <cac:Price>
+    <cac:Price>
       <cbc:PriceAmount currencyID="EUR">1.5</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>

@@ -16,30 +16,30 @@
       <cac:PartyIdentification>
         <cbc:ID schemeID="0088">Homepage Design GmbH</cbc:ID>
       </cac:PartyIdentification>
-          <cac:PartyName>
+      <cac:PartyName>
         <cbc:Name>Homepage Design GmbH</cbc:Name>
       </cac:PartyName>
-          <cac:PostalAddress>
+      <cac:PostalAddress>
         <cbc:StreetName>Musterstr. 60</cbc:StreetName>
-              <cbc:CityName>Berlin</cbc:CityName>
-              <cbc:PostalZone>10409</cbc:PostalZone>
-              <cac:Country>
+        <cbc:CityName>Berlin</cbc:CityName>
+        <cbc:PostalZone>10409</cbc:PostalZone>
+        <cac:Country>
           <cbc:IdentificationCode>DE</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-          <cac:PartyTaxScheme>
+      <cac:PartyTaxScheme>
         <cbc:CompanyID>DE123456789</cbc:CompanyID>
-              <cac:TaxScheme>
+        <cac:TaxScheme>
           <cbc:ID>FC</cbc:ID>
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
-          <cac:PartyLegalEntity>
+      <cac:PartyLegalEntity>
         <cbc:RegistrationName>Homepage Design GmbH</cbc:RegistrationName>
       </cac:PartyLegalEntity>
-          <cac:Contact>
+      <cac:Contact>
         <cbc:Name>Anna Blume </cbc:Name>
-              <cbc:Telephone>0000 0000 0000</cbc:Telephone>
-              <cbc:ElectronicMail>a.blume@takeaway.de</cbc:ElectronicMail>
+        <cbc:Telephone>0000 0000 0000</cbc:Telephone>
+        <cbc:ElectronicMail>a.blume@takeaway.de</cbc:ElectronicMail>
       </cac:Contact>
     </cac:Party>
   </cac:AccountingSupplierParty>
@@ -48,41 +48,41 @@
       <cac:PartyIdentification>
         <cbc:ID>Lampenlager GmbH</cbc:ID>
       </cac:PartyIdentification>
-          <cac:PartyName>
+      <cac:PartyName>
         <cbc:Name>Anne Mach</cbc:Name>
       </cac:PartyName>
-          <cac:PostalAddress>
+      <cac:PostalAddress>
         <cbc:StreetName>Industriestr. 21</cbc:StreetName>
-              <cbc:CityName>Berlin </cbc:CityName>
-              <cbc:PostalZone>15856</cbc:PostalZone>
-              <cac:Country>
+        <cbc:CityName>Berlin </cbc:CityName>
+        <cbc:PostalZone>15856</cbc:PostalZone>
+        <cac:Country>
           <cbc:IdentificationCode>DE</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-          <cac:PartyLegalEntity>
+      <cac:PartyLegalEntity>
         <cbc:RegistrationName>Anne Mach</cbc:RegistrationName>
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingCustomerParty>
   <cac:PaymentMeans>
     <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-      <cac:PayeeFinancialAccount>
+    <cac:PayeeFinancialAccount>
       <cbc:ID>DE02120300000000202051</cbc:ID>
-          <cbc:Name>Homepage Design GmbH</cbc:Name>
-          <cac:FinancialInstitutionBranch>
+      <cbc:Name>Homepage Design GmbH</cbc:Name>
+      <cac:FinancialInstitutionBranch>
         <cbc:ID>BYLADEM1001</cbc:ID>
       </cac:FinancialInstitutionBranch>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="EUR">2850</cbc:TaxAmount>
-      <cac:TaxSubtotal>
+    <cac:TaxSubtotal>
       <cbc:TaxableAmount currencyID="EUR">15000</cbc:TaxableAmount>
-          <cbc:TaxAmount currencyID="EUR">2850</cbc:TaxAmount>
-          <cac:TaxCategory>
+      <cbc:TaxAmount currencyID="EUR">2850</cbc:TaxAmount>
+      <cac:TaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19</cbc:Percent>
-              <cac:TaxScheme>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:TaxCategory>
@@ -90,25 +90,25 @@
   </cac:TaxTotal>
   <cac:LegalMonetaryTotal>
     <cbc:LineExtensionAmount currencyID="EUR">15000</cbc:LineExtensionAmount>
-      <cbc:TaxExclusiveAmount currencyID="EUR">15000</cbc:TaxExclusiveAmount>
-      <cbc:TaxInclusiveAmount currencyID="EUR">17850</cbc:TaxInclusiveAmount>
-      <cbc:PayableAmount currencyID="EUR">17850</cbc:PayableAmount>
+    <cbc:TaxExclusiveAmount currencyID="EUR">15000</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="EUR">17850</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="EUR">17850</cbc:PayableAmount>
   </cac:LegalMonetaryTotal>
   <cac:InvoiceLine>
     <cbc:ID>0</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="XPP">1</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">15000</cbc:LineExtensionAmount>
-      <cac:Item>
+    <cbc:InvoicedQuantity unitCode="XPP">1</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">15000</cbc:LineExtensionAmount>
+    <cac:Item>
       <cbc:Name>Homepage</cbc:Name>
-          <cac:ClassifiedTaxCategory>
+      <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>19</cbc:Percent>
-              <cac:TaxScheme>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>
-      <cac:Price>
+    <cac:Price>
       <cbc:PriceAmount currencyID="EUR">15000</cbc:PriceAmount>
     </cac:Price>
   </cac:InvoiceLine>

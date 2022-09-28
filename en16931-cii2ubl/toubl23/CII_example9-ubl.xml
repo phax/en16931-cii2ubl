@@ -19,27 +19,27 @@ het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Blue
       <cac:PartyName>
         <cbc:Name>Bluem BV</cbc:Name>
       </cac:PartyName>
-          <cac:PostalAddress>
+      <cac:PostalAddress>
         <cbc:StreetName>Lindeboomseweg 41</cbc:StreetName>
-              <cbc:CityName>Amersfoort</cbc:CityName>
-              <cbc:PostalZone>3825 AL</cbc:PostalZone>
-              <cac:Country>
+        <cbc:CityName>Amersfoort</cbc:CityName>
+        <cbc:PostalZone>3825 AL</cbc:PostalZone>
+        <cac:Country>
           <cbc:IdentificationCode>NL</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-          <cac:PartyTaxScheme>
+      <cac:PartyTaxScheme>
         <cbc:CompanyID>NL809163160B01</cbc:CompanyID>
-              <cac:TaxScheme>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
-          <cac:PartyLegalEntity>
+      <cac:PartyLegalEntity>
         <cbc:RegistrationName>Bluem BV</cbc:RegistrationName>
-              <cbc:CompanyID>32081330 Amersfoort</cbc:CompanyID>
+        <cbc:CompanyID>32081330 Amersfoort</cbc:CompanyID>
       </cac:PartyLegalEntity>
-          <cac:Contact>
+      <cac:Contact>
         <cbc:Telephone> 033-4549055</cbc:Telephone>
-              <cbc:ElectronicMail>info@bluem.nl</cbc:ElectronicMail>
+        <cbc:ElectronicMail>info@bluem.nl</cbc:ElectronicMail>
       </cac:Contact>
     </cac:Party>
   </cac:AccountingSupplierParty>
@@ -48,45 +48,45 @@ het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Blue
       <cac:PartyName>
         <cbc:Name>Provide Verzekeringen</cbc:Name>
       </cac:PartyName>
-          <cac:PostalAddress>
+      <cac:PostalAddress>
         <cbc:StreetName>Henry Dunantweg 42</cbc:StreetName>
-              <cbc:CityName>Alphen aan den Rijn</cbc:CityName>
-              <cbc:PostalZone>2402 NR</cbc:PostalZone>
-              <cac:Country>
+        <cbc:CityName>Alphen aan den Rijn</cbc:CityName>
+        <cbc:PostalZone>2402 NR</cbc:PostalZone>
+        <cac:Country>
           <cbc:IdentificationCode>NL</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-          <cac:PartyLegalEntity>
+      <cac:PartyLegalEntity>
         <cbc:RegistrationName>Provide Verzekeringen</cbc:RegistrationName>
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingCustomerParty>
   <cac:PaymentMeans>
     <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-      <cbc:PaymentID>2015 0483 0000 0000</cbc:PaymentID>
-      <cac:PayeeFinancialAccount>
+    <cbc:PaymentID>2015 0483 0000 0000</cbc:PaymentID>
+    <cac:PayeeFinancialAccount>
       <cbc:ID>NL13RABO0377815500</cbc:ID>
-          <cac:FinancialInstitutionBranch>
+      <cac:FinancialInstitutionBranch>
         <cbc:ID>RABONL2U</cbc:ID>
       </cac:FinancialInstitutionBranch>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
   <cac:PaymentMeans>
     <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-      <cbc:PaymentID>2015 0483 0000 0000</cbc:PaymentID>
-      <cac:PayeeFinancialAccount>
+    <cbc:PaymentID>2015 0483 0000 0000</cbc:PaymentID>
+    <cac:PayeeFinancialAccount>
       <cbc:ID>NL13RABO0377815500</cbc:ID>
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="EUR">30.87</cbc:TaxAmount>
-      <cac:TaxSubtotal>
+    <cac:TaxSubtotal>
       <cbc:TaxableAmount currencyID="EUR">147</cbc:TaxableAmount>
-          <cbc:TaxAmount currencyID="EUR">30.87</cbc:TaxAmount>
-          <cac:TaxCategory>
+      <cbc:TaxAmount currencyID="EUR">30.87</cbc:TaxAmount>
+      <cac:TaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>21</cbc:Percent>
-              <cac:TaxScheme>
+        <cbc:Percent>21</cbc:Percent>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:TaxCategory>
@@ -94,35 +94,35 @@ het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Blue
   </cac:TaxTotal>
   <cac:LegalMonetaryTotal>
     <cbc:LineExtensionAmount currencyID="EUR">147</cbc:LineExtensionAmount>
-      <cbc:TaxExclusiveAmount currencyID="EUR">147</cbc:TaxExclusiveAmount>
-      <cbc:TaxInclusiveAmount currencyID="EUR">177.87</cbc:TaxInclusiveAmount>
-      <cbc:PayableAmount currencyID="EUR">177.87</cbc:PayableAmount>
+    <cbc:TaxExclusiveAmount currencyID="EUR">147</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="EUR">177.87</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="EUR">177.87</cbc:PayableAmount>
   </cac:LegalMonetaryTotal>
   <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
-      <cbc:InvoicedQuantity unitCode="MON">3</cbc:InvoicedQuantity>
-      <cbc:LineExtensionAmount currencyID="EUR">147</cbc:LineExtensionAmount>
-      <cac:InvoicePeriod>
+    <cbc:InvoicedQuantity unitCode="MON">3</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">147</cbc:LineExtensionAmount>
+    <cac:InvoicePeriod>
       <cbc:StartDate>2016-04-01</cbc:StartDate>
-          <cbc:EndDate>2016-04-01</cbc:EndDate>
+      <cbc:EndDate>2016-04-01</cbc:EndDate>
     </cac:InvoicePeriod>
-      <cac:Item>
+    <cac:Item>
       <cbc:Name>IExpress licentiekosten</cbc:Name>
-          <cac:ClassifiedTaxCategory>
+      <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-              <cbc:Percent>21</cbc:Percent>
-              <cac:TaxScheme>
+        <cbc:Percent>21</cbc:Percent>
+        <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
-          <cac:AdditionalItemProperty>
+      <cac:AdditionalItemProperty>
         <cbc:Name>Verbruikscategorie</cbc:Name>
-              <cbc:Value>Start</cbc:Value>
+        <cbc:Value>Start</cbc:Value>
       </cac:AdditionalItemProperty>
     </cac:Item>
-      <cac:Price>
+    <cac:Price>
       <cbc:PriceAmount currencyID="EUR">49</cbc:PriceAmount>
-          <cbc:BaseQuantity unitCode="MON">49</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="MON">49</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
 </Invoice>
