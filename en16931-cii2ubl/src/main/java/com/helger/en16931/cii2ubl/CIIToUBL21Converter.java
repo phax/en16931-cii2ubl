@@ -1346,7 +1346,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
                                                          "SupplyChainTradeTransaction",
                                                          "IncludedSupplyChainTradeLineItem",
                                                          "SpecifiedLineTradeAgreement",
-                                                         "NetPriceProductTradePrice",
+                                                         "GrossPriceProductTradePrice",
                                                          "AppliedTradeAllowanceCharge" },
                                          "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
           if (eIsCharge.isDefined ())
@@ -2144,7 +2144,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
                                     bUsePrice ? aUBLPrice::setPriceAmount : null);
 
       // Allowance charge
-      final TradePriceType aTradePrice = aLineAgreement.getNetPriceProductTradePrice ();
+      final TradePriceType aTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
       if (aTradePrice != null)
         for (final TradeAllowanceChargeType aPriceAllowanceCharge : aTradePrice.getAppliedTradeAllowanceCharge ())
         {
@@ -2156,7 +2156,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
                                                          "SupplyChainTradeTransaction",
                                                          "IncludedSupplyChainTradeLineItem",
                                                          "SpecifiedLineTradeAgreement",
-                                                         "NetPriceProductTradePrice",
+                                                         "GrossPriceProductTradePrice",
                                                          "AppliedTradeAllowanceCharge" },
                                          "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
           if (eIsCharge.isDefined ())
