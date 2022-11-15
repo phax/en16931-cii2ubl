@@ -201,7 +201,7 @@
     <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
     <cbc:AllowanceChargeReasonCode>95</cbc:AllowanceChargeReasonCode>
     <cbc:AllowanceChargeReason>Loyal customer</cbc:AllowanceChargeReason>
-    <cbc:MultiplierFactorNumeric>0.1</cbc:MultiplierFactorNumeric>
+    <cbc:MultiplierFactorNumeric>10</cbc:MultiplierFactorNumeric>
     <cbc:Amount currencyID="DKK">150</cbc:Amount>
     <cbc:BaseAmount currencyID="DKK">1500</cbc:BaseAmount>
     <cac:TaxCategory>
@@ -216,7 +216,7 @@
     <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
     <cbc:AllowanceChargeReasonCode>ABL</cbc:AllowanceChargeReasonCode>
     <cbc:AllowanceChargeReason>Packaging</cbc:AllowanceChargeReason>
-    <cbc:MultiplierFactorNumeric>0.1</cbc:MultiplierFactorNumeric>
+    <cbc:MultiplierFactorNumeric>10</cbc:MultiplierFactorNumeric>
     <cbc:Amount currencyID="DKK">150</cbc:Amount>
     <cbc:BaseAmount currencyID="DKK">1500</cbc:BaseAmount>
     <cac:TaxCategory>
@@ -284,7 +284,7 @@
       <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
       <cbc:AllowanceChargeReasonCode>95</cbc:AllowanceChargeReasonCode>
       <cbc:AllowanceChargeReason>Loyal customer</cbc:AllowanceChargeReason>
-      <cbc:MultiplierFactorNumeric>0.1</cbc:MultiplierFactorNumeric>
+      <cbc:MultiplierFactorNumeric>10</cbc:MultiplierFactorNumeric>
       <cbc:Amount currencyID="DKK">100</cbc:Amount>
       <cbc:BaseAmount currencyID="DKK">1000</cbc:BaseAmount>
     </cac:AllowanceCharge>
@@ -292,7 +292,7 @@
       <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
       <cbc:AllowanceChargeReasonCode>ABL</cbc:AllowanceChargeReasonCode>
       <cbc:AllowanceChargeReason>Packaging</cbc:AllowanceChargeReason>
-      <cbc:MultiplierFactorNumeric>0.1</cbc:MultiplierFactorNumeric>
+      <cbc:MultiplierFactorNumeric>10</cbc:MultiplierFactorNumeric>
       <cbc:Amount currencyID="DKK">100</cbc:Amount>
       <cbc:BaseAmount currencyID="DKK">1000</cbc:BaseAmount>
     </cac:AllowanceCharge>

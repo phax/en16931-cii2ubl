@@ -25,7 +25,6 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.commons.CGlobal;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.equals.EqualsHelper;
@@ -360,8 +359,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     }
     if (aAllowanceCharge.getCalculationPercent () != null)
     {
-      // TODO calc is correct?
-      aUBLAllowanceCharge.setMultiplierFactorNumeric (aAllowanceCharge.getCalculationPercentValue ().divide (CGlobal.BIGDEC_100));
+      // UBL requires values between 0 and 100
+      aUBLAllowanceCharge.setMultiplierFactorNumeric (aAllowanceCharge.getCalculationPercentValue ());
     }
     if (aAllowanceCharge.hasActualAmountEntries ())
     {
