@@ -82,6 +82,7 @@ CII to UBL Converter for EN 16931 invoices
 
 * v1.4.9 - 2022-11-15
     * Fixed an unnecsseary division by 100 for creating `MultiplierFactorNumeric`. See [issue #17](https://github.com/phax/en16931-cii2ubl/issues/17) - thanks @L3Mars
+    * Tested output against EN 16931 rules v1.3.9 - no changes necessary
 * v1.4.8 - 2022-09-28
     * Added new option `--output-suffix` to customize the output file suffix, that is currently hard coded to `-ubl`
     * Fixed a problem with the mapping of BT-147, BT-148, BT-149 and BT-150. See [issue #15](https://github.com/phax/en16931-cii2ubl/issues/15). Thanks to @cambid for pointing that out
