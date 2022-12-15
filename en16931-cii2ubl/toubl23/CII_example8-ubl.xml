@@ -18,6 +18,7 @@ www.enexis.nl</cbc:Note>
   </cac:InvoicePeriod>
   <cac:AdditionalDocumentReference>
     <cbc:ID>871694831000290806</cbc:ID>
+    <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
   </cac:AdditionalDocumentReference>
   <cac:AccountingSupplierParty>
     <cac:Party>

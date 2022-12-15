@@ -279,6 +279,7 @@
     </cac:OrderLineReference>
     <cac:DocumentReference>
       <cbc:ID>Object2</cbc:ID>
+      <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
     </cac:DocumentReference>
     <cac:AllowanceCharge>
       <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
@@ -347,6 +348,7 @@
     </cac:OrderLineReference>
     <cac:DocumentReference>
       <cbc:ID>Object2</cbc:ID>
+      <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
     </cac:DocumentReference>
     <cac:Item>
       <cbc:Description>Parker Pen, Black, model Sansa</cbc:Description>

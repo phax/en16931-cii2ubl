@@ -235,7 +235,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    * @return <code>null</code> if the format is unknown.
    */
   @Nullable
-  protected static String _getDatePattern (@Nonnull @Nonempty final String sFormat, @Nonnull final IErrorList aErrorList)
+  protected static String _getDatePattern (@Nonnull @Nonempty final String sFormat,
+                                           @Nonnull final IErrorList aErrorList)
   {
     ValueEnforcer.notEmpty (sFormat, "Format");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
@@ -270,7 +271,9 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate parseDate (@Nullable final String sDate, @Nullable final String sFormat, @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (@Nullable final String sDate,
+                                        @Nullable final String sFormat,
+                                        @Nonnull final IErrorList aErrorList)
   {
     if (StringHelper.hasNoText (sDate))
       return null;
@@ -284,7 +287,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     // Try to parse it
     final LocalDate aDate = PDTFromString.getLocalDateFromString (sDate, sPattern);
     if (aDate == null)
-      aErrorList.add (_buildError (null, "Failed to parse the date '" + sDate + "' using format '" + sRealFormat + "'"));
+      aErrorList.add (_buildError (null,
+                                   "Failed to parse the date '" + sDate + "' using format '" + sRealFormat + "'"));
 
     return aDate;
   }
@@ -320,7 +324,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nonnull
-  protected static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator, @Nonnull final IErrorList aErrorList)
+  protected static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator,
+                                              @Nonnull final IErrorList aErrorList)
   {
     if (aIndicator == null)
       return ETriState.UNDEFINED;
@@ -340,7 +345,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       if ("false".equals (sIndicator))
         return ETriState.FALSE;
 
-      aErrorList.add (_buildError (null, "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
+      aErrorList.add (_buildError (null,
+                                   "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
       return ETriState.UNDEFINED;
     }
 
@@ -492,7 +498,14 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   protected static boolean isOriginatorDocumentReferenceTypeCode (@Nullable final String s)
   {
+    // BT-17
     return "50".equals (s);
+  }
+
+  protected static boolean isValidDocumentReferenceTypeCode (@Nullable final String s)
+  {
+    // BT-17 or BT-18
+    return isOriginatorDocumentReferenceTypeCode (s) || "130".equals (s);
   }
 
   protected static boolean isLT0Strict (@Nullable final BigDecimal aBD)
@@ -515,7 +528,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static ICommonsList <IDType> getAllUsableGlobalIDs (@Nonnull final TradePartyType aParty)
   {
     return CommonsArrayList.createFiltered (aParty.getGlobalID (),
-                                            x -> StringHelper.hasText (x.getValue ()) && StringHelper.hasText (x.getSchemeID ()));
+                                            x -> StringHelper.hasText (x.getValue ()) &&
+                                                 StringHelper.hasText (x.getSchemeID ()));
   }
 
   /**
@@ -663,10 +677,13 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
     // Check total
     final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
-    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
+    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null
+                                                                       : aTransaction.getApplicableHeaderTradeSettlement ();
     final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
                                                                                   : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
-    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null : aTotal.getDuePayableAmount ().get (0);
+    final AmountType aDuePayable = aTotal == null ||
+                                   aTotal.hasNoDuePayableAmountEntries () ? null
+                                                                          : aTotal.getDuePayableAmount ().get (0);
 
     if (eIsInvoice.isUndefined () && aDuePayable != null)
     {
@@ -682,7 +699,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     }
     else
       if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("Determined the provided CII document to be " + (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
+        LOGGER.debug ("Determined the provided CII document to be " +
+                      (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
 
     return eIsInvoice;
   }
@@ -723,5 +741,6 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    *         <code>null</code> in case of error.
    */
   @Nullable
-  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice, @Nonnull ErrorList aErrorList);
+  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice,
+                                                @Nonnull ErrorList aErrorList);
 }

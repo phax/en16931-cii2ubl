@@ -112,6 +112,10 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     // ID value is a mandatory field
     ret.setID (sID).setSchemeID (aRD.getReferenceTypeCodeValue ());
 
+    // Add DocumentTypeCode where possible
+    if (isValidDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
+      ret.setDocumentTypeCode (aRD.getTypeCodeValue ());
+
     // IssueDate is optional
     final FormattedDateTimeType aFDT = aRD.getFormattedIssueDateTime ();
     if (aFDT != null)
@@ -214,7 +218,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     if (aUBLID != null)
     {
       // Avoid duplicate IDs
-      if (!CollectionHelper.containsAny (aParty.getPartyIdentification (), x -> EqualsHelper.equals (aUBLID, x.getID ())))
+      if (!CollectionHelper.containsAny (aParty.getPartyIdentification (),
+                                         x -> EqualsHelper.equals (aUBLID, x.getID ())))
       {
         final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
         aUBLPartyIdentification.setID (aUBLID);
@@ -332,7 +337,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     if (aEmail != null)
       ifNotEmpty (aUBLContact::setElectronicMail, aEmail.getURIIDValue ());
 
-    if (aUBLContact.getName () == null && aUBLContact.getTelephone () == null && aUBLContact.getElectronicMail () == null)
+    if (aUBLContact.getName () == null &&
+        aUBLContact.getTelephone () == null &&
+        aUBLContact.getElectronicMail () == null)
       return null;
     return aUBLContact;
   }
@@ -341,7 +348,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AmountType _copyAmount (@Nullable final AmountType aAmount,
                                                                                                            @Nullable final String sDefaultCurrencyCode)
   {
-    return _copyAmount (aAmount, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AmountType (), sDefaultCurrencyCode);
+    return _copyAmount (aAmount,
+                        new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AmountType (),
+                        sDefaultCurrencyCode);
   }
 
   private void _copyAllowanceCharge (@Nonnull final TradeAllowanceChargeType aAllowanceCharge,
@@ -367,7 +376,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       aUBLAllowanceCharge.setAmount (_copyAmount (aAllowanceCharge.getActualAmountAtIndex (0), sDefaultCurrencyCode));
     }
 
-    aUBLAllowanceCharge.setBaseAmount (_copyAmount (aAllowanceCharge.getBasisAmount (), new BaseAmountType (), sDefaultCurrencyCode));
+    aUBLAllowanceCharge.setBaseAmount (_copyAmount (aAllowanceCharge.getBasisAmount (),
+                                                    new BaseAmountType (),
+                                                    sDefaultCurrencyCode));
 
     // TaxCategory
     for (final TradeTaxType aTradeTax : aAllowanceCharge.getCategoryTradeTax ())
@@ -418,7 +429,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     {
       final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
       if (aAccount == null)
-        aErrorList.add (_buildError (null, "The element 'PayeePartyCreditorFinancialAccount' is missing for Credit Transfer"));
+        aErrorList.add (_buildError (null,
+                                     "The element 'PayeePartyCreditorFinancialAccount' is missing for Credit Transfer"));
       else
       {
         final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
@@ -452,7 +464,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     {
       final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
       if (aCard == null)
-        aErrorList.add (_buildError (null, "The element 'ApplicableTradeSettlementFinancialCard' is missing for Payment Card Information"));
+        aErrorList.add (_buildError (null,
+                                     "The element 'ApplicableTradeSettlementFinancialCard' is missing for Payment Card Information"));
       else
       {
         final CardAccountType aUBLCardAccount = new CardAccountType ();
@@ -524,7 +537,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     if (bIsBG17 || bIsBG18 || bIsBG19 || isPaymentMeansCodeOtherKnown (sTypeCode))
       aPaymentMeansHandler.accept (aUBLPaymentMeans);
     else
-      aErrorList.add (_buildError (null, "Failed to determine a supported Payment Means Type from code '" + sTypeCode + "'"));
+      aErrorList.add (_buildError (null,
+                                   "Failed to determine a supported Payment Means Type from code '" + sTypeCode + "'"));
   }
 
   @Nullable
@@ -545,14 +559,16 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     }
 
     // Ignore defacto empty elements
-    if (StringHelper.hasNoText (aUBLOrderRef.getIDValue ()) && StringHelper.hasNoText (aUBLOrderRef.getSalesOrderIDValue ()))
+    if (StringHelper.hasNoText (aUBLOrderRef.getIDValue ()) &&
+        StringHelper.hasNoText (aUBLOrderRef.getSalesOrderIDValue ()))
       return null;
 
     return aUBLOrderRef;
   }
 
   @Nullable
-  public InvoiceType convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice, @Nonnull final ErrorList aErrorList)
+  public InvoiceType convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
+                                       @Nonnull final ErrorList aErrorList)
   {
     ValueEnforcer.notNull (aCIIInvoice, "CIIInvoice");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
@@ -695,7 +711,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
     // BillingReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderSettlement.getInvoiceReferencedDocument (), aErrorList);
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderSettlement.getInvoiceReferencedDocument (),
+                                                                          aErrorList);
       if (aUBLDocRef != null)
       {
         final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
@@ -724,19 +741,24 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     {
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
-        // Use for "Tender or lot reference" with TypeCode "50"
+        // Use for "Tender or lot reference" with TypeCode "50" (BT-17)
         if (isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
+          {
+            // Explicitly disallowed here
+            aUBLDocRef.setDocumentTypeCode ((DocumentTypeCodeType) null);
             aUBLInvoice.addOriginatorDocumentReference (aUBLDocRef);
+          }
         }
       }
     }
 
     // ContractDocumentReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderAgreement.getContractReferencedDocument (), aErrorList);
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderAgreement.getContractReferencedDocument (),
+                                                                          aErrorList);
       if (aUBLDocRef != null)
         aUBLInvoice.addContractDocumentReference (aUBLDocRef);
     }
@@ -1042,7 +1064,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
         if (aTradeTax.hasCalculatedAmountEntries ())
         {
-          aUBLTaxSubtotal.setTaxAmount (_copyAmount (aTradeTax.getCalculatedAmountAtIndex (0), new TaxAmountType (), sDefaultCurrencyCode));
+          aUBLTaxSubtotal.setTaxAmount (_copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
+                                                     new TaxAmountType (),
+                                                     sDefaultCurrencyCode));
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -1168,9 +1192,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       {
         final PeriodType aUBLLinePeriod = new PeriodType ();
         if (aLineBillingPeriod.getStartDateTime () != null)
-          aUBLLinePeriod.setStartDate (_parseDate (aLineBillingPeriod.getStartDateTime ().getDateTimeString (), aErrorList));
+          aUBLLinePeriod.setStartDate (_parseDate (aLineBillingPeriod.getStartDateTime ().getDateTimeString (),
+                                                   aErrorList));
         if (aLineBillingPeriod.getEndDateTime () != null)
-          aUBLLinePeriod.setEndDate (_parseDate (aLineBillingPeriod.getEndDateTime ().getDateTimeString (), aErrorList));
+          aUBLLinePeriod.setEndDate (_parseDate (aLineBillingPeriod.getEndDateTime ().getDateTimeString (),
+                                                 aErrorList));
         aUBLInvoiceLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
@@ -1273,7 +1299,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           if (aClassCode != null)
           {
             final CommodityClassificationType aUBLCommodityClassification = new CommodityClassificationType ();
-            aUBLCommodityClassification.setItemClassificationCode (_copyCode (aClassCode, new ItemClassificationCodeType ()));
+            aUBLCommodityClassification.setItemClassificationCode (_copyCode (aClassCode,
+                                                                              new ItemClassificationCodeType ()));
             if (aUBLCommodityClassification.getItemClassificationCode () != null)
               aUBLItem.addCommodityClassification (aUBLCommodityClassification);
           }
@@ -1315,7 +1342,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           if (aNPPTP.hasChargeAmountEntries ())
           {
-            aUBLPrice.setPriceAmount (_copyAmount (aNPPTP.getChargeAmountAtIndex (0), new PriceAmountType (), sDefaultCurrencyCode));
+            aUBLPrice.setPriceAmount (_copyAmount (aNPPTP.getChargeAmountAtIndex (0),
+                                                   new PriceAmountType (),
+                                                   sDefaultCurrencyCode));
             bUsePrice = true;
           }
           if (aNPPTP.getBasisQuantity () != null)
@@ -1369,7 +1398,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
   }
 
   @Nullable
-  public CreditNoteType convertToCreditNote (@Nonnull final CrossIndustryInvoiceType aCIICreditNote, @Nonnull final ErrorList aErrorList)
+  public CreditNoteType convertToCreditNote (@Nonnull final CrossIndustryInvoiceType aCIICreditNote,
+                                             @Nonnull final ErrorList aErrorList)
   {
     ValueEnforcer.notNull (aCIICreditNote, "CIICreditNote");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
@@ -1512,7 +1542,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
     // BillingReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderSettlement.getInvoiceReferencedDocument (), aErrorList);
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderSettlement.getInvoiceReferencedDocument (),
+                                                                          aErrorList);
       if (aUBLDocRef != null)
       {
         final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
@@ -1541,19 +1572,24 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     {
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
-        // Use for "Tender or lot reference" with TypeCode "50"
+        // Use for "Tender or lot reference" with TypeCode "50" (BT-17)
         if (isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
+          {
+            // Explicitly disallowed here
+            aUBLDocRef.setDocumentTypeCode ((DocumentTypeCodeType) null);
             aUBLCreditNote.addOriginatorDocumentReference (aUBLDocRef);
+          }
         }
       }
     }
 
     // ContractDocumentReference
     {
-      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderAgreement.getContractReferencedDocument (), aErrorList);
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderAgreement.getContractReferencedDocument (),
+                                                                          aErrorList);
       if (aUBLDocRef != null)
         aUBLCreditNote.addContractDocumentReference (aUBLDocRef);
     }
@@ -1849,7 +1885,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
         if (aTradeTax.hasCalculatedAmountEntries ())
         {
-          aUBLTaxSubtotal.setTaxAmount (_copyAmount (aTradeTax.getCalculatedAmountAtIndex (0), new TaxAmountType (), sDefaultCurrencyCode));
+          aUBLTaxSubtotal.setTaxAmount (_copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
+                                                     new TaxAmountType (),
+                                                     sDefaultCurrencyCode));
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -1975,9 +2013,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       {
         final PeriodType aUBLLinePeriod = new PeriodType ();
         if (aLineBillingPeriod.getStartDateTime () != null)
-          aUBLLinePeriod.setStartDate (_parseDate (aLineBillingPeriod.getStartDateTime ().getDateTimeString (), aErrorList));
+          aUBLLinePeriod.setStartDate (_parseDate (aLineBillingPeriod.getStartDateTime ().getDateTimeString (),
+                                                   aErrorList));
         if (aLineBillingPeriod.getEndDateTime () != null)
-          aUBLLinePeriod.setEndDate (_parseDate (aLineBillingPeriod.getEndDateTime ().getDateTimeString (), aErrorList));
+          aUBLLinePeriod.setEndDate (_parseDate (aLineBillingPeriod.getEndDateTime ().getDateTimeString (),
+                                                 aErrorList));
         aUBLCreditNoteLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
@@ -2080,7 +2120,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           if (aClassCode != null)
           {
             final CommodityClassificationType aUBLCommodityClassification = new CommodityClassificationType ();
-            aUBLCommodityClassification.setItemClassificationCode (_copyCode (aClassCode, new ItemClassificationCodeType ()));
+            aUBLCommodityClassification.setItemClassificationCode (_copyCode (aClassCode,
+                                                                              new ItemClassificationCodeType ()));
             if (aUBLCommodityClassification.getItemClassificationCode () != null)
               aUBLItem.addCommodityClassification (aUBLCommodityClassification);
           }
@@ -2122,7 +2163,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           if (aNPPTP.hasChargeAmountEntries ())
           {
-            aUBLPrice.setPriceAmount (_copyAmount (aNPPTP.getChargeAmountAtIndex (0), new PriceAmountType (), sDefaultCurrencyCode));
+            aUBLPrice.setPriceAmount (_copyAmount (aNPPTP.getChargeAmountAtIndex (0),
+                                                   new PriceAmountType (),
+                                                   sDefaultCurrencyCode));
             bUsePrice = true;
           }
           if (aNPPTP.getBasisQuantity () != null)
@@ -2177,7 +2220,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
   @Override
   @Nullable
-  public Serializable convertCIItoUBL (@Nonnull final CrossIndustryInvoiceType aCIIInvoice, @Nonnull final ErrorList aErrorList)
+  public Serializable convertCIItoUBL (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
+                                       @Nonnull final ErrorList aErrorList)
   {
     ValueEnforcer.notNull (aCIIInvoice, "CIIInvoice");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
