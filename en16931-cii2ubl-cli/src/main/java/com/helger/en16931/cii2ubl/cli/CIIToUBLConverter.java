@@ -157,6 +157,18 @@ public class CIIToUBLConverter implements Callable <Integer>
     return ret;
   }
 
+  private static void _log (@Nonnull final IError aError)
+  {
+    final String sMsg = "  " + aError.getAsString (Locale.US);
+    if (aError.isError ())
+      LOGGER.error (sMsg);
+    else
+      if (aError.isFailure ())
+        LOGGER.warn (sMsg);
+      else
+        LOGGER.info (sMsg);
+  }
+
   // doing the business
   public Integer call () throws Exception
   {
@@ -184,7 +196,6 @@ public class CIIToUBLConverter implements Callable <Integer>
               .setProfileID (m_sProfileID)
               .setCardAccountNetworkID (m_sCardAccountNetworkID);
 
-    final Locale aErrorLocale = Locale.US;
     for (final File f : m_aSourceFiles)
     {
       final File aDestFile = new File (m_sOutputDir, FilenameHelper.getBaseName (f) + m_sOutputFileSuffix + ".xml");
@@ -198,16 +209,13 @@ public class CIIToUBLConverter implements Callable <Integer>
       {
         LOGGER.error ("Failed to convert CII file '" + f.getAbsolutePath () + "' to UBL:");
         for (final IError aError : aErrorList)
-        {
-          final String sMsg = aError.getAsString (aErrorLocale);
-          if (aError.isError ())
-            LOGGER.error (sMsg);
-          else
-            LOGGER.warn (sMsg);
-        }
+          _log (aError);
       }
       else
       {
+        for (final IError aError : aErrorList)
+          _log (aError);
+
         final boolean bFormattedOutput = true;
         final ESuccess eSuccess;
         if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType)
