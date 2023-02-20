@@ -216,11 +216,29 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nonnull
-  protected static IError _buildError (@Nullable final String [] aPath, final String sErrorMsg)
+  protected static IError buildInfo (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
+  {
+    return SingleError.builderInfo ()
+                      .errorFieldName (aPath == null ? null : StringHelper.getImploded ('/', aPath))
+                      .errorText (sErrorMsg)
+                      .build ();
+  }
+
+  @Nonnull
+  protected static IError buildWarn (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
+  {
+    return SingleError.builderWarn ()
+                      .errorFieldName (aPath == null ? null : StringHelper.getImploded ('/', aPath))
+                      .errorText (sErrorMsg)
+                      .build ();
+  }
+
+  @Nonnull
+  protected static IError buildError (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
   {
     return SingleError.builderError ()
-                      .errorText (sErrorMsg)
                       .errorFieldName (aPath == null ? null : StringHelper.getImploded ('/', aPath))
+                      .errorText (sErrorMsg)
                       .build ();
   }
 
@@ -265,7 +283,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       case "105":
         return "uuDDD";
       default:
-        aErrorList.add (_buildError (null, "Unsupported date format '" + sFormat + "'"));
+        aErrorList.add (buildError (null, "Unsupported date format '" + sFormat + "'"));
         return null;
     }
   }
@@ -287,8 +305,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     // Try to parse it
     final LocalDate aDate = PDTFromString.getLocalDateFromString (sDate, sPattern);
     if (aDate == null)
-      aErrorList.add (_buildError (null,
-                                   "Failed to parse the date '" + sDate + "' using format '" + sRealFormat + "'"));
+      aErrorList.add (buildError (null, "Failed to parse the date '" + sDate + "' using format '" + sRealFormat + "'"));
 
     return aDate;
   }
@@ -345,8 +362,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       if ("false".equals (sIndicator))
         return ETriState.FALSE;
 
-      aErrorList.add (_buildError (null,
-                                   "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
+      aErrorList.add (buildError (null,
+                                  "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
       return ETriState.UNDEFINED;
     }
 
@@ -547,12 +564,15 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    *        Optional line price amount
    * @param aPriceAmountSetter
    *        Optional setter to change line price amount
+   * @param aErrorList
+   *        The error list to be filled. May not be <code>null</code>.
    */
   protected void swapQuantityAndPriceIfNeeded (final boolean bLineExtensionAmountIsNegative,
                                                @Nonnull final BigDecimal aQuantity,
                                                @Nonnull final Consumer <BigDecimal> aQuantitySetter,
                                                @Nullable final BigDecimal aPriceAmount,
-                                               @Nullable final Consumer <BigDecimal> aPriceAmountSetter)
+                                               @Nullable final Consumer <BigDecimal> aPriceAmountSetter,
+                                               @Nonnull final IErrorList aErrorList)
   {
     final boolean bHasPrice = aPriceAmount != null && aPriceAmountSetter != null;
 
@@ -570,11 +590,12 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
         {
           // If both are positive, or if both are negative
           // This looks like an inconsistency
-          LOGGER.warn ("A negative line extension amount with quantity " +
-                       aQuantity +
-                       " and price " +
-                       aPriceAmount +
-                       " looks interesting.");
+          aErrorList.add (buildWarn (null,
+                                     "A negative line extension amount with quantity " +
+                                           aQuantity +
+                                           " and price " +
+                                           aPriceAmount +
+                                           " looks interesting."));
         }
         else
           if (bNegPrice)
@@ -584,12 +605,12 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
             if (isSwapQuantitySignIfNeeded ())
               aQuantitySetter.accept (aQuantity.negate ());
             else
-              LOGGER.info ("Swapping of the quantity sign is disabled, so not doing it");
+              aErrorList.add (buildInfo (null, "Swapping of the quantity sign is disabled, so not doing it"));
 
             if (isSwapPriceSignIfNeeded ())
               aPriceAmountSetter.accept (aPriceAmount.negate ());
             else
-              LOGGER.info ("Swapping of the price sign is disabled, so not doing it");
+              aErrorList.add (buildInfo (null, "Swapping of the price sign is disabled, so not doing it"));
           }
           else
             if (bNegQuantity)
@@ -604,7 +625,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
         if (bPosQuantity)
         {
           // This looks like an inconsistency
-          LOGGER.warn ("A negative line extension amount with quantity " + aQuantity + " looks interesting.");
+          aErrorList.add (buildWarn (null,
+                                     "A negative line extension amount with quantity " +
+                                           aQuantity +
+                                           " looks interesting."));
         }
       }
     }
@@ -623,23 +647,24 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
           if (isSwapQuantitySignIfNeeded ())
             aQuantitySetter.accept (aQuantity.negate ());
           else
-            LOGGER.info ("Swapping of the quantity sign is disabled, so not doing it");
+            aErrorList.add (buildInfo (null, "Swapping of the quantity sign is disabled, so not doing it"));
 
           if (isSwapPriceSignIfNeeded ())
             aPriceAmountSetter.accept (aPriceAmount.negate ());
           else
-            LOGGER.info ("Swapping of the price sign is disabled, so not doing it");
+            aErrorList.add (buildInfo (null, "Swapping of the price sign is disabled, so not doing it"));
         }
         else
           if (bNegQuantity || bNegPrice)
           {
             // Only one value is negative
             // This looks like an inconsistency
-            LOGGER.warn ("A positive line extension amount with quantity " +
-                         aQuantity +
-                         " and price " +
-                         aPriceAmount +
-                         " looks interesting.");
+            aErrorList.add (buildWarn (null,
+                                       "A positive line extension amount with quantity " +
+                                             aQuantity +
+                                             " and price " +
+                                             aPriceAmount +
+                                             " looks interesting."));
           }
         // If both values are positive, no action needed
       }
@@ -649,14 +674,18 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
         if (bNegQuantity)
         {
           // This looks like an inconsistency
-          LOGGER.warn ("A positive line extension amount with quantity " + aQuantity + " looks interesting.");
+          aErrorList.add (buildWarn (null,
+                                     "A positive line extension amount with quantity " +
+                                           aQuantity +
+                                           " looks interesting."));
         }
       }
     }
   }
 
   @Nonnull
-  protected static ETriState isInvoiceType (@Nonnull final CrossIndustryInvoiceType aCIIInvoice)
+  protected static ETriState isInvoiceType (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
+                                            @Nonnull final IErrorList aErrorList)
   {
     ETriState eIsInvoice = ETriState.UNDEFINED;
 
@@ -692,16 +721,18 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
     if (eIsInvoice.isUndefined ())
     {
-      LOGGER.warn ("Could not determine, if the provided CII document is an Invoice or a CreditNote. TypeCode =is '" +
-                   sTypeCode +
-                   "'; DuePayable = " +
-                   aDuePayable);
+      aErrorList.add (buildWarn (null,
+                                 "Could not determine, if the provided CII document is an Invoice or a CreditNote. TypeCode is '" +
+                                       sTypeCode +
+                                       "'; DuePayable is " +
+                                       aDuePayable));
     }
     else
+    {
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Determined the provided CII document to be " +
                       (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
-
+    }
     return eIsInvoice;
   }
 

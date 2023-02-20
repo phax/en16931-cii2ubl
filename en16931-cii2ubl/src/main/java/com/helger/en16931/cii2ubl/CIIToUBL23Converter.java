@@ -427,8 +427,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     {
       final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
       if (aAccount == null)
-        aErrorList.add (_buildError (null,
-                                     "The element 'PayeePartyCreditorFinancialAccount' is missing for Credit Transfer"));
+        aErrorList.add (buildError (null,
+                                    "The element 'PayeePartyCreditorFinancialAccount' is missing for Credit Transfer"));
       else
       {
         final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
@@ -462,8 +462,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     {
       final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
       if (aCard == null)
-        aErrorList.add (_buildError (null,
-                                     "The element 'ApplicableTradeSettlementFinancialCard' is missing for Payment Card Information"));
+        aErrorList.add (buildError (null,
+                                    "The element 'ApplicableTradeSettlementFinancialCard' is missing for Payment Card Information"));
       else
       {
         final CardAccountType aUBLCardAccount = new CardAccountType ();
@@ -480,10 +480,10 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
 
         if (StringHelper.hasNoText (aUBLCardAccount.getPrimaryAccountNumberIDValue ()))
-          aErrorList.add (_buildError (null, "The Payment card primary account number is missing"));
+          aErrorList.add (buildError (null, "The Payment card primary account number is missing"));
         else
           if (StringHelper.hasNoText (aUBLCardAccount.getNetworkIDValue ()))
-            aErrorList.add (_buildError (null, "The Payment card network ID is missing"));
+            aErrorList.add (buildError (null, "The Payment card network ID is missing"));
           else
           {
             // UBL 2.3 supports multiple
@@ -538,8 +538,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     if (bIsBG17 || bIsBG18 || bIsBG19 || isPaymentMeansCodeOtherKnown (sTypeCode))
       aPaymentMeansHandler.accept (aUBLPaymentMeans);
     else
-      aErrorList.add (_buildError (null,
-                                   "Failed to determine a supported Payment Means Type from code '" + sTypeCode + "'"));
+      aErrorList.add (buildError (null,
+                                  "Failed to determine a supported Payment Means Type from code '" + sTypeCode + "'"));
   }
 
   @Nullable
@@ -1004,11 +1004,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         if (aAllowanceCharge.getChargeIndicator () != null)
           eIsCharge = _parseIndicator (aAllowanceCharge.getChargeIndicator (), aErrorList);
         else
-          aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
-                                                       "SupplyChainTradeTransaction",
-                                                       "ApplicableHeaderTradeSettlement",
-                                                       "SpecifiedTradeAllowanceCharge" },
-                                       "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
+          aErrorList.add (buildError (new String [] { "CrossIndustryInvoice",
+                                                      "SupplyChainTradeTransaction",
+                                                      "ApplicableHeaderTradeSettlement",
+                                                      "SpecifiedTradeAllowanceCharge" },
+                                      "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
         if (eIsCharge.isDefined ())
         {
           final AllowanceChargeType aUBLAllowanceCharge = new AllowanceChargeType ();
@@ -1229,12 +1229,12 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         if (aLineAllowanceCharge.getChargeIndicator () != null)
           eIsCharge = _parseIndicator (aLineAllowanceCharge.getChargeIndicator (), aErrorList);
         else
-          aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
-                                                       "SupplyChainTradeTransaction",
-                                                       "IncludedSupplyChainTradeLineItem",
-                                                       "SpecifiedLineTradeSettlement",
-                                                       "SpecifiedTradeAllowanceCharge" },
-                                       "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
+          aErrorList.add (buildError (new String [] { "CrossIndustryInvoice",
+                                                      "SupplyChainTradeTransaction",
+                                                      "IncludedSupplyChainTradeLineItem",
+                                                      "SpecifiedLineTradeSettlement",
+                                                      "SpecifiedTradeAllowanceCharge" },
+                                      "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
         if (eIsCharge.isDefined ())
         {
           final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
@@ -1360,7 +1360,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
                                     aUBLInvoiceLine.getInvoicedQuantityValue (),
                                     aUBLInvoiceLine::setInvoicedQuantity,
                                     bUsePrice ? aUBLPrice.getPriceAmountValue () : null,
-                                    bUsePrice ? aUBLPrice::setPriceAmount : null);
+                                    bUsePrice ? aUBLPrice::setPriceAmount : null,
+                                    aErrorList);
 
       // Allowance charge
       final TradePriceType aTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
@@ -1371,13 +1372,13 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           if (aPriceAllowanceCharge.getChargeIndicator () != null)
             eIsCharge = _parseIndicator (aPriceAllowanceCharge.getChargeIndicator (), aErrorList);
           else
-            aErrorList.add (_buildError (new String [] { "CrossIndustryInvoice",
-                                                         "SupplyChainTradeTransaction",
-                                                         "IncludedSupplyChainTradeLineItem",
-                                                         "SpecifiedLineTradeAgreement",
-                                                         "GrossPriceProductTradePrice",
-                                                         "AppliedTradeAllowanceCharge" },
-                                         "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
+            aErrorList.add (buildError (new String [] { "CrossIndustryInvoice",
+                                                        "SupplyChainTradeTransaction",
+                                                        "IncludedSupplyChainTradeLineItem",
+                                                        "SpecifiedLineTradeAgreement",
+                                                        "GrossPriceProductTradePrice",
+                                                        "AppliedTradeAllowanceCharge" },
+                                        "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
           if (eIsCharge.isDefined ())
           {
             final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
@@ -1825,11 +1826,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         if (aAllowanceCharge.getChargeIndicator () != null)
           eIsCharge = _parseIndicator (aAllowanceCharge.getChargeIndicator (), aErrorList);
         else
-          aErrorList.add (_buildError (new String [] { "CrossIndustryCreditNote",
-                                                       "SupplyChainTradeTransaction",
-                                                       "ApplicableHeaderTradeSettlement",
-                                                       "SpecifiedTradeAllowanceCharge" },
-                                       "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
+          aErrorList.add (buildError (new String [] { "CrossIndustryCreditNote",
+                                                      "SupplyChainTradeTransaction",
+                                                      "ApplicableHeaderTradeSettlement",
+                                                      "SpecifiedTradeAllowanceCharge" },
+                                      "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
         if (eIsCharge.isDefined ())
         {
           final AllowanceChargeType aUBLAllowanceCharge = new AllowanceChargeType ();
@@ -2050,12 +2051,12 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         if (aLineAllowanceCharge.getChargeIndicator () != null)
           eIsCharge = _parseIndicator (aLineAllowanceCharge.getChargeIndicator (), aErrorList);
         else
-          aErrorList.add (_buildError (new String [] { "CrossIndustryCreditNote",
-                                                       "SupplyChainTradeTransaction",
-                                                       "IncludedSupplyChainTradeLineItem",
-                                                       "SpecifiedLineTradeSettlement",
-                                                       "SpecifiedTradeAllowanceCharge" },
-                                       "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
+          aErrorList.add (buildError (new String [] { "CrossIndustryCreditNote",
+                                                      "SupplyChainTradeTransaction",
+                                                      "IncludedSupplyChainTradeLineItem",
+                                                      "SpecifiedLineTradeSettlement",
+                                                      "SpecifiedTradeAllowanceCharge" },
+                                      "Failed to determine if SpecifiedTradeAllowanceCharge is an Allowance or a Charge"));
         if (eIsCharge.isDefined ())
         {
           final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
@@ -2181,7 +2182,8 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
                                     aUBLCreditNoteLine.getCreditedQuantityValue (),
                                     aUBLCreditNoteLine::setCreditedQuantity,
                                     bUsePrice ? aUBLPrice.getPriceAmountValue () : null,
-                                    bUsePrice ? aUBLPrice::setPriceAmount : null);
+                                    bUsePrice ? aUBLPrice::setPriceAmount : null,
+                                    aErrorList);
 
       // Allowance charge
       final TradePriceType aTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
@@ -2192,13 +2194,13 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           if (aPriceAllowanceCharge.getChargeIndicator () != null)
             eIsCharge = _parseIndicator (aPriceAllowanceCharge.getChargeIndicator (), aErrorList);
           else
-            aErrorList.add (_buildError (new String [] { "CrossIndustryCreditNote",
-                                                         "SupplyChainTradeTransaction",
-                                                         "IncludedSupplyChainTradeLineItem",
-                                                         "SpecifiedLineTradeAgreement",
-                                                         "GrossPriceProductTradePrice",
-                                                         "AppliedTradeAllowanceCharge" },
-                                         "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
+            aErrorList.add (buildError (new String [] { "CrossIndustryCreditNote",
+                                                        "SupplyChainTradeTransaction",
+                                                        "IncludedSupplyChainTradeLineItem",
+                                                        "SpecifiedLineTradeAgreement",
+                                                        "GrossPriceProductTradePrice",
+                                                        "AppliedTradeAllowanceCharge" },
+                                        "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
           if (eIsCharge.isDefined ())
           {
             final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
@@ -2230,7 +2232,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     switch (getUBLCreationMode ())
     {
       case AUTOMATIC:
-        final ETriState eIsInvoice = isInvoiceType (aCIIInvoice);
+        final ETriState eIsInvoice = isInvoiceType (aCIIInvoice, aErrorList);
         // Default to invoice
         return eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList)
                                                    : convertToCreditNote (aCIIInvoice, aErrorList);

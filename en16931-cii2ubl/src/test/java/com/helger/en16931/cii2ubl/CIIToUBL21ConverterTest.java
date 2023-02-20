@@ -69,10 +69,11 @@ public final class CIIToUBL21ConverterTest
       // Main conversion
       final ErrorList aErrorList = new ErrorList ();
       final Serializable aInvoice = new CIIToUBL21Converter ().convertCIItoUBL (aFile, aErrorList);
-      assertTrue ("Errors: " + aErrorList.toString (), aErrorList.isEmpty ());
+      assertTrue ("Errors: " + aErrorList.toString (), aErrorList.containsNoError ());
       assertNotNull (aInvoice);
 
-      final File aDestFile = new File ("toubl21/" + aFile.getParentFile ().getAbsolutePath ().substring (sBasePath.length ()),
+      final File aDestFile = new File ("toubl21/" +
+                                       aFile.getParentFile ().getAbsolutePath ().substring (sBasePath.length ()),
                                        FilenameHelper.getBaseName (aFile.getName ()) + "-ubl.xml");
       final ValidationResultList aResultList;
 
