@@ -95,12 +95,6 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more CII file(s)")
   private List <File> m_aSourceFiles;
 
-  private void _verboseLog (@Nonnull final String s)
-  {
-    if (m_bVerbose)
-      LOGGER.info (s);
-  }
-
   private void _verboseLog (@Nonnull final Supplier <String> a)
   {
     if (m_bVerbose)
