@@ -95,18 +95,18 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more CII file(s)")
   private List <File> m_aSourceFiles;
 
-  private void _verboseLog (@Nonnull final Supplier <String> a)
+  private void _verboseLog (@Nonnull final Supplier <String> aSupplier)
   {
     if (m_bVerbose)
-      LOGGER.info (a.get ());
+      LOGGER.info (aSupplier.get ());
   }
 
   @Nonnull
-  private String _normalizeOutputDirectory (@Nonnull final String dir)
+  private String _normalizeOutputDirectory (@Nonnull final String sDirectory)
   {
-    _verboseLog ( () -> "CLI option UBL output directory '" + dir + "'");
-    final String ret = Paths.get (dir).toAbsolutePath ().normalize ().toString ();
-    if (!dir.equals (ret))
+    _verboseLog ( () -> "CLI option UBL output directory '" + sDirectory + "'");
+    final String ret = Paths.get (sDirectory).toAbsolutePath ().normalize ().toString ();
+    if (!sDirectory.equals (ret))
       _verboseLog ( () -> "Normalized UBL output directory '" + ret + "'");
     return ret;
   }
@@ -120,12 +120,13 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Nonnull
   private ICommonsList <File> _normalizeInputFiles (@Nonnull final List <File> aFiles)
   {
+    _verboseLog ( () -> "Normalizing the input files '" + aFiles + "'");
     final ICommonsList <File> ret = new CommonsArrayList <> ();
     for (final File aFile : aFiles)
     {
       if (aFile.isDirectory ())
       {
-        _verboseLog ( () -> "Is a directory '" + aFile.toString () + "'");
+        _verboseLog ( () -> "Input '" + aFile.toString () + "' is a Directory");
         // collecting readable and normalized absolute path files
         for (final File aChildFile : new FileSystemIterator (aFile))
         {
@@ -140,7 +141,7 @@ public class CIIToUBLConverter implements Callable <Integer>
       else
         if (aFile.canRead ())
         {
-          _verboseLog ( () -> "Is a file '" + aFile.toString () + "'");
+          _verboseLog ( () -> "Input '" + aFile.toString () + "' is a readable File");
           ret.add (_normalizeFile (aFile.toPath ()));
         }
         else
