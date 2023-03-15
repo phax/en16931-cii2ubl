@@ -18,9 +18,12 @@
 package com.helger.en16931.cii2ubl.cli;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +40,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.error.IError;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.io.file.FileSystemIterator;
+import com.helger.commons.io.file.FileSystemRecursiveIterator;
 import com.helger.commons.io.file.FilenameHelper;
 import com.helger.commons.state.ESuccess;
 import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverter;
@@ -89,11 +93,14 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Option (names = "--ubl-cardaccountnetworkid", paramLabel = "ID", defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID, description = "The UBL CardAccount network ID to be used (default: ${DEFAULT-VALUE})")
   private String m_sCardAccountNetworkID;
 
-  @Option (names = "--verbose", paramLabel = "ID", defaultValue = "false", description = "Enable debug logging (default: ${DEFAULT-VALUE})")
+  @Option (names = "--verbose", paramLabel = "boolean", defaultValue = "false", description = "Enable debug logging (default: ${DEFAULT-VALUE})")
   private boolean m_bVerbose;
 
+  @Option (names = "--disable-wildcard-expansion", paramLabel = "boolean", defaultValue = "false", description = "Disable wildcard expansion of filenames")
+  private boolean m_bDisableWildcardExpansion;
+
   @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more CII file(s)")
-  private List <File> m_aSourceFiles;
+  private List <String> m_aSourceFilenames;
 
   private void _verboseLog (@Nonnull final Supplier <String> aSupplier)
   {
@@ -118,10 +125,54 @@ public class CIIToUBLConverter implements Callable <Integer>
   }
 
   @Nonnull
-  private ICommonsList <File> _normalizeInputFiles (@Nonnull final List <File> aFiles)
+  private ICommonsList <File> _resolveWildcards (@Nonnull final List <String> aFilenames) throws IOException
   {
-    _verboseLog ( () -> "Normalizing the input files '" + aFiles + "'");
+    final ICommonsList <File> ret = new CommonsArrayList <> (aFilenames.size ());
+
+    final File aRootDir = new File (".").getCanonicalFile ();
+    for (final String sFilename : aFilenames)
+    {
+      if (sFilename.indexOf ('*') >= 0 ||
+          sFilename.indexOf ('?') >= 0 ||
+          (sFilename.indexOf ('[') >= 0 && sFilename.indexOf (']') >= 0))
+      {
+        // Make search pattern absolute
+        final String sRealName = new File (sFilename).getAbsolutePath ();
+        _verboseLog ( () -> "Trying to resolve wildcards for '" + sRealName + "'");
+        final PathMatcher matcher = FileSystems.getDefault ().getPathMatcher ("glob:" + sRealName);
+        for (final File f : new FileSystemRecursiveIterator (aRootDir))
+        {
+          if (matcher.matches (f.toPath ()))
+          {
+            _verboseLog ( () -> "  Found wildcard match '" + f + "'");
+            ret.add (f);
+          }
+        }
+      }
+      else
+        ret.add (new File (sFilename));
+    }
+    return ret;
+  }
+
+  @Nonnull
+  private ICommonsList <File> _normalizeInputFiles (@Nonnull final List <String> aFilenames) throws IOException
+  {
+    final ICommonsList <File> aFiles;
+    if (m_bDisableWildcardExpansion)
+    {
+      aFiles = new CommonsArrayList <> (aFilenames, File::new);
+      _verboseLog ( () -> "Using the input files '" + aFiles + "'");
+    }
+    else
+    {
+      _verboseLog ( () -> "Normalizing the input files '" + aFilenames + "'");
+      aFiles = _resolveWildcards (aFilenames);
+      _verboseLog ( () -> "Resolved wildcards of input files to '" + aFiles + "'");
+    }
+
     final ICommonsList <File> ret = new CommonsArrayList <> ();
+
     for (final File aFile : aFiles)
     {
       if (aFile.isDirectory ())
@@ -139,6 +190,7 @@ public class CIIToUBLConverter implements Callable <Integer>
         }
       }
       else
+        // Does not need to be file - only needs to be readable
         if (aFile.canRead ())
         {
           _verboseLog ( () -> "Input '" + aFile.toString () + "' is a readable File");
@@ -171,7 +223,7 @@ public class CIIToUBLConverter implements Callable <Integer>
       System.setProperty ("org.slf4j.simpleLogger.defaultLogLevel", "debug");
 
     m_sOutputDir = _normalizeOutputDirectory (m_sOutputDir);
-    m_aSourceFiles = _normalizeInputFiles (m_aSourceFiles);
+    final List <File> m_aSourceFiles = _normalizeInputFiles (m_aSourceFilenames);
 
     final AbstractCIIToUBLConverter <?> aConverter;
     if ("2.1".equals (m_sUBLVersion))

@@ -84,13 +84,16 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v2.0.1 - 2023-03-15
+    * Added manual wildcard expansion of filenames
+    * Added new CLI option `--disable-wildcard-expansion` to disable the wildcard expansion and stick to the old resolution logic
 * v2.0.0 - 2023-02-20
     * Using Java 11 as the baseline
     * Updated to ph-commons 11
     * Updated to JAXB 4.0
     * Added the new CLI parameter `--verbose` for a few more details
     * Improved logging
-    * Successfully tested the CLI parameter with wildcard parameters
+    * Successfully tested the CLI parameter with wildcard parameters (because the Java Windows Runtime performs automatic wildcard expansion)
 * v1.4.10 - 2022-12-16
     * Fixed the conversion of the `TypeCode` element in `AdditionalReferencedDocument`. See [issue #18](https://github.com/phax/en16931-cii2ubl/issues/18) - thanks @L3Mars
 * v1.4.9 - 2022-11-15
