@@ -71,7 +71,7 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Option (names = "--ubl", paramLabel = "version", defaultValue = "2.1", description = "Version of the target UBL Format: '2.1', '2.2' or '2.3' (default: ${DEFAULT-VALUE})")
   private String m_sUBLVersion;
 
-  @Option (names = "--mode", paramLabel = "mode", defaultValue = "INVOICE", description = "Allowed values: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
+  @Option (names = "--mode", paramLabel = "mode", defaultValue = "AUTOMATIC", description = "Allowed values: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
   private EUBLCreationMode m_eMode;
 
   @Option (names = { "-t",

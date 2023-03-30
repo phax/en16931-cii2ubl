@@ -84,6 +84,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v2.0.2 - 2023-03-30
+    * Changed the default mode of the CLI version from `INVOICE` to `AUTOMATIC`. See [issue #19](https://github.com/phax/en16931-cii2ubl/issues/19) - thanks @msccip
 * v2.0.1 - 2023-03-15
     * Added manual wildcard expansion of filenames
     * Added new CLI option `--disable-wildcard-expansion` to disable the wildcard expansion and stick to the old resolution logic
