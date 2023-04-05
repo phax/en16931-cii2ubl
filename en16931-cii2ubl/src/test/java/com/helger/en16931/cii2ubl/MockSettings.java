@@ -31,7 +31,7 @@ import com.helger.phive.engine.source.IValidationSourceXML;
 
 final class MockSettings
 {
-  public static final String BASE_TEST_DIR = "src/test/resources/cii/";
+  public static final String BASE_TEST_DIR = "src/test/resources/external/cii/";
   private static final String [] TEST_FILES_EN16931 = new String [] { "CII_business_example_01.xml",
                                                                       "CII_business_example_02.xml",
                                                                       "CII_example1.xml",
