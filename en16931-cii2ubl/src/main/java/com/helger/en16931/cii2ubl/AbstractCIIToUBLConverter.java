@@ -522,6 +522,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static boolean isValidDocumentReferenceTypeCode (@Nullable final String s)
   {
     // BT-17 or BT-18
+    // Value 916 from BT-122 should not lead to a DocumentTypeCode
     return isOriginatorDocumentReferenceTypeCode (s) || "130".equals (s);
   }
 

@@ -144,15 +144,24 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       aEmbeddedDoc.setValue (aBinObj.getValue ());
       aUBLAttachment.setEmbeddedDocumentBinaryObject (aEmbeddedDoc);
 
-      final String sURI = aRD.getURIIDValue ();
-      if (StringHelper.hasText (sURI))
-      {
-        final ExternalReferenceType aUBLExtRef = new ExternalReferenceType ();
-        aUBLExtRef.setURI (sURI);
-        aUBLAttachment.setExternalReference (aUBLExtRef);
-      }
       ret.setAttachment (aUBLAttachment);
     }
+
+    final String sURI = aRD.getURIIDValue ();
+    if (StringHelper.hasText (sURI))
+    {
+      AttachmentType aUBLAttachment = ret.getAttachment ();
+      if (aUBLAttachment == null)
+      {
+        aUBLAttachment = new AttachmentType ();
+        ret.setAttachment (aUBLAttachment);
+      }
+
+      final ExternalReferenceType aUBLExtRef = new ExternalReferenceType ();
+      aUBLExtRef.setURI (sURI);
+      aUBLAttachment.setExternalReference (aUBLExtRef);
+    }
+
     return ret;
   }
 

@@ -44,7 +44,7 @@ final class MockSettings
                                                                       "CII_example7.xml",
                                                                       "CII_example8.xml",
                                                                       "CII_example9.xml" };
-  private static final String [] TEST_FILES_ISSUES = new String [] { "issue7.xml", "issue12.xml" };
+  private static final String [] TEST_FILES_ISSUES = new String [] { "issue7.xml", "issue12.xml", "issue20.xml" };
   private static final String [] TEST_FILES_XRECHNUNG_122 = new String [] { "01.01a-INVOICE_uncefact.xml",
                                                                             "01.02a-INVOICE_uncefact.xml",
                                                                             "01.03a-INVOICE_uncefact.xml",
