@@ -49,9 +49,9 @@ import com.helger.en16931.cii2ubl.CIIToUBL22Converter;
 import com.helger.en16931.cii2ubl.CIIToUBL23Converter;
 import com.helger.en16931.cii2ubl.CIIToUBLVersion;
 import com.helger.en16931.cii2ubl.EUBLCreationMode;
-import com.helger.ubl21.UBL21Writer;
-import com.helger.ubl22.UBL22Writer;
-import com.helger.ubl23.UBL23Writer;
+import com.helger.ubl21.UBL21Marshaller;
+import com.helger.ubl22.UBL22Marshaller;
+import com.helger.ubl23.UBL23Marshaller;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -267,50 +267,50 @@ public class CIIToUBLConverter implements Callable <Integer>
         final ESuccess eSuccess;
         if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType)
         {
-          eSuccess = UBL21Writer.invoice ()
-                                .setFormattedOutput (bFormattedOutput)
-                                .write ((oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType) aUBL,
-                                        aDestFile);
+          eSuccess = UBL21Marshaller.invoice ()
+                                    .setFormattedOutput (bFormattedOutput)
+                                    .write ((oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType) aUBL,
+                                            aDestFile);
         }
         else
           if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType)
           {
-            eSuccess = UBL21Writer.creditNote ()
-                                  .setFormattedOutput (bFormattedOutput)
-                                  .write ((oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType) aUBL,
-                                          aDestFile);
+            eSuccess = UBL21Marshaller.creditNote ()
+                                      .setFormattedOutput (bFormattedOutput)
+                                      .write ((oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType) aUBL,
+                                              aDestFile);
           }
           else
             if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType)
             {
-              eSuccess = UBL22Writer.invoice ()
-                                    .setFormattedOutput (bFormattedOutput)
-                                    .write ((oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType) aUBL,
-                                            aDestFile);
+              eSuccess = UBL22Marshaller.invoice ()
+                                        .setFormattedOutput (bFormattedOutput)
+                                        .write ((oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType) aUBL,
+                                                aDestFile);
             }
             else
               if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType)
               {
-                eSuccess = UBL22Writer.creditNote ()
-                                      .setFormattedOutput (bFormattedOutput)
-                                      .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL,
-                                              aDestFile);
+                eSuccess = UBL22Marshaller.creditNote ()
+                                          .setFormattedOutput (bFormattedOutput)
+                                          .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL,
+                                                  aDestFile);
               }
               else
                 if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType)
                 {
-                  eSuccess = UBL23Writer.invoice ()
-                                        .setFormattedOutput (bFormattedOutput)
-                                        .write ((oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType) aUBL,
-                                                aDestFile);
+                  eSuccess = UBL23Marshaller.invoice ()
+                                            .setFormattedOutput (bFormattedOutput)
+                                            .write ((oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType) aUBL,
+                                                    aDestFile);
                 }
                 else
                   if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType)
                   {
-                    eSuccess = UBL23Writer.creditNote ()
-                                          .setFormattedOutput (bFormattedOutput)
-                                          .write ((oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType) aUBL,
-                                                  aDestFile);
+                    eSuccess = UBL23Marshaller.creditNote ()
+                                              .setFormattedOutput (bFormattedOutput)
+                                              .write ((oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType) aUBL,
+                                                      aDestFile);
                   }
                   else
                     throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");

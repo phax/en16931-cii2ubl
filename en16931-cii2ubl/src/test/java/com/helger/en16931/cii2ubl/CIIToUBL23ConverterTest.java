@@ -33,13 +33,13 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.error.list.ErrorList;
 import com.helger.commons.io.file.FilenameHelper;
 import com.helger.commons.io.resource.FileSystemResource;
+import com.helger.jaxb.GenericJAXBMarshaller;
 import com.helger.phive.api.execute.ValidationExecutionManager;
 import com.helger.phive.api.result.ValidationResult;
 import com.helger.phive.api.result.ValidationResultList;
 import com.helger.phive.en16931.EN16931Validation;
 import com.helger.phive.engine.source.ValidationSourceXML;
-import com.helger.ubl23.UBL23Writer;
-import com.helger.ubl23.UBL23WriterBuilder;
+import com.helger.ubl23.UBL23Marshaller;
 
 import oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType;
@@ -72,7 +72,7 @@ public final class CIIToUBL23ConverterTest
       assertTrue ("Errors: " + aErrorList.toString (), aErrorList.containsNoError ());
       assertNotNull (aInvoice);
 
-      final File aDestFile = new File ("toubl23/" +
+      final File aDestFile = new File ("generated/toubl23/" +
                                        aFile.getParentFile ().getAbsolutePath ().substring (sBasePath.length ()),
                                        FilenameHelper.getBaseName (aFile.getName ()) + "-ubl.xml");
       final ValidationResultList aResultList;
@@ -82,7 +82,7 @@ public final class CIIToUBL23ConverterTest
         final InvoiceType aUBLInvoice = (InvoiceType) aInvoice;
 
         // Check UBL XSD scheme
-        final UBL23WriterBuilder <InvoiceType> aWriter = UBL23Writer.invoice ().setFormattedOutput (true);
+        final GenericJAXBMarshaller <InvoiceType> aWriter = UBL23Marshaller.invoice ().setFormattedOutput (true);
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
@@ -94,7 +94,7 @@ public final class CIIToUBL23ConverterTest
         final CreditNoteType aUBLInvoice = (CreditNoteType) aInvoice;
 
         // Check UBL XSD scheme
-        final UBL23WriterBuilder <CreditNoteType> aWriter = UBL23Writer.creditNote ().setFormattedOutput (true);
+        final GenericJAXBMarshaller <CreditNoteType> aWriter = UBL23Marshaller.creditNote ().setFormattedOutput (true);
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
