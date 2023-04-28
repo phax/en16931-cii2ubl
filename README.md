@@ -20,6 +20,7 @@ The entrance classes are:
 * Create UBL 2.1: `com.helger.en16931.cii2ubl.CIIToUBL21Converter`
 * Create UBL 2.2: `com.helger.en16931.cii2ubl.CIIToUBL22Converter`
 * Create UBL 2.3: `com.helger.en16931.cii2ubl.CIIToUBL23Converter` (since v1.3.0)
+* Create UBL 2.4: `com.helger.en16931.cii2ubl.CIIToUBL24Converter` (since v2.1.0)
 
 The main conversion method is called `convertCIItoUBL` and takes either a `File` as input or a pre-parsed `un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType` object (that reading is done with class `com.helger.cii.d16b.CIID16BReader` from [ph-cii](https://github.com/phax/ph-cii)).
 Additionally an `ErrorList` object must be provided as a container for all the errors that occur.
@@ -84,6 +85,9 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v2.1.0 - work in progress
+    * Updated to ph-ubl 8.0.1
+    * Added support for converting to UBL 2.4
 * v2.0.3 - 2023-04-20
     * Improved mapping of references to external documents in additional document references. See [issue #20](https://github.com/phax/en16931-cii2ubl/issues/20) - thanks @msccip
 * v2.0.2 - 2023-03-30

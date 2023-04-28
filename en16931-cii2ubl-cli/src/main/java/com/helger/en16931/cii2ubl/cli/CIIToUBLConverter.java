@@ -47,6 +47,7 @@ import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverter;
 import com.helger.en16931.cii2ubl.CIIToUBL21Converter;
 import com.helger.en16931.cii2ubl.CIIToUBL22Converter;
 import com.helger.en16931.cii2ubl.CIIToUBL23Converter;
+import com.helger.en16931.cii2ubl.CIIToUBL24Converter;
 import com.helger.en16931.cii2ubl.CIIToUBLVersion;
 import com.helger.en16931.cii2ubl.EUBLCreationMode;
 import com.helger.ubl21.UBL21Marshaller;
@@ -68,7 +69,7 @@ public class CIIToUBLConverter implements Callable <Integer>
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverter.class);
 
-  @Option (names = "--ubl", paramLabel = "version", defaultValue = "2.1", description = "Version of the target UBL Format: '2.1', '2.2' or '2.3' (default: ${DEFAULT-VALUE})")
+  @Option (names = "--ubl", paramLabel = "version", defaultValue = "2.1", description = "Version of the target UBL Format: '2.1', '2.2', '2.3' or '2.4' (default: ${DEFAULT-VALUE})")
   private String m_sUBLVersion;
 
   @Option (names = "--mode", paramLabel = "mode", defaultValue = "AUTOMATIC", description = "Allowed values: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
@@ -235,7 +236,10 @@ public class CIIToUBLConverter implements Callable <Integer>
         if ("2.3".equals (m_sUBLVersion))
           aConverter = new CIIToUBL23Converter ();
         else
-          throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
+          if ("2.4".equals (m_sUBLVersion))
+            aConverter = new CIIToUBL24Converter ();
+          else
+            throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
 
     aConverter.setUBLCreationMode (m_eMode)
               .setVATScheme (m_sVATScheme)
