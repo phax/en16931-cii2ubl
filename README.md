@@ -44,24 +44,26 @@ Replace `x.y.z` with the effective version you want to use:
 Call it via `java -jar en16931-cii2ubl-cli-x.y.y-full.jar` (where `x.y.z` denotes the version number) followed by the options and parameters.
 
 ```
-[INFO] CII to UBL Converter v2.0.0 (build 2023-02-20T12:25:51Z)
+[INFO] CII to UBL Converter v2.1.0
 Missing required parameter: 'source files'
-Usage: CIItoUBLConverter [-hV] [--verbose] [--mode mode] [--output-suffix
-                         filename part] [-t directory] [--ubl version]
-                         [--ubl-cardaccountnetworkid ID] [--ubl-customizationid
-                         ID] [--ubl-profileid ID] [--ubl-vatscheme vat scheme]
-                         source files...
+Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion] [--verbose]
+                         [--mode mode] [--output-suffix filename part] [-t
+                         directory] [--ubl version] [--ubl-cardaccountnetworkid
+                         ID] [--ubl-customizationid ID] [--ubl-profileid ID]
+                         [--ubl-vatscheme vat scheme] source files...
 CII to UBL Converter for EN 16931 invoices
       source files...      One or more CII file(s)
+      --disable-wildcard-expansion
+                           Disable wildcard expansion of filenames
   -h, --help               Show this help message and exit.
       --mode mode          Allowed values: AUTOMATIC, INVOICE, CREDIT_NOTE
-                             (default: INVOICE)
+                             (default: AUTOMATIC)
       --output-suffix filename part
                            The suffix added to the output filename (default:
                              -ubl)
   -t, --target directory   The target directory for result output (default: .)
-      --ubl version        Version of the target UBL Format: '2.1', '2.2' or
-                             '2.3' (default: 2.1)
+      --ubl version        Version of the target UBL Format: '2.1', '2.2',
+                             '2.3' or '2.4' (default: 2.1)
       --ubl-cardaccountnetworkid ID
                            The UBL CardAccount network ID to be used (default:
                              mapped-from-cii)
@@ -85,7 +87,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v2.1.0 - work in progress
+* v2.1.0 - 2023-04-28
     * Updated to ph-ubl 8.0.1
     * Added support for converting to UBL 2.4
 * v2.0.3 - 2023-04-20
