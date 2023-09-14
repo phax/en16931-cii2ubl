@@ -27,7 +27,7 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.phive.api.executorset.ValidationExecutorSetRegistry;
 import com.helger.phive.en16931.EN16931Validation;
-import com.helger.phive.engine.source.IValidationSourceXML;
+import com.helger.phive.xml.source.IValidationSourceXML;
 
 final class MockSettings
 {

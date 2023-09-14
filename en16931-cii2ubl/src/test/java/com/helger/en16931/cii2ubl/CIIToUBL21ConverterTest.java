@@ -38,7 +38,7 @@ import com.helger.phive.api.execute.ValidationExecutionManager;
 import com.helger.phive.api.result.ValidationResult;
 import com.helger.phive.api.result.ValidationResultList;
 import com.helger.phive.en16931.EN16931Validation;
-import com.helger.phive.engine.source.ValidationSourceXML;
+import com.helger.phive.xml.source.ValidationSourceXML;
 import com.helger.ubl21.UBL21Marshaller;
 
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
