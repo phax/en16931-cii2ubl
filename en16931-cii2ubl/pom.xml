@@ -99,6 +99,7 @@
     <dependency>
       <groupId>com.helger.phive.rules</groupId>
       <artifactId>phive-rules-en16931</artifactId>
+      <version>${phive-rules.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
