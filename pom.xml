@@ -26,7 +26,7 @@
     <version>2.0.5</version>
   </parent>
   <artifactId>en16931-cii2ubl-parent-pom</artifactId>
-  <version>2.1.1-SNAPSHOT</version>
+  <version>2.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>en16931-cii2ubl-parent-pom</name>
   <inceptionYear>2019</inceptionYear>
@@ -57,7 +57,7 @@
   </developers>
   
   <properties>
-    <phive-rules.version>3.1.6</phive-rules.version>
+    <phive-rules.version>3.1.8</phive-rules.version>
     <picocli.version>4.7.5</picocli.version>
   </properties>
 
@@ -73,7 +73,7 @@
       <dependency>
         <groupId>com.helger.ubl</groupId>
         <artifactId>ph-ubl-parent-pom</artifactId>
-        <version>8.0.3</version>
+        <version>9.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
