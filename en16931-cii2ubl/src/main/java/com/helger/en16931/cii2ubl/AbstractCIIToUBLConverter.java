@@ -76,6 +76,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   public static final String DEFAULT_CUSTOMIZATION_ID = "urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0";
   public static final String DEFAULT_PROFILE_ID = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
+  public static final String DEFAULT_DATE_TIME_FORMAT = "102";
   public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
   public static final boolean DEFAULT_SWAP_PRICE_SIGN_IF_NEEDED = true;
 
@@ -253,8 +254,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    * @return <code>null</code> if the format is unknown.
    */
   @Nullable
-  protected static String _getDatePattern (@Nonnull @Nonempty final String sFormat,
-                                           @Nonnull final IErrorList aErrorList)
+  protected static String getDatePattern (@Nonnull @Nonempty final String sFormat, @Nonnull final IErrorList aErrorList)
   {
     ValueEnforcer.notEmpty (sFormat, "Format");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
@@ -274,7 +274,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       case "101":
         return "uuMMdd";
       // CCYYMMDD
-      case "102":
+      case DEFAULT_DATE_TIME_FORMAT:
         return "uuuuMMdd";
       // YYWWD
       case "103":
@@ -297,8 +297,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       return null;
 
     // Default to 102
-    final String sRealFormat = StringHelper.getNotEmpty (sFormat, "102");
-    final String sPattern = _getDatePattern (sRealFormat, aErrorList);
+    final String sRealFormat = StringHelper.getNotEmpty (sFormat, DEFAULT_DATE_TIME_FORMAT);
+    final String sPattern = getDatePattern (sRealFormat, aErrorList);
     if (sPattern == null)
       return null;
 
@@ -311,8 +311,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate _parseDate (@Nullable final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType.DateTimeString aDateObj,
-                                         @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (@Nullable final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType.DateTimeString aDateObj,
+                                        @Nonnull final IErrorList aErrorList)
   {
     if (aDateObj == null)
       return null;
@@ -321,8 +321,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate _parseDate (@Nullable final un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType.DateTimeString aDateObj,
-                                         @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (@Nullable final un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType.DateTimeString aDateObj,
+                                        @Nonnull final IErrorList aErrorList)
   {
     if (aDateObj == null)
       return null;
@@ -331,8 +331,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate _parseDate (@Nullable final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType.DateString aDateObj,
-                                         @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (@Nullable final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType.DateString aDateObj,
+                                        @Nonnull final IErrorList aErrorList)
   {
     if (aDateObj == null)
       return null;
@@ -341,8 +341,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nonnull
-  protected static ETriState _parseIndicator (@Nullable final IndicatorType aIndicator,
-                                              @Nonnull final IErrorList aErrorList)
+  protected static ETriState parseIndicator (@Nullable final IndicatorType aIndicator,
+                                             @Nonnull final IErrorList aErrorList)
   {
     if (aIndicator == null)
       return ETriState.UNDEFINED;
@@ -380,8 +380,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    * @return Created UBL ID
    */
   @Nullable
-  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.IdentifierType> T _copyID (@Nullable final IDType aCIIID,
-                                                                                               @Nonnull final T aUBLID)
+  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.IdentifierType> T copyID (@Nullable final IDType aCIIID,
+                                                                                              @Nonnull final T aUBLID)
   {
     if (aCIIID == null)
       return null;
@@ -402,8 +402,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.TextType> T _copyName (@Nullable final TextType aName,
-                                                                                           @Nonnull final T ret)
+  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.TextType> T copyName (@Nullable final TextType aName,
+                                                                                          @Nonnull final T ret)
   {
     if (aName == null)
       return null;
@@ -419,8 +419,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.CodeType> T _copyCode (@Nullable final CodeType aCode,
-                                                                                           @Nonnull final T ret)
+  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.CodeType> T copyCode (@Nullable final CodeType aCode,
+                                                                                          @Nonnull final T ret)
   {
     if (aCode == null)
       return null;
@@ -443,8 +443,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.QuantityType> T _copyQuantity (@Nullable final QuantityType aQuantity,
-                                                                                                   @Nonnull final T ret)
+  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.QuantityType> T copyQuantity (@Nullable final QuantityType aQuantity,
+                                                                                                  @Nonnull final T ret)
   {
     if (aQuantity == null)
       return null;
@@ -462,9 +462,9 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.AmountType> T _copyAmount (@Nullable final AmountType aAmount,
-                                                                                               @Nonnull final T ret,
-                                                                                               @Nullable final String sDefaultCurrencyCode)
+  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.AmountType> T copyAmount (@Nullable final AmountType aAmount,
+                                                                                              @Nonnull final T ret,
+                                                                                              @Nullable final String sDefaultCurrencyCode)
   {
     if (aAmount == null)
       return null;
@@ -707,13 +707,13 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
     // Check total
     final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
-    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null
-                                                                       : aTransaction.getApplicableHeaderTradeSettlement ();
-    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
-                                                                                  : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
-    final AmountType aDuePayable = aTotal == null ||
-                                   aTotal.hasNoDuePayableAmountEntries () ? null
-                                                                          : aTotal.getDuePayableAmount ().get (0);
+    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction
+                                                                                            .getApplicableHeaderTradeSettlement ();
+    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null : aSettlement
+                                                                                                      .getSpecifiedTradeSettlementHeaderMonetarySummation ();
+    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null : aTotal
+                                                                                                           .getDuePayableAmount ()
+                                                                                                           .get (0);
 
     if (eIsInvoice.isUndefined () && aDuePayable != null)
     {
