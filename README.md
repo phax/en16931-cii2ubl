@@ -1,8 +1,8 @@
 # en16931-cii2ubl
 
-Converter for unidirectional EN16931 invoices from CII D16B to UBL 2.1, 2.2 or 2.3.
+Converter for unidirectional EN16931 invoices from CII D16B to UBL 2.1, 2.2, 2.3 or 2.4.
 
-This is a Java 1.8+ library that converts a Cross Industry Invoice (CII) into a Universal Business Language (UBL) document following the rules of the European Norm (EN) 16931 that defines a common semantic data model for electronic invoices in Europe.
+This is a Java 11+ library that converts a Cross Industry Invoice (CII) into a Universal Business Language (UBL) document following the rules of the European Norm (EN) 16931 that defines a common semantic data model for electronic invoices in Europe.
 
 Special care was given to XRechnung invoices - all the CII examples of them translate to UBL that is valid according to the EN 16931 validation rules.
 
