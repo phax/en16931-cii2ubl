@@ -87,10 +87,11 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v2.2.0 - 2024-03-06
+* v2.2.0 - 2024-03-07
     * Updated to ph-ubl 9.0.0
     * Tested output against EN 16931 rules v1.3.10 and v1.3.11 - no changes necessary
     * Updated to create UBL 2.4-CS01
+    * Added support for BT-8 mapping. See [issue 22](https://github.com/phax/en16931-cii2ubl/issues/22)
 * v2.1.0 - 2023-04-28
     * Updated to ph-ubl 8.0.1
     * Added support for converting to UBL 2.4
