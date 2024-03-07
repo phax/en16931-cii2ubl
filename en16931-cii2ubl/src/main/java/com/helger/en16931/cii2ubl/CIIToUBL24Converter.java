@@ -356,8 +356,8 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
                                                                                                            @Nullable final String sDefaultCurrencyCode)
   {
     return copyAmount (aAmount,
-                        new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_24.AmountType (),
-                        sDefaultCurrencyCode);
+                       new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_24.AmountType (),
+                       sDefaultCurrencyCode);
   }
 
   private void _copyAllowanceCharge (@Nonnull final TradeAllowanceChargeType aAllowanceCharge,
@@ -384,8 +384,8 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
     }
 
     aUBLAllowanceCharge.setBaseAmount (copyAmount (aAllowanceCharge.getBasisAmount (),
-                                                    new BaseAmountType (),
-                                                    sDefaultCurrencyCode));
+                                                   new BaseAmountType (),
+                                                   sDefaultCurrencyCode));
 
     // TaxCategory
     for (final TradeTaxType aTradeTax : aAllowanceCharge.getCategoryTradeTax ())
@@ -651,12 +651,11 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
         ifNotNull (aUBLInvoice::addNote, _copyNote (aEDNote));
 
-    // TaxPointDate
+    // BT-7 TaxPointDate
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
     {
       if (aTradeTax.getTaxPointDate () != null)
       {
-        // BT-7
         final LocalDate aTaxPointDate = parseDate (aTradeTax.getTaxPointDate ().getDateString (), aErrorList);
         if (aTaxPointDate != null)
         {
@@ -697,20 +696,31 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
 
     // InvoicePeriod
     {
+      final PeriodType aUBLPeriod = new PeriodType ();
       final SpecifiedPeriodType aSPT = aHeaderSettlement.getBillingSpecifiedPeriod ();
       if (aSPT != null)
       {
         final DateTimeType aStartDT = aSPT.getStartDateTime ();
-        final DateTimeType aEndDT = aSPT.getEndDateTime ();
-
-        if (aStartDT != null && aEndDT != null)
-        {
-          final PeriodType aUBLPeriod = new PeriodType ();
+        if (aStartDT != null)
           aUBLPeriod.setStartDate (parseDate (aStartDT.getDateTimeString (), aErrorList));
+
+        final DateTimeType aEndDT = aSPT.getEndDateTime ();
+        if (aEndDT != null)
           aUBLPeriod.setEndDate (parseDate (aEndDT.getDateTimeString (), aErrorList));
-          aUBLInvoice.addInvoicePeriod (aUBLPeriod);
-        }
       }
+
+      // BT-8 Value added tax point date code
+      if (aHeaderSettlement.hasApplicableTradeTaxEntries ())
+      {
+        final TradeTaxType aTradeTax = aHeaderSettlement.getApplicableTradeTaxAtIndex (0);
+        if (StringHelper.hasText (aTradeTax.getDueDateTypeCodeValue ()))
+          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (aTradeTax.getDueDateTypeCodeValue ()));
+      }
+
+      if (aUBLPeriod.getStartDate () != null ||
+          aUBLPeriod.getEndDate () != null ||
+          aUBLPeriod.hasDescriptionCodeEntries ())
+        aUBLInvoice.addInvoicePeriod (aUBLPeriod);
     }
 
     // OrderReference
@@ -1069,15 +1079,15 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
         if (aTradeTax.hasBasisAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxableAmount (copyAmount (aTradeTax.getBasisAmountAtIndex (0),
-                                                         new TaxableAmountType (),
-                                                         sDefaultCurrencyCode));
+                                                        new TaxableAmountType (),
+                                                        sDefaultCurrencyCode));
         }
 
         if (aTradeTax.hasCalculatedAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxAmount (copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
-                                                     new TaxAmountType (),
-                                                     sDefaultCurrencyCode));
+                                                    new TaxAmountType (),
+                                                    sDefaultCurrencyCode));
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -1110,28 +1120,28 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       {
         if (aSTSHMS.hasLineTotalAmountEntries ())
           aUBLMonetaryTotal.setLineExtensionAmount (copyAmount (aSTSHMS.getLineTotalAmountAtIndex (0),
-                                                                 new LineExtensionAmountType (),
-                                                                 sDefaultCurrencyCode));
+                                                                new LineExtensionAmountType (),
+                                                                sDefaultCurrencyCode));
         if (aSTSHMS.hasTaxBasisTotalAmountEntries ())
           aUBLMonetaryTotal.setTaxExclusiveAmount (copyAmount (aSTSHMS.getTaxBasisTotalAmountAtIndex (0),
-                                                                new TaxExclusiveAmountType (),
-                                                                sDefaultCurrencyCode));
+                                                               new TaxExclusiveAmountType (),
+                                                               sDefaultCurrencyCode));
         if (aSTSHMS.hasGrandTotalAmountEntries ())
           aUBLMonetaryTotal.setTaxInclusiveAmount (copyAmount (aSTSHMS.getGrandTotalAmountAtIndex (0),
-                                                                new TaxInclusiveAmountType (),
-                                                                sDefaultCurrencyCode));
+                                                               new TaxInclusiveAmountType (),
+                                                               sDefaultCurrencyCode));
         if (aSTSHMS.hasAllowanceTotalAmountEntries ())
           aUBLMonetaryTotal.setAllowanceTotalAmount (copyAmount (aSTSHMS.getAllowanceTotalAmountAtIndex (0),
-                                                                  new AllowanceTotalAmountType (),
-                                                                  sDefaultCurrencyCode));
+                                                                 new AllowanceTotalAmountType (),
+                                                                 sDefaultCurrencyCode));
         if (aSTSHMS.hasChargeTotalAmountEntries ())
           aUBLMonetaryTotal.setChargeTotalAmount (copyAmount (aSTSHMS.getChargeTotalAmountAtIndex (0),
-                                                               new ChargeTotalAmountType (),
-                                                               sDefaultCurrencyCode));
+                                                              new ChargeTotalAmountType (),
+                                                              sDefaultCurrencyCode));
         if (aSTSHMS.hasTotalPrepaidAmountEntries ())
           aUBLMonetaryTotal.setPrepaidAmount (copyAmount (aSTSHMS.getTotalPrepaidAmountAtIndex (0),
-                                                           new PrepaidAmountType (),
-                                                           sDefaultCurrencyCode));
+                                                          new PrepaidAmountType (),
+                                                          sDefaultCurrencyCode));
         if (aSTSHMS.hasRoundingAmountEntries ())
         {
           // Work around
@@ -1140,13 +1150,13 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           // compatibility
           if (MathHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
             aUBLMonetaryTotal.setPayableRoundingAmount (copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
-                                                                     new PayableRoundingAmountType (),
-                                                                     sDefaultCurrencyCode));
+                                                                    new PayableRoundingAmountType (),
+                                                                    sDefaultCurrencyCode));
         }
         if (aSTSHMS.hasDuePayableAmountEntries ())
           aUBLMonetaryTotal.setPayableAmount (copyAmount (aSTSHMS.getDuePayableAmountAtIndex (0),
-                                                           new PayableAmountType (),
-                                                           sDefaultCurrencyCode));
+                                                          new PayableAmountType (),
+                                                          sDefaultCurrencyCode));
       }
       aUBLInvoice.setLegalMonetaryTotal (aUBLMonetaryTotal);
     }
@@ -1172,8 +1182,8 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
         if (aSTSLMS.hasLineTotalAmountEntries ())
         {
           aUBLInvoiceLine.setLineExtensionAmount (copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
-                                                               new LineExtensionAmountType (),
-                                                               sDefaultCurrencyCode));
+                                                              new LineExtensionAmountType (),
+                                                              sDefaultCurrencyCode));
           if (isLT0Strict (aUBLInvoiceLine.getLineExtensionAmountValue ()))
             bLineExtensionAmountIsNegative = true;
         }
@@ -1202,12 +1212,16 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       if (aLineBillingPeriod != null)
       {
         final PeriodType aUBLLinePeriod = new PeriodType ();
-        if (aLineBillingPeriod.getStartDateTime () != null)
-          aUBLLinePeriod.setStartDate (parseDate (aLineBillingPeriod.getStartDateTime ().getDateTimeString (),
-                                                  aErrorList));
-        if (aLineBillingPeriod.getEndDateTime () != null)
-          aUBLLinePeriod.setEndDate (parseDate (aLineBillingPeriod.getEndDateTime ().getDateTimeString (), aErrorList));
-        aUBLInvoiceLine.addInvoicePeriod (aUBLLinePeriod);
+        final DateTimeType aStartDT = aLineBillingPeriod.getStartDateTime ();
+        if (aStartDT != null)
+          aUBLLinePeriod.setStartDate (parseDate (aStartDT.getDateTimeString (), aErrorList));
+
+        final DateTimeType aEndDT = aLineBillingPeriod.getEndDateTime ();
+        if (aEndDT != null)
+          aUBLLinePeriod.setEndDate (parseDate (aEndDT.getDateTimeString (), aErrorList));
+
+        if (aUBLLinePeriod.getStartDate () != null || aUBLLinePeriod.getEndDate () != null)
+          aUBLInvoiceLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
       // Order line reference
@@ -1310,7 +1324,7 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           {
             final CommodityClassificationType aUBLCommodityClassification = new CommodityClassificationType ();
             aUBLCommodityClassification.setItemClassificationCode (copyCode (aClassCode,
-                                                                              new ItemClassificationCodeType ()));
+                                                                             new ItemClassificationCodeType ()));
             if (aUBLCommodityClassification.getItemClassificationCode () != null)
               aUBLItem.addCommodityClassification (aUBLCommodityClassification);
           }
@@ -1353,8 +1367,8 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           if (aNPPTP.hasChargeAmountEntries ())
           {
             aUBLPrice.setPriceAmount (copyAmount (aNPPTP.getChargeAmountAtIndex (0),
-                                                   new PriceAmountType (),
-                                                   sDefaultCurrencyCode));
+                                                  new PriceAmountType (),
+                                                  sDefaultCurrencyCode));
             bUsePrice = true;
           }
           if (aNPPTP.getBasisQuantity () != null)
@@ -1483,7 +1497,7 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
         ifNotNull (aUBLCreditNote::addNote, _copyNote (aEDNote));
 
-    // TaxPointDate
+    // BT-7 TaxPointDate
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
     {
       if (aTradeTax.getTaxPointDate () != null)
@@ -1528,20 +1542,31 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
 
     // CreditNotePeriod
     {
+      final PeriodType aUBLPeriod = new PeriodType ();
       final SpecifiedPeriodType aSPT = aHeaderSettlement.getBillingSpecifiedPeriod ();
       if (aSPT != null)
       {
         final DateTimeType aStartDT = aSPT.getStartDateTime ();
-        final DateTimeType aEndDT = aSPT.getEndDateTime ();
-
-        if (aStartDT != null && aEndDT != null)
-        {
-          final PeriodType aUBLPeriod = new PeriodType ();
+        if (aStartDT != null)
           aUBLPeriod.setStartDate (parseDate (aStartDT.getDateTimeString (), aErrorList));
+
+        final DateTimeType aEndDT = aSPT.getEndDateTime ();
+        if (aEndDT != null)
           aUBLPeriod.setEndDate (parseDate (aEndDT.getDateTimeString (), aErrorList));
-          aUBLCreditNote.addInvoicePeriod (aUBLPeriod);
-        }
       }
+
+      // BT-8 Value added tax point date code
+      if (aHeaderSettlement.hasApplicableTradeTaxEntries ())
+      {
+        final TradeTaxType aTradeTax = aHeaderSettlement.getApplicableTradeTaxAtIndex (0);
+        if (StringHelper.hasText (aTradeTax.getDueDateTypeCodeValue ()))
+          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (aTradeTax.getDueDateTypeCodeValue ()));
+      }
+
+      if (aUBLPeriod.getStartDate () != null ||
+          aUBLPeriod.getEndDate () != null ||
+          aUBLPeriod.hasDescriptionCodeEntries ())
+        aUBLCreditNote.addInvoicePeriod (aUBLPeriod);
     }
 
     // OrderReference
@@ -1890,15 +1915,15 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
         if (aTradeTax.hasBasisAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxableAmount (copyAmount (aTradeTax.getBasisAmountAtIndex (0),
-                                                         new TaxableAmountType (),
-                                                         sDefaultCurrencyCode));
+                                                        new TaxableAmountType (),
+                                                        sDefaultCurrencyCode));
         }
 
         if (aTradeTax.hasCalculatedAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxAmount (copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
-                                                     new TaxAmountType (),
-                                                     sDefaultCurrencyCode));
+                                                    new TaxAmountType (),
+                                                    sDefaultCurrencyCode));
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -1931,28 +1956,28 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       {
         if (aSTSHMS.hasLineTotalAmountEntries ())
           aUBLMonetaryTotal.setLineExtensionAmount (copyAmount (aSTSHMS.getLineTotalAmountAtIndex (0),
-                                                                 new LineExtensionAmountType (),
-                                                                 sDefaultCurrencyCode));
+                                                                new LineExtensionAmountType (),
+                                                                sDefaultCurrencyCode));
         if (aSTSHMS.hasTaxBasisTotalAmountEntries ())
           aUBLMonetaryTotal.setTaxExclusiveAmount (copyAmount (aSTSHMS.getTaxBasisTotalAmountAtIndex (0),
-                                                                new TaxExclusiveAmountType (),
-                                                                sDefaultCurrencyCode));
+                                                               new TaxExclusiveAmountType (),
+                                                               sDefaultCurrencyCode));
         if (aSTSHMS.hasGrandTotalAmountEntries ())
           aUBLMonetaryTotal.setTaxInclusiveAmount (copyAmount (aSTSHMS.getGrandTotalAmountAtIndex (0),
-                                                                new TaxInclusiveAmountType (),
-                                                                sDefaultCurrencyCode));
+                                                               new TaxInclusiveAmountType (),
+                                                               sDefaultCurrencyCode));
         if (aSTSHMS.hasAllowanceTotalAmountEntries ())
           aUBLMonetaryTotal.setAllowanceTotalAmount (copyAmount (aSTSHMS.getAllowanceTotalAmountAtIndex (0),
-                                                                  new AllowanceTotalAmountType (),
-                                                                  sDefaultCurrencyCode));
+                                                                 new AllowanceTotalAmountType (),
+                                                                 sDefaultCurrencyCode));
         if (aSTSHMS.hasChargeTotalAmountEntries ())
           aUBLMonetaryTotal.setChargeTotalAmount (copyAmount (aSTSHMS.getChargeTotalAmountAtIndex (0),
-                                                               new ChargeTotalAmountType (),
-                                                               sDefaultCurrencyCode));
+                                                              new ChargeTotalAmountType (),
+                                                              sDefaultCurrencyCode));
         if (aSTSHMS.hasTotalPrepaidAmountEntries ())
           aUBLMonetaryTotal.setPrepaidAmount (copyAmount (aSTSHMS.getTotalPrepaidAmountAtIndex (0),
-                                                           new PrepaidAmountType (),
-                                                           sDefaultCurrencyCode));
+                                                          new PrepaidAmountType (),
+                                                          sDefaultCurrencyCode));
         if (aSTSHMS.hasRoundingAmountEntries ())
         {
           // Work around
@@ -1961,13 +1986,13 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           // compatibility
           if (MathHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
             aUBLMonetaryTotal.setPayableRoundingAmount (copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
-                                                                     new PayableRoundingAmountType (),
-                                                                     sDefaultCurrencyCode));
+                                                                    new PayableRoundingAmountType (),
+                                                                    sDefaultCurrencyCode));
         }
         if (aSTSHMS.hasDuePayableAmountEntries ())
           aUBLMonetaryTotal.setPayableAmount (copyAmount (aSTSHMS.getDuePayableAmountAtIndex (0),
-                                                           new PayableAmountType (),
-                                                           sDefaultCurrencyCode));
+                                                          new PayableAmountType (),
+                                                          sDefaultCurrencyCode));
       }
       aUBLCreditNote.setLegalMonetaryTotal (aUBLMonetaryTotal);
     }
@@ -1993,8 +2018,8 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
         if (aSTSLMS.hasLineTotalAmountEntries ())
         {
           aUBLCreditNoteLine.setLineExtensionAmount (copyAmount (aSTSLMS.getLineTotalAmountAtIndex (0),
-                                                                  new LineExtensionAmountType (),
-                                                                  sDefaultCurrencyCode));
+                                                                 new LineExtensionAmountType (),
+                                                                 sDefaultCurrencyCode));
           if (isLT0Strict (aUBLCreditNoteLine.getLineExtensionAmountValue ()))
             bLineExtensionAmountIsNegative = true;
         }
@@ -2023,12 +2048,16 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       if (aLineBillingPeriod != null)
       {
         final PeriodType aUBLLinePeriod = new PeriodType ();
-        if (aLineBillingPeriod.getStartDateTime () != null)
-          aUBLLinePeriod.setStartDate (parseDate (aLineBillingPeriod.getStartDateTime ().getDateTimeString (),
-                                                  aErrorList));
-        if (aLineBillingPeriod.getEndDateTime () != null)
-          aUBLLinePeriod.setEndDate (parseDate (aLineBillingPeriod.getEndDateTime ().getDateTimeString (), aErrorList));
-        aUBLCreditNoteLine.addInvoicePeriod (aUBLLinePeriod);
+        final DateTimeType aStartDT = aLineBillingPeriod.getStartDateTime ();
+        if (aStartDT != null)
+          aUBLLinePeriod.setStartDate (parseDate (aStartDT.getDateTimeString (), aErrorList));
+
+        final DateTimeType aEndDT = aLineBillingPeriod.getEndDateTime ();
+        if (aEndDT != null)
+          aUBLLinePeriod.setEndDate (parseDate (aEndDT.getDateTimeString (), aErrorList));
+
+        if (aUBLLinePeriod.getStartDate () != null || aUBLLinePeriod.getEndDate () != null)
+          aUBLCreditNoteLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
       // Order line reference
@@ -2131,7 +2160,7 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           {
             final CommodityClassificationType aUBLCommodityClassification = new CommodityClassificationType ();
             aUBLCommodityClassification.setItemClassificationCode (copyCode (aClassCode,
-                                                                              new ItemClassificationCodeType ()));
+                                                                             new ItemClassificationCodeType ()));
             if (aUBLCommodityClassification.getItemClassificationCode () != null)
               aUBLItem.addCommodityClassification (aUBLCommodityClassification);
           }
@@ -2174,8 +2203,8 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           if (aNPPTP.hasChargeAmountEntries ())
           {
             aUBLPrice.setPriceAmount (copyAmount (aNPPTP.getChargeAmountAtIndex (0),
-                                                   new PriceAmountType (),
-                                                   sDefaultCurrencyCode));
+                                                  new PriceAmountType (),
+                                                  sDefaultCurrencyCode));
             bUsePrice = true;
           }
           if (aNPPTP.getBasisQuantity () != null)
