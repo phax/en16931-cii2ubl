@@ -90,6 +90,9 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v2.2.1 - 2024-03-29
+    * Updated to ph-commons 11.1.5
+    * Ensured Java 21 compatibility
 * v2.2.0 - 2024-03-08
     * Updated to ph-ubl 9.0.0
     * Tested output against EN 16931 rules v1.3.10 and v1.3.11 - no changes necessary
