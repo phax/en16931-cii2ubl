@@ -44,7 +44,7 @@ Replace `x.y.z` with the effective version you want to use:
 
 ## Commandline usage
 
-Call it via `java -jar en16931-cii2ubl-cli-x.y.y-full.jar` (where `x.y.z` denotes the version number) followed by the options and parameters.
+Call it via `java -jar en16931-cii2ubl-cli-x.y.z.jar` (where `x.y.z` denotes the version number) followed by the options and parameters.
 
 ```
 [INFO] CII to UBL Converter v2.1.0
