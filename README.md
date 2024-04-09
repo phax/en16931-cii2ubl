@@ -44,10 +44,10 @@ Replace `x.y.z` with the effective version you want to use:
 
 ## Commandline usage
 
-Call it via `java -jar en16931-cii2ubl-cli-x.y.y-full.jar` (where `x.y.z` denotes the version number) followed by the options and parameters.
+Call it via `java -jar en16931-cii2ubl-cli-full.jar` followed by the options and parameters.
 
 ```
-[INFO] CII to UBL Converter v2.1.0
+[INFO] CII to UBL Converter v2.2.0 (build 2024-03-08T11:11:07Z)
 Missing required parameter: 'source files'
 Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion] [--verbose]
                          [--mode mode] [--output-suffix filename part] [-t
