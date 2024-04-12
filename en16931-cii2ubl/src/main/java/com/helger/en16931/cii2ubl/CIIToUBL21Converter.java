@@ -713,6 +713,15 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     {
       final OrderReferenceType aUBLOrderRef = _createUBLOrderRef (aHeaderAgreement.getBuyerOrderReferencedDocument (),
                                                                   aHeaderAgreement.getSellerOrderReferencedDocument ());
+      /* Set BT-13 with a hyhen if it is empty */
+      if(aUBLOrderRef != null) 
+      {
+        if(aUBLOrderRef.getIDValue().equals("")) 
+        {
+          aUBLOrderRef.setID("-");
+        }
+      }
+      
       aUBLInvoice.setOrderReference (aUBLOrderRef);
     }
 
