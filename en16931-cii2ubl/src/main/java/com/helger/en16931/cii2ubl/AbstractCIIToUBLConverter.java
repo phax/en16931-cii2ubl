@@ -80,6 +80,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
   public static final boolean DEFAULT_SWAP_PRICE_SIGN_IF_NEEDED = true;
 
+  protected static final String DEFAULT_UBL_ORDER_REF_ID = "";
+
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverter.class);
 
   // Source: EN 16931 validation artefacts

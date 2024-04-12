@@ -37,7 +37,6 @@ import com.helger.jaxb.GenericJAXBMarshaller;
 import com.helger.phive.api.execute.ValidationExecutionManager;
 import com.helger.phive.api.result.ValidationResult;
 import com.helger.phive.api.result.ValidationResultList;
-import com.helger.phive.en16931.EN16931Validation;
 import com.helger.phive.xml.source.ValidationSourceXML;
 import com.helger.ubl23.UBL23Marshaller;
 
@@ -86,7 +85,7 @@ public final class CIIToUBL23ConverterTest
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
-        aResultList = ValidationExecutionManager.executeValidation (MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_INVOICE_1311),
+        aResultList = ValidationExecutionManager.executeValidation (MockSettings.VES_REGISTRY.getOfID (MockSettings.VID_INVOICE),
                                                                     ValidationSourceXML.create (new FileSystemResource (aDestFile)));
       }
       else
@@ -98,7 +97,7 @@ public final class CIIToUBL23ConverterTest
         aWriter.write (aUBLInvoice, aDestFile);
 
         // Validate against EN16931 validation rules
-        aResultList = ValidationExecutionManager.executeValidation (MockSettings.VES_REGISTRY.getOfID (EN16931Validation.VID_UBL_CREDIT_NOTE_1311),
+        aResultList = ValidationExecutionManager.executeValidation (MockSettings.VES_REGISTRY.getOfID (MockSettings.VID_CREDIT_NOTE),
                                                                     ValidationSourceXML.create (new FileSystemResource (aDestFile)));
       }
 

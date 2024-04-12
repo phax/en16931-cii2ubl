@@ -25,6 +25,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.diver.api.version.VESID;
 import com.helger.phive.api.executorset.ValidationExecutorSetRegistry;
 import com.helger.phive.en16931.EN16931Validation;
 import com.helger.phive.xml.source.IValidationSourceXML;
@@ -44,7 +45,11 @@ final class MockSettings
                                                         "CII_example7.xml",
                                                         "CII_example8.xml",
                                                         "CII_example9.xml" };
-  private static final String [] TEST_FILES_ISSUES = { "issue7.xml", "issue12.xml", "issue20.xml", "issue22.xml" };
+  private static final String [] TEST_FILES_ISSUES = { "issue7.xml",
+                                                       "issue12.xml",
+                                                       "issue20.xml",
+                                                       "issue22.xml",
+                                                       "issue23.xml" };
   private static final String [] TEST_FILES_XRECHNUNG_122 = { "01.01a-INVOICE_uncefact.xml",
                                                               "01.02a-INVOICE_uncefact.xml",
                                                               "01.03a-INVOICE_uncefact.xml",
@@ -85,6 +90,9 @@ final class MockSettings
                                                               "02.02a-INVOICE_uncefact.xml",
                                                               // "03.01a-INVOICE_uncefact.xml",
                                                               "03.02a-INVOICE_uncefact.xml" };
+
+  static final VESID VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1311;
+  static final VESID VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1311;
 
   static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
   static
