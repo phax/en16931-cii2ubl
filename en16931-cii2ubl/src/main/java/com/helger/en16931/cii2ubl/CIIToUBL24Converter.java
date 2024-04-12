@@ -552,8 +552,8 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
   }
 
   @Nullable
-  private static OrderReferenceType _createUBLOrderRef (@Nullable final ReferencedDocumentType aBuyerOrderRef,
-                                                        @Nullable final ReferencedDocumentType aSellerOrderRef)
+  private OrderReferenceType _createUBLOrderRef (@Nullable final ReferencedDocumentType aBuyerOrderRef,
+                                                 @Nullable final ReferencedDocumentType aSellerOrderRef)
   {
     final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
     if (aBuyerOrderRef != null)
@@ -563,7 +563,7 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       if (aUBLOrderRef.getIDValue () == null)
       {
         // Mandatory element
-        aUBLOrderRef.setID (DEFAULT_UBL_ORDER_REF_ID);
+        aUBLOrderRef.setID (getDefaultOrderRefID ());
       }
       ifNotEmpty (aUBLOrderRef::setSalesOrderID, aSellerOrderRef.getIssuerAssignedIDValue ());
     }

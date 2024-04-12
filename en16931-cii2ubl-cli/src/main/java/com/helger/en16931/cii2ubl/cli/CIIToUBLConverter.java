@@ -75,55 +75,61 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Option (names = "--ubl",
            paramLabel = "version",
            defaultValue = "2.1",
-           description = "Version of the target UBL Format: '2.1', '2.2', '2.3' or '2.4' (default: ${DEFAULT-VALUE})")
+           description = "Version of the target UBL Format: '2.1', '2.2', '2.3' or '2.4' (default: '${DEFAULT-VALUE}')")
   private String m_sUBLVersion;
 
   @Option (names = "--mode",
            paramLabel = "mode",
            defaultValue = "AUTOMATIC",
-           description = "Allowed values: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
+           description = "Allowed values: ${COMPLETION-CANDIDATES} (default: '${DEFAULT-VALUE}')")
   private EUBLCreationMode m_eMode;
 
   @Option (names = { "-t", "--target" },
            paramLabel = "directory",
            defaultValue = ".",
-           description = "The target directory for result output (default: ${DEFAULT-VALUE})")
+           description = "The target directory for result output (default: '${DEFAULT-VALUE}')")
   private String m_sOutputDir;
 
   @Option (names = "--output-suffix",
            paramLabel = "filename part",
            defaultValue = "-ubl",
-           description = "The suffix added to the output filename (default: ${DEFAULT-VALUE})")
+           description = "The suffix added to the output filename (default: '${DEFAULT-VALUE}')")
   private String m_sOutputFileSuffix;
 
   @Option (names = "--ubl-vatscheme",
            paramLabel = "vat scheme",
            defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME,
-           description = "The UBL VAT scheme to be used (default: ${DEFAULT-VALUE})")
+           description = "The UBL VAT scheme to be used (default: '${DEFAULT-VALUE}')")
   private String m_sVATScheme;
 
   @Option (names = "--ubl-customizationid",
            paramLabel = "ID",
            defaultValue = AbstractCIIToUBLConverter.DEFAULT_CUSTOMIZATION_ID,
-           description = "The UBL customization ID to be used (default: ${DEFAULT-VALUE})")
+           description = "The UBL customization ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sCustomizationID;
 
   @Option (names = "--ubl-profileid",
            paramLabel = "ID",
            defaultValue = AbstractCIIToUBLConverter.DEFAULT_PROFILE_ID,
-           description = "The UBL profile ID to be used (default: ${DEFAULT-VALUE})")
+           description = "The UBL profile ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sProfileID;
 
   @Option (names = "--ubl-cardaccountnetworkid",
            paramLabel = "ID",
            defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID,
-           description = "The UBL CardAccount network ID to be used (default: ${DEFAULT-VALUE})")
+           description = "The UBL CardAccount network ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sCardAccountNetworkID;
+
+  @Option (names = "--ubl-defaultorderrefid",
+           paramLabel = "ID",
+           defaultValue = AbstractCIIToUBLConverter.DEFAULT_ORDER_REF_ID,
+           description = "The UBL default order reference ID to be used (default: '${DEFAULT-VALUE}')")
+  private String m_sDefaultOrderRefID;
 
   @Option (names = "--verbose",
            paramLabel = "boolean",
            defaultValue = "false",
-           description = "Enable debug logging (default: ${DEFAULT-VALUE})")
+           description = "Enable debug logging (default: '${DEFAULT-VALUE}')")
   private boolean m_bVerbose;
 
   @Option (names = "--disable-wildcard-expansion",
@@ -165,7 +171,9 @@ public class CIIToUBLConverter implements Callable <Integer>
     final File aRootDir = new File (".").getCanonicalFile ();
     for (final String sFilename : aFilenames)
     {
-      if (sFilename.indexOf ('*') >= 0 || sFilename.indexOf ('?') >= 0 || (sFilename.indexOf ('[') >= 0 && sFilename.indexOf (']') >= 0))
+      if (sFilename.indexOf ('*') >= 0 ||
+          sFilename.indexOf ('?') >= 0 ||
+          (sFilename.indexOf ('[') >= 0 && sFilename.indexOf (']') >= 0))
       {
         // Make search pattern absolute
         final String sRealName = new File (sFilename).getAbsolutePath ();
@@ -275,7 +283,8 @@ public class CIIToUBLConverter implements Callable <Integer>
               .setVATScheme (m_sVATScheme)
               .setCustomizationID (m_sCustomizationID)
               .setProfileID (m_sProfileID)
-              .setCardAccountNetworkID (m_sCardAccountNetworkID);
+              .setCardAccountNetworkID (m_sCardAccountNetworkID)
+              .setDefaultOrderRefID (m_sDefaultOrderRefID);
 
     for (final File f : m_aSourceFiles)
     {
@@ -303,35 +312,40 @@ public class CIIToUBLConverter implements Callable <Integer>
         {
           eSuccess = UBL21Marshaller.invoice ()
                                     .setFormattedOutput (bFormattedOutput)
-                                    .write ((oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType) aUBL, aDestFile);
+                                    .write ((oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType) aUBL,
+                                            aDestFile);
         }
         else
           if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType)
           {
             eSuccess = UBL21Marshaller.creditNote ()
                                       .setFormattedOutput (bFormattedOutput)
-                                      .write ((oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType) aUBL, aDestFile);
+                                      .write ((oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType) aUBL,
+                                              aDestFile);
           }
           else
             if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType)
             {
               eSuccess = UBL22Marshaller.invoice ()
                                         .setFormattedOutput (bFormattedOutput)
-                                        .write ((oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType) aUBL, aDestFile);
+                                        .write ((oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType) aUBL,
+                                                aDestFile);
             }
             else
               if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType)
               {
                 eSuccess = UBL22Marshaller.creditNote ()
                                           .setFormattedOutput (bFormattedOutput)
-                                          .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL, aDestFile);
+                                          .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL,
+                                                  aDestFile);
               }
               else
                 if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType)
                 {
                   eSuccess = UBL23Marshaller.invoice ()
                                             .setFormattedOutput (bFormattedOutput)
-                                            .write ((oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType) aUBL, aDestFile);
+                                            .write ((oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType) aUBL,
+                                                    aDestFile);
                 }
                 else
                   if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType)
@@ -356,7 +370,11 @@ public class CIIToUBLConverter implements Callable <Integer>
 
   public static void main (final String [] aArgs)
   {
-    LOGGER.info ("CII to UBL Converter v" + CIIToUBLVersion.BUILD_VERSION + " (build " + CIIToUBLVersion.BUILD_TIMESTAMP + ")");
+    LOGGER.info ("CII to UBL Converter v" +
+                 CIIToUBLVersion.BUILD_VERSION +
+                 " (build " +
+                 CIIToUBLVersion.BUILD_TIMESTAMP +
+                 ")");
 
     final CommandLine cmd = new CommandLine (new CIIToUBLConverter ());
     cmd.setCaseInsensitiveEnumValuesAllowed (true);
