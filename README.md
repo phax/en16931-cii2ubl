@@ -47,12 +47,13 @@ Replace `x.y.z` with the effective version you want to use:
 Call it via `java -jar en16931-cii2ubl-cli-full.jar` followed by the options and parameters.
 
 ```
-[INFO] CII to UBL Converter v2.2.0 (build 2024-03-08T11:11:07Z)
+[INFO] CII to UBL Converter v2.2.2 (build 2024-04-12T15:26:48Z)
 Missing required parameter: 'source files'
 Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion] [--verbose]
                          [--mode mode] [--output-suffix filename part] [-t
                          directory] [--ubl version] [--ubl-cardaccountnetworkid
-                         ID] [--ubl-customizationid ID] [--ubl-profileid ID]
+                         ID] [--ubl-customizationid ID]
+                         [--ubl-defaultorderrefid ID] [--ubl-profileid ID]
                          [--ubl-vatscheme vat scheme] source files...
 CII to UBL Converter for EN 16931 invoices
       source files...      One or more CII file(s)
@@ -60,26 +61,29 @@ CII to UBL Converter for EN 16931 invoices
                            Disable wildcard expansion of filenames
   -h, --help               Show this help message and exit.
       --mode mode          Allowed values: AUTOMATIC, INVOICE, CREDIT_NOTE
-                             (default: AUTOMATIC)
+                             (default: 'AUTOMATIC')
       --output-suffix filename part
                            The suffix added to the output filename (default:
-                             -ubl)
-  -t, --target directory   The target directory for result output (default: .)
+                             '-ubl')
+  -t, --target directory   The target directory for result output (default: '.')
       --ubl version        Version of the target UBL Format: '2.1', '2.2',
-                             '2.3' or '2.4' (default: 2.1)
+                             '2.3' or '2.4' (default: '2.1')
       --ubl-cardaccountnetworkid ID
                            The UBL CardAccount network ID to be used (default:
-                             mapped-from-cii)
+                             'mapped-from-cii')
       --ubl-customizationid ID
-                           The UBL customization ID to be used (default: urn:
+                           The UBL customization ID to be used (default: 'urn:
                              cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:
-                             2017:poacc:billing:3.0)
-      --ubl-profileid ID   The UBL profile ID to be used (default: urn:fdc:
-                             peppol.eu:2017:poacc:billing:01:1.0)
+                             2017:poacc:billing:3.0')
+      --ubl-defaultorderrefid ID
+                           The UBL default order reference ID to be used
+                             (default: '')
+      --ubl-profileid ID   The UBL profile ID to be used (default: 'urn:fdc:
+                             peppol.eu:2017:poacc:billing:01:1.0')
       --ubl-vatscheme vat scheme
-                           The UBL VAT scheme to be used (default: VAT)
+                           The UBL VAT scheme to be used (default: 'VAT')
   -V, --version            Print version information and exit.
-      --verbose            Enable debug logging (default: false)
+      --verbose            Enable debug logging (default: 'false')
 ```
 
 # Open issues
