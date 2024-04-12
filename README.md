@@ -90,6 +90,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v2.2.2 - 2024-04-12
+    * Added support for providing the default UBL order reference ID, in case the empty String is not good enough. See[#23](https://github.com/phax/en16931-cii2ubl/issues/23)
 * v2.2.1 - 2024-03-29
     * Updated to ph-commons 11.1.5
     * Ensured Java 21 compatibility
