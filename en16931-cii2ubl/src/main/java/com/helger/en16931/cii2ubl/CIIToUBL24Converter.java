@@ -335,6 +335,11 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
     final ContactType aUBLContact = new ContactType ();
 
     aUBLContact.setName (copyName (aDTC.getPersonName (), new NameType ()));
+    if (aUBLContact.getNameValue () == null)
+    {
+      // BT-41
+      aUBLContact.setName (copyName (aDTC.getDepartmentName (), new NameType ()));
+    }
 
     final UniversalCommunicationType aTel = aDTC.getTelephoneUniversalCommunication ();
     if (aTel != null)
