@@ -16,9 +16,6 @@
       <cac:PartyIdentification>
         <cbc:ID schemeID="0088">Homepage Design GmbH</cbc:ID>
       </cac:PartyIdentification>
-      <cac:PartyName>
-        <cbc:Name>Homepage Design GmbH</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Musterstr. 60</cbc:StreetName>
         <cbc:CityName>Berlin</cbc:CityName>
@@ -48,9 +45,6 @@
       <cac:PartyIdentification>
         <cbc:ID>Lampenlager GmbH</cbc:ID>
       </cac:PartyIdentification>
-      <cac:PartyName>
-        <cbc:Name>Anne Mach</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Industriestr. 21</cbc:StreetName>
         <cbc:CityName>Berlin </cbc:CityName>

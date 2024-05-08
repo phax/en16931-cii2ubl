@@ -18,9 +18,6 @@
   </cac:ProjectReference>
   <cac:AccountingSupplierParty>
     <cac:Party>
-      <cac:PartyName>
-        <cbc:Name>[Seller name]</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>[Seller address line 1]</cbc:StreetName>
         <cbc:CityName>[Seller city]</cbc:CityName>
@@ -48,9 +45,6 @@
   </cac:AccountingSupplierParty>
   <cac:AccountingCustomerParty>
     <cac:Party>
-      <cac:PartyName>
-        <cbc:Name>[Buyer name]</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>[Buyer address line 1]</cbc:StreetName>
         <cbc:CityName>[Buyer city]</cbc:CityName>

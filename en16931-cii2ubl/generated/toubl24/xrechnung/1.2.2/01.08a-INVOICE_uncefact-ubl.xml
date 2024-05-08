@@ -19,7 +19,7 @@
   <cac:AccountingSupplierParty>
     <cac:Party>
       <cac:PartyName>
-        <cbc:Name>[Seller name]</cbc:Name>
+        <cbc:Name>[Seller trading name]</cbc:Name>
       </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Postfach 123456</cbc:StreetName>
@@ -36,7 +36,7 @@
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
       <cac:PartyLegalEntity>
-        <cbc:RegistrationName>[Seller trading name]</cbc:RegistrationName>
+        <cbc:RegistrationName>[Seller name]</cbc:RegistrationName>
         <cbc:CompanyID>HRB 123</cbc:CompanyID>
         <cbc:CompanyLegalForm>Amtsgericht […], Geschäftsführer: […], Sitz der Gesellschaft […], Aufsichtsratvorsitzender: […]</cbc:CompanyLegalForm>
       </cac:PartyLegalEntity>
@@ -49,9 +49,6 @@
   </cac:AccountingSupplierParty>
   <cac:AccountingCustomerParty>
     <cac:Party>
-      <cac:PartyName>
-        <cbc:Name>[Buyer name]</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>[Buyer address line 1]</cbc:StreetName>
         <cbc:CityName>[Buyer city]</cbc:CityName>
