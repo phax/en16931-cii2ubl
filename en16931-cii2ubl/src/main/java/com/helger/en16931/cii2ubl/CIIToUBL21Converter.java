@@ -1375,7 +1375,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       boolean bUsePrice = false;
 
       final AllowanceChargeType aUBLPriceAllowanceCharge = new AllowanceChargeType ();
-      aUBLPriceAllowanceCharge.setChargeIndicator (true);
+      aUBLPriceAllowanceCharge.setChargeIndicator (false);
       aUBLPrice.addAllowanceCharge (aUBLPriceAllowanceCharge);
       boolean bUsePriceAC = false;
 
@@ -1408,6 +1408,13 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
             if (aBT148 != null)
             {
               aUBLPriceAllowanceCharge.setBaseAmount (copyAmount (aBT148, new BaseAmountType (), sDefaultCurrencyCode));
+              if (!bUsePriceAC)
+              {
+                // Make sure the AC gets printed
+                // Set "0" discount
+                aUBLPriceAllowanceCharge.setAmount (BigDecimal.ZERO).setCurrencyID (sDefaultCurrencyCode);
+                bUsePriceAC = true;
+              }
             }
           }
           if (aGPPTP.getBasisQuantity () != null)
@@ -1455,7 +1462,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
 
       // Allowance charge
       final TradePriceType aGrossTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
-      if (aGrossTradePrice != null)
+      if (false && aGrossTradePrice != null)
       {
         if (aGrossTradePrice.hasAppliedTradeAllowanceChargeEntries ())
         {
