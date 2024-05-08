@@ -720,7 +720,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       {
         final TradeTaxType aTradeTax = aHeaderSettlement.getApplicableTradeTaxAtIndex (0);
         if (StringHelper.hasText (aTradeTax.getDueDateTypeCodeValue ()))
-          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (aTradeTax.getDueDateTypeCodeValue ()));
+          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (mapDueDateTypeCode (aTradeTax.getDueDateTypeCodeValue ())));
       }
 
       if (aUBLPeriod.getStartDate () != null ||
@@ -1629,7 +1629,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       {
         final TradeTaxType aTradeTax = aHeaderSettlement.getApplicableTradeTaxAtIndex (0);
         if (StringHelper.hasText (aTradeTax.getDueDateTypeCodeValue ()))
-          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (aTradeTax.getDueDateTypeCodeValue ()));
+          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (mapDueDateTypeCode (aTradeTax.getDueDateTypeCodeValue ())));
       }
 
       if (aUBLPeriod.getStartDate () != null ||
