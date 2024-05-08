@@ -17,9 +17,6 @@
   </cac:ContractDocumentReference>
   <cac:AccountingSupplierParty>
     <cac:Party>
-      <cac:PartyName>
-        <cbc:Name>xxxx</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Storkower Straße 207</cbc:StreetName>
         <cbc:CityName>Berlin</cbc:CityName>
@@ -45,9 +42,6 @@
       <cac:PartyIdentification>
         <cbc:ID schemeID="0088">1111111111</cbc:ID>
       </cac:PartyIdentification>
-      <cac:PartyName>
-        <cbc:Name>Buyercompany ltd</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Anystreet, Building 1</cbc:StreetName>
         <cbc:CityName>Anytown</cbc:CityName>

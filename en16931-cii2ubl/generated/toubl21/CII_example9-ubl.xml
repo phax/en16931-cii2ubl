@@ -16,9 +16,6 @@ het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Blue
   </cac:ContractDocumentReference>
   <cac:AccountingSupplierParty>
     <cac:Party>
-      <cac:PartyName>
-        <cbc:Name>Bluem BV</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Lindeboomseweg 41</cbc:StreetName>
         <cbc:CityName>Amersfoort</cbc:CityName>
@@ -45,9 +42,6 @@ het factuurnummer. Het bankrekeningnummer is 37.78.15.500, Rabobank, t.n.v. Blue
   </cac:AccountingSupplierParty>
   <cac:AccountingCustomerParty>
     <cac:Party>
-      <cac:PartyName>
-        <cbc:Name>Provide Verzekeringen</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Henry Dunantweg 42</cbc:StreetName>
         <cbc:CityName>Alphen aan den Rijn</cbc:CityName>

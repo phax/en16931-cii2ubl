@@ -42,7 +42,7 @@
         <cbc:ID schemeID="0200">987654321</cbc:ID>
       </cac:PartyIdentification>
       <cac:PartyName>
-        <cbc:Name>[Seller name]</cbc:Name>
+        <cbc:Name>[Seller trading name]</cbc:Name>
       </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>[Seller address line 1]</cbc:StreetName>
@@ -66,7 +66,7 @@
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
       <cac:PartyLegalEntity>
-        <cbc:RegistrationName>[Seller trading name]</cbc:RegistrationName>
+        <cbc:RegistrationName>[Seller name]</cbc:RegistrationName>
         <cbc:CompanyID schemeID="0200">123456789</cbc:CompanyID>
         <cbc:CompanyLegalForm>Amtsgericht […], Geschäftsführer: […], Sitz der Gesellschaft […], Aufsichtsratvorsitzender: […]</cbc:CompanyLegalForm>
       </cac:PartyLegalEntity>
@@ -83,9 +83,6 @@
       <cac:PartyIdentification>
         <cbc:ID>138</cbc:ID>
       </cac:PartyIdentification>
-      <cac:PartyName>
-        <cbc:Name>[Buyer name]</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>[Buyer address line 1]</cbc:StreetName>
         <cbc:AdditionalStreetName>[Buyer address line 2]</cbc:AdditionalStreetName>

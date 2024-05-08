@@ -58,7 +58,7 @@
         <cbc:ID schemeID="0088">5790000436101</cbc:ID>
       </cac:PartyIdentification>
       <cac:PartyName>
-        <cbc:Name>SellerCompany</cbc:Name>
+        <cbc:Name>SelCo</cbc:Name>
       </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Hoofdstraat 4</cbc:StreetName>
@@ -83,7 +83,7 @@
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
       <cac:PartyLegalEntity>
-        <cbc:RegistrationName>SelCo</cbc:RegistrationName>
+        <cbc:RegistrationName>SellerCompany</cbc:RegistrationName>
         <cbc:CompanyID>NL16356706</cbc:CompanyID>
         <cbc:CompanyLegalForm>Export</cbc:CompanyLegalForm>
       </cac:PartyLegalEntity>
@@ -101,7 +101,7 @@
         <cbc:ID schemeID="0088">5790000436057</cbc:ID>
       </cac:PartyIdentification>
       <cac:PartyName>
-        <cbc:Name>Buyercompany ltd</cbc:Name>
+        <cbc:Name>Buyco</cbc:Name>
       </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Anystreet, Building 1</cbc:StreetName>
@@ -120,7 +120,7 @@
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
       <cac:PartyLegalEntity>
-        <cbc:RegistrationName>Buyco</cbc:RegistrationName>
+        <cbc:RegistrationName>Buyercompany ltd</cbc:RegistrationName>
         <cbc:CompanyID>DK16356607</cbc:CompanyID>
       </cac:PartyLegalEntity>
       <cac:Contact>

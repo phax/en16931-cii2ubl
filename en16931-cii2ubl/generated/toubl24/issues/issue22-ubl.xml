@@ -49,9 +49,6 @@
       <cac:PartyIdentification>
         <cbc:ID schemeID="0088">1238764941386</cbc:ID>
       </cac:PartyIdentification>
-      <cac:PartyName>
-        <cbc:Name>Salescompany ltd.</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Main street 34</cbc:StreetName>
         <cbc:AdditionalStreetName>Suite 123</cbc:AdditionalStreetName>
@@ -84,9 +81,6 @@
       <cac:PartyIdentification>
         <cbc:ID schemeID="0088">3456789012098</cbc:ID>
       </cac:PartyIdentification>
-      <cac:PartyName>
-        <cbc:Name>The Buyercompany</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cbc:StreetName>Anystreet 8</cbc:StreetName>
         <cbc:AdditionalStreetName>Back door</cbc:AdditionalStreetName>

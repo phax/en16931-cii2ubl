@@ -9,9 +9,6 @@
   <cbc:DocumentCurrencyCode>DKK</cbc:DocumentCurrencyCode>
   <cac:AccountingSupplierParty>
     <cac:Party>
-      <cac:PartyName>
-        <cbc:Name>SellerCompany</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cac:Country>
           <cbc:IdentificationCode>DK</cbc:IdentificationCode>
@@ -30,9 +27,6 @@
   </cac:AccountingSupplierParty>
   <cac:AccountingCustomerParty>
     <cac:Party>
-      <cac:PartyName>
-        <cbc:Name>Buyercompany ltd</cbc:Name>
-      </cac:PartyName>
       <cac:PostalAddress>
         <cac:Country>
           <cbc:IdentificationCode>DK</cbc:IdentificationCode>

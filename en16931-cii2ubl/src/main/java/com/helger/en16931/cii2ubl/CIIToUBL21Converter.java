@@ -238,7 +238,9 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
   }
 
   @Nonnull
-  private static PartyType _convertParty (@Nonnull final TradePartyType aParty, final boolean bMultiID)
+  private static PartyType _convertParty (@Nonnull final TradePartyType aParty,
+                                          final boolean bMultiID,
+                                          final boolean bUseLegalEntityName)
   {
     final PartyType ret = new PartyType ();
 
@@ -253,13 +255,24 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     else
       _addPartyID (_extractFirstPartyID (aParty), ret);
 
+    // BT-27, BT-44, BT-59, BT-62, BT-70
     final TextType aName = aParty.getName ();
-    if (aName != null)
+    if (aName != null && StringHelper.hasText (aName.getValue ()))
     {
-      final PartyNameType aUBLPartyName = new PartyNameType ();
-      aUBLPartyName.setName (copyName (aName, new NameType ()));
-      if (aUBLPartyName.getName () != null)
-        ret.addPartyName (aUBLPartyName);
+      // Some map to PartyLegalEntity some to PartyName
+      if (bUseLegalEntityName)
+      {
+        final PartyLegalEntityType aUBLPartyLegalEntity = new PartyLegalEntityType ();
+        aUBLPartyLegalEntity.setRegistrationName (aName.getValue ());
+        ret.addPartyLegalEntity (aUBLPartyLegalEntity);
+      }
+      else
+      {
+        final PartyNameType aUBLPartyName = new PartyNameType ();
+        aUBLPartyName.setName (copyName (aName, new NameType ()));
+        if (aUBLPartyName.getName () != null)
+          ret.addPartyName (aUBLPartyName);
+      }
     }
 
     final TradeAddressType aPostalAddress = aParty.getPostalTradeAddress ();
@@ -296,16 +309,30 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     return aUBLPartyTaxScheme;
   }
 
-  @Nullable
-  private static PartyLegalEntityType _convertPartyLegalEntity (@Nonnull final TradePartyType aTradeParty)
+  private static void _convertPartyLegalEntity (@Nonnull final TradePartyType aTradeParty,
+                                                @Nonnull final PartyType aUBLParty)
   {
-    final PartyLegalEntityType aUBLPartyLegalEntity = new PartyLegalEntityType ();
+    final PartyLegalEntityType aUBLPartyLegalEntity;
+    if (aUBLParty.hasPartyLegalEntityEntries ())
+    {
+      aUBLPartyLegalEntity = aUBLParty.getPartyLegalEntityAtIndex (0);
+    }
+    else
+    {
+      aUBLPartyLegalEntity = new PartyLegalEntityType ();
+      aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+    }
 
     final LegalOrganizationType aSLO = aTradeParty.getSpecifiedLegalOrganization ();
     if (aSLO != null)
     {
       if (StringHelper.hasText (aSLO.getTradingBusinessNameValue ()))
-        aUBLPartyLegalEntity.setRegistrationName (aSLO.getTradingBusinessNameValue ());
+      {
+        final PartyNameType aUBLPartyName = new PartyNameType ();
+        aUBLPartyName.setName (aSLO.getTradingBusinessNameValue ());
+        if (aUBLPartyName.getName () != null)
+          aUBLParty.addPartyName (aUBLPartyName);
+      }
 
       aUBLPartyLegalEntity.setCompanyID (copyID (aSLO.getID (), new CompanyIDType ()));
     }
@@ -323,8 +350,6 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       // Mandatory field according to Schematron
       aUBLPartyLegalEntity.setRegistrationName (aTradeParty.getNameValue ());
     }
-
-    return aUBLPartyLegalEntity;
   }
 
   @Nullable
@@ -823,7 +848,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       final TradePartyType aSellerParty = aHeaderAgreement.getSellerTradeParty ();
       if (aSellerParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aSellerParty, true);
+        // BT-27
+        final PartyType aUBLParty = _convertParty (aSellerParty, true, true);
 
         for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
         {
@@ -832,9 +858,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
 
-        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aSellerParty);
-        if (aUBLPartyLegalEntity != null)
-          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        _convertPartyLegalEntity (aSellerParty, aUBLParty);
 
         final ContactType aUBLContact = _convertContact (aSellerParty);
         if (aUBLContact != null)
@@ -849,7 +873,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       final TradePartyType aBuyerParty = aHeaderAgreement.getBuyerTradeParty ();
       if (aBuyerParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aBuyerParty, false);
+        // BT-44
+        final PartyType aUBLParty = _convertParty (aBuyerParty, false, true);
 
         for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
         {
@@ -858,9 +883,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
 
-        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aBuyerParty);
-        if (aUBLPartyLegalEntity != null)
-          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        _convertPartyLegalEntity (aBuyerParty, aUBLParty);
 
         final ContactType aUBLContact = _convertContact (aBuyerParty);
         if (aUBLContact != null)
@@ -875,21 +898,14 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       final TradePartyType aPayeeParty = aHeaderSettlement.getPayeeTradeParty ();
       if (aPayeeParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aPayeeParty, false);
+        // BT-59
+        final PartyType aUBLParty = _convertParty (aPayeeParty, false, false);
 
         for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
           if (aUBLPartyTaxScheme != null)
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
-        }
-
-        // validation rules warning
-        if (false)
-        {
-          final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aPayeeParty);
-          if (aUBLPartyLegalEntity != null)
-            aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
         }
 
         final ContactType aUBLContact = _convertContact (aPayeeParty);
@@ -905,21 +921,14 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       final TradePartyType aTaxRepresentativeParty = aHeaderAgreement.getSellerTaxRepresentativeTradeParty ();
       if (aTaxRepresentativeParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty, false);
+        // BT-62
+        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty, false, false);
 
         for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
           if (aUBLPartyTaxScheme != null)
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
-        }
-
-        // validation rules warning
-        if (false)
-        {
-          final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aTaxRepresentativeParty);
-          if (aUBLPartyLegalEntity != null)
-            aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
         }
 
         final ContactType aUBLContact = _convertContact (aTaxRepresentativeParty);
@@ -1672,7 +1681,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       final TradePartyType aSellerParty = aHeaderAgreement.getSellerTradeParty ();
       if (aSellerParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aSellerParty, true);
+        // BT-27
+        final PartyType aUBLParty = _convertParty (aSellerParty, true, true);
 
         for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
         {
@@ -1681,9 +1691,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
 
-        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aSellerParty);
-        if (aUBLPartyLegalEntity != null)
-          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        _convertPartyLegalEntity (aSellerParty, aUBLParty);
 
         final ContactType aUBLContact = _convertContact (aSellerParty);
         if (aUBLContact != null)
@@ -1698,7 +1706,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       final TradePartyType aBuyerParty = aHeaderAgreement.getBuyerTradeParty ();
       if (aBuyerParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aBuyerParty, false);
+        // BT-44
+        final PartyType aUBLParty = _convertParty (aBuyerParty, false, true);
 
         for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
         {
@@ -1707,9 +1716,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
 
-        final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aBuyerParty);
-        if (aUBLPartyLegalEntity != null)
-          aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+        _convertPartyLegalEntity (aBuyerParty, aUBLParty);
 
         final ContactType aUBLContact = _convertContact (aBuyerParty);
         if (aUBLContact != null)
@@ -1724,21 +1731,14 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       final TradePartyType aPayeeParty = aHeaderSettlement.getPayeeTradeParty ();
       if (aPayeeParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aPayeeParty, false);
+        // BT-59
+        final PartyType aUBLParty = _convertParty (aPayeeParty, false, false);
 
         for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
           if (aUBLPartyTaxScheme != null)
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
-        }
-
-        // validation rules warning
-        if (false)
-        {
-          final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aPayeeParty);
-          if (aUBLPartyLegalEntity != null)
-            aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
         }
 
         final ContactType aUBLContact = _convertContact (aPayeeParty);
@@ -1754,21 +1754,14 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       final TradePartyType aTaxRepresentativeParty = aHeaderAgreement.getSellerTaxRepresentativeTradeParty ();
       if (aTaxRepresentativeParty != null)
       {
-        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty, false);
+        // BT-62
+        final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty, false, false);
 
         for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
           if (aUBLPartyTaxScheme != null)
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
-        }
-
-        // validation rules warning
-        if (false)
-        {
-          final PartyLegalEntityType aUBLPartyLegalEntity = _convertPartyLegalEntity (aTaxRepresentativeParty);
-          if (aUBLPartyLegalEntity != null)
-            aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
         }
 
         final ContactType aUBLContact = _convertContact (aTaxRepresentativeParty);
