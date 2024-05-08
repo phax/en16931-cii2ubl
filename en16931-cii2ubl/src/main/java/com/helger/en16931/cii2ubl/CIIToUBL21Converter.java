@@ -412,7 +412,6 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     }
     if (aAllowanceCharge.hasActualAmountEntries ())
     {
-      // BT-147
       aUBLAllowanceCharge.setAmount (_copyAmount (aAllowanceCharge.getActualAmountAtIndex (0), sDefaultCurrencyCode));
     }
 
@@ -1398,7 +1397,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
                 aUBLPriceAllowanceCharge.setAmount (copyAmount (aBT147,
                                                                 new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType (),
                                                                 sDefaultCurrencyCode));
-                bUsePriceAC = true;
+                bUsePriceAC = aUBLPriceAllowanceCharge.getAmount () != null;
               }
             }
           }
@@ -1409,7 +1408,6 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
             if (aBT148 != null)
             {
               aUBLPriceAllowanceCharge.setBaseAmount (copyAmount (aBT148, new BaseAmountType (), sDefaultCurrencyCode));
-              bUsePriceAC = true;
             }
           }
           if (aGPPTP.getBasisQuantity () != null)
