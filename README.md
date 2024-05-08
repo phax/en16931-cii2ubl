@@ -96,6 +96,7 @@ CII to UBL Converter for EN 16931 invoices
 
 * v2.2.3 - work in progress
     * Added additional mapping of BT-41. See [issue #28](https://github.com/phax/en16931-cii2ubl/issues/28) - thx @bdewein
+    * Fixed the mapping of the Due Date Type Code for BT-8. See [issue #29](https://github.com/phax/en16931-cii2ubl/issues/29) - thx @bdewein
 * v2.2.2 - 2024-04-12
     * Added support for providing the default UBL order reference ID, in case the empty String is not good enough. See [issue #23](https://github.com/phax/en16931-cii2ubl/issues/23) - thx @lkumai
 * v2.2.1 - 2024-03-29

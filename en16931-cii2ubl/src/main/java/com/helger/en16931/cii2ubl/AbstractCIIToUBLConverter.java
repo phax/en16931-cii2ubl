@@ -542,6 +542,19 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return isOriginatorDocumentReferenceTypeCode (s) || "130".equals (s);
   }
 
+  @Nullable
+  protected static String mapDueDateTypeCode (@Nullable final String s)
+  {
+    // BT-8 mapping; see #29
+    if ("5".equals (s))
+      return "3";
+    if ("29".equals (s))
+      return "35";
+    if ("72".equals (s))
+      return "432";
+    return s;
+  }
+
   protected static boolean isLT0Strict (@Nullable final BigDecimal aBD)
   {
     return aBD != null && MathHelper.isLT0 (aBD);
