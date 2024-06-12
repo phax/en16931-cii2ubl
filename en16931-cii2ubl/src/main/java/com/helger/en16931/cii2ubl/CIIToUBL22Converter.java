@@ -1372,22 +1372,82 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
       final PriceType aUBLPrice = new PriceType ();
       boolean bUsePrice = false;
+
+      final AllowanceChargeType aUBLPriceAllowanceCharge = new AllowanceChargeType ();
+      aUBLPriceAllowanceCharge.setChargeIndicator (false);
+      aUBLPrice.addAllowanceCharge (aUBLPriceAllowanceCharge);
+      boolean bUsePriceAC = false;
+
       if (aLineAgreement != null)
       {
+        String sBT150 = null;
+        final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
+        if (aGPPTP != null)
+        {
+          if (aGPPTP.hasNoAppliedTradeAllowanceChargeEntries ())
+          {
+            // BT-147 Item Price Discount (optional)
+            final var aTAC = aGPPTP.getAppliedTradeAllowanceChargeAtIndex (0);
+            if (aTAC.hasActualAmountEntries ())
+            {
+              final AmountType aBT147 = aTAC.getActualAmountAtIndex (0);
+              if (aBT147 != null)
+              {
+                aUBLPriceAllowanceCharge.setAmount (copyAmount (aBT147,
+                                                                new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.AmountType (),
+                                                                sDefaultCurrencyCode));
+                bUsePriceAC = aUBLPriceAllowanceCharge.getAmount () != null;
+              }
+            }
+          }
+          if (aGPPTP.hasChargeAmountEntries ())
+          {
+            // BT-148 Item Gross Price (optional)
+            final AmountType aBT148 = aGPPTP.getChargeAmountAtIndex (0);
+            if (aBT148 != null)
+            {
+              aUBLPriceAllowanceCharge.setBaseAmount (copyAmount (aBT148, new BaseAmountType (), sDefaultCurrencyCode));
+              if (!bUsePriceAC)
+              {
+                // Make sure the AC gets printed
+                // Set "0" discount
+                aUBLPriceAllowanceCharge.setAmount (BigDecimal.ZERO).setCurrencyID (sDefaultCurrencyCode);
+                bUsePriceAC = true;
+              }
+            }
+          }
+          if (aGPPTP.getBasisQuantity () != null)
+          {
+            // BT-150 Item Price Base Quantity Unit of Measure Code
+            sBT150 = aGPPTP.getBasisQuantity ().getUnitCode ();
+          }
+        }
         final TradePriceType aNPPTP = aLineAgreement.getNetPriceProductTradePrice ();
         if (aNPPTP != null)
         {
           if (aNPPTP.hasChargeAmountEntries ())
           {
+            // BT-146 Item Net Price (mandatory)
             aUBLPrice.setPriceAmount (copyAmount (aNPPTP.getChargeAmountAtIndex (0),
                                                   new PriceAmountType (),
                                                   sDefaultCurrencyCode));
-            bUsePrice = true;
+            // Only use the price if BT-146 is present
+            bUsePrice = aUBLPrice.getPriceAmount () != null;
           }
-          if (aNPPTP.getBasisQuantity () != null)
+
+          // Prefer gross over net
+          // BT-149 Item Price Base Quantity (optional)
+          var aBT149 = aGPPTP != null ? aGPPTP.getBasisQuantity () : null;
+          if (aBT149 == null)
+            aBT149 = aNPPTP.getBasisQuantity ();
+
+          if (aBT149 != null)
           {
-            aUBLPrice.setBaseQuantity (copyQuantity (aNPPTP.getBasisQuantity (), new BaseQuantityType ()));
-            bUsePrice = true;
+            // BT-149 Item Price Base Quantity (optional)
+            aUBLPrice.setBaseQuantity (copyQuantity (aBT149, new BaseQuantityType ()));
+            // BT-150 is from gross only
+            if (aUBLPrice.getBaseQuantity () != null)
+              aUBLPrice.getBaseQuantity ().setUnitCode (sBT150);
           }
         }
       }
@@ -1399,33 +1459,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                     bUsePrice ? aUBLPrice::setPriceAmount : null,
                                     aErrorList);
 
-      // Allowance charge
-      final TradePriceType aTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
-      if (aTradePrice != null)
-        for (final TradeAllowanceChargeType aPriceAllowanceCharge : aTradePrice.getAppliedTradeAllowanceCharge ())
-        {
-          ETriState eIsCharge = ETriState.UNDEFINED;
-          if (aPriceAllowanceCharge.getChargeIndicator () != null)
-            eIsCharge = parseIndicator (aPriceAllowanceCharge.getChargeIndicator (), aErrorList);
-          else
-            aErrorList.add (buildError (new String [] { "CrossIndustryInvoice",
-                                                        "SupplyChainTradeTransaction",
-                                                        "IncludedSupplyChainTradeLineItem",
-                                                        "SpecifiedLineTradeAgreement",
-                                                        "GrossPriceProductTradePrice",
-                                                        "AppliedTradeAllowanceCharge" },
-                                        "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
-          if (eIsCharge.isDefined ())
-          {
-            final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
-            aUBLLineAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
-            _copyAllowanceCharge (aPriceAllowanceCharge, aUBLLineAllowanceCharge, sDefaultCurrencyCode);
-            aUBLPrice.addAllowanceCharge (aUBLLineAllowanceCharge);
-          }
-        }
-
       if (bUsePrice)
+      {
+        if (!bUsePriceAC)
+          aUBLPrice.setAllowanceCharge (null);
         aUBLInvoiceLine.setPrice (aUBLPrice);
+      }
 
       aUBLInvoiceLine.setItem (aUBLItem);
 
@@ -2220,9 +2259,10 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                     aErrorList);
 
       // Allowance charge
-      final TradePriceType aTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
-      if (aTradePrice != null)
-        for (final TradeAllowanceChargeType aPriceAllowanceCharge : aTradePrice.getAppliedTradeAllowanceCharge ())
+      final TradePriceType aGrossTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
+      if (aGrossTradePrice != null)
+      {
+        for (final TradeAllowanceChargeType aPriceAllowanceCharge : aGrossTradePrice.getAppliedTradeAllowanceCharge ())
         {
           ETriState eIsCharge = ETriState.UNDEFINED;
           if (aPriceAllowanceCharge.getChargeIndicator () != null)
@@ -2243,6 +2283,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLPrice.addAllowanceCharge (aUBLLineAllowanceCharge);
           }
         }
+      }
 
       if (bUsePrice)
         aUBLCreditNoteLine.setPrice (aUBLPrice);

@@ -326,10 +326,11 @@
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="DKK">1</cbc:PriceAmount>
-      <cbc:BaseQuantity unitCode="C62">1</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="C62">1.1</cbc:BaseQuantity>
       <cac:AllowanceCharge>
         <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
-        <cbc:Amount currencyID="DKK">10</cbc:Amount>
+        <cbc:Amount currencyID="DKK">0</cbc:Amount>
+        <cbc:BaseAmount currencyID="DKK">1.1</cbc:BaseAmount>
       </cac:AllowanceCharge>
     </cac:Price>
   </cac:InvoiceLine>

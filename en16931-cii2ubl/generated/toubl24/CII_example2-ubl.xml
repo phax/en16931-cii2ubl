@@ -283,10 +283,11 @@ Penalty percentage 10% from due date</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="NOK">1273</cbc:PriceAmount>
-      <cbc:BaseQuantity unitCode="NAR">1273</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="NAR">1498</cbc:BaseQuantity>
       <cac:AllowanceCharge>
         <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
-        <cbc:Amount currencyID="NOK">225</cbc:Amount>
+        <cbc:Amount currencyID="NOK">0</cbc:Amount>
+        <cbc:BaseAmount currencyID="NOK">1498</cbc:BaseAmount>
       </cac:AllowanceCharge>
     </cac:Price>
   </cac:InvoiceLine>
@@ -320,7 +321,7 @@ Penalty percentage 10% from due date</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="NOK">3.96</cbc:PriceAmount>
-      <cbc:BaseQuantity unitCode="NAR">3.96</cbc:BaseQuantity>
+      <cbc:BaseQuantity>3.96</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -352,10 +353,11 @@ Penalty percentage 10% from due date</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="NOK">2.48</cbc:PriceAmount>
-      <cbc:BaseQuantity unitCode="NAR">2.48</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="NAR">2.75</cbc:BaseQuantity>
       <cac:AllowanceCharge>
         <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
-        <cbc:Amount currencyID="NOK">0.275</cbc:Amount>
+        <cbc:Amount currencyID="NOK">0</cbc:Amount>
+        <cbc:BaseAmount currencyID="NOK">2.75</cbc:BaseAmount>
       </cac:AllowanceCharge>
     </cac:Price>
   </cac:InvoiceLine>
@@ -388,7 +390,7 @@ Penalty percentage 10% from due date</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="NOK">25</cbc:PriceAmount>
-      <cbc:BaseQuantity unitCode="NAR">25</cbc:BaseQuantity>
+      <cbc:BaseQuantity>25</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -424,7 +426,7 @@ Penalty percentage 10% from due date</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="NOK">0.75</cbc:PriceAmount>
-      <cbc:BaseQuantity unitCode="MTR">0.75</cbc:BaseQuantity>
+      <cbc:BaseQuantity>0.75</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
 </Invoice>
