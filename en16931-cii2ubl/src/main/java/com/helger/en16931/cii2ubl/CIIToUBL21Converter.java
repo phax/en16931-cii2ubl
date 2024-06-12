@@ -1460,34 +1460,6 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
                                     bUsePrice ? aUBLPrice::setPriceAmount : null,
                                     aErrorList);
 
-      // Allowance charge
-      final TradePriceType aGrossTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
-      if (false && aGrossTradePrice != null)
-      {
-        if (aGrossTradePrice.hasAppliedTradeAllowanceChargeEntries ())
-        {
-          final TradeAllowanceChargeType aPriceAllowanceCharge = aGrossTradePrice.getAppliedTradeAllowanceChargeAtIndex (0);
-          ETriState eIsCharge = ETriState.UNDEFINED;
-          if (aPriceAllowanceCharge.getChargeIndicator () != null)
-            eIsCharge = parseIndicator (aPriceAllowanceCharge.getChargeIndicator (), aErrorList);
-          else
-            aErrorList.add (buildError (new String [] { "CrossIndustryInvoice",
-                                                        "SupplyChainTradeTransaction",
-                                                        "IncludedSupplyChainTradeLineItem",
-                                                        "SpecifiedLineTradeAgreement",
-                                                        "GrossPriceProductTradePrice",
-                                                        "AppliedTradeAllowanceCharge" },
-                                        "Failed to determine if AppliedTradeAllowanceCharge is an Allowance or a Charge"));
-          if (eIsCharge.isDefined ())
-          {
-            final AllowanceChargeType aUBLLineAllowanceCharge = new AllowanceChargeType ();
-            aUBLLineAllowanceCharge.setChargeIndicator (eIsCharge.getAsBooleanValue ());
-            _copyAllowanceCharge (aPriceAllowanceCharge, aUBLLineAllowanceCharge, sDefaultCurrencyCode);
-            aUBLPrice.addAllowanceCharge (aUBLLineAllowanceCharge);
-          }
-        }
-      }
-
       if (bUsePrice)
       {
         if (!bUsePriceAC)
