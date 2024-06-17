@@ -1385,7 +1385,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
         if (aGPPTP != null)
         {
-          if (aGPPTP.hasNoAppliedTradeAllowanceChargeEntries ())
+          if (aGPPTP.hasAppliedTradeAllowanceChargeEntries ())
           {
             // BT-147 Item Price Discount (optional)
             final var aTAC = aGPPTP.getAppliedTradeAllowanceChargeAtIndex (0);
@@ -1452,7 +1452,6 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           }
         }
       }
-
 
       swapQuantityAndPriceIfNeeded (bLineExtensionAmountIsNegative,
                                     aUBLInvoiceLine.getInvoicedQuantityValue (),
@@ -2286,7 +2285,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           }
         }
       }
-      
+
       if (bUsePrice)
         aUBLCreditNoteLine.setPrice (aUBLPrice);
 

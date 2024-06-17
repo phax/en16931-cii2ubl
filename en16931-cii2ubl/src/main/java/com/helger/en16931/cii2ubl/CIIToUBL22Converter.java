@@ -1384,7 +1384,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         final TradePriceType aGPPTP = aLineAgreement.getGrossPriceProductTradePrice ();
         if (aGPPTP != null)
         {
-          if (aGPPTP.hasNoAppliedTradeAllowanceChargeEntries ())
+          if (aGPPTP.hasAppliedTradeAllowanceChargeEntries ())
           {
             // BT-147 Item Price Discount (optional)
             final var aTAC = aGPPTP.getAppliedTradeAllowanceChargeAtIndex (0);

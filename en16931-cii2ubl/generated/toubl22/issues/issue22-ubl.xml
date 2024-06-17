@@ -300,7 +300,7 @@
       <cbc:BaseQuantity unitCode="NAR">1498</cbc:BaseQuantity>
       <cac:AllowanceCharge>
         <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
-        <cbc:Amount currencyID="NOK">0</cbc:Amount>
+        <cbc:Amount currencyID="NOK">225</cbc:Amount>
         <cbc:BaseAmount currencyID="NOK">1498</cbc:BaseAmount>
       </cac:AllowanceCharge>
     </cac:Price>
@@ -370,7 +370,7 @@
       <cbc:BaseQuantity unitCode="NAR">2.75</cbc:BaseQuantity>
       <cac:AllowanceCharge>
         <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
-        <cbc:Amount currencyID="NOK">0</cbc:Amount>
+        <cbc:Amount currencyID="NOK">0.275</cbc:Amount>
         <cbc:BaseAmount currencyID="NOK">2.75</cbc:BaseAmount>
       </cac:AllowanceCharge>
     </cac:Price>
