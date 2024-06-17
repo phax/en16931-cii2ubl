@@ -94,6 +94,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v2.2.4 - 2024-06-17
+    * Fixed a regression from v2.2.3. See [issue #31](https://github.com/phax/en16931-cii2ubl/issues/31) - thx @msccip
 * v2.2.3 - 2024-06-12
     * Added additional mapping of BT-41. See [issue #28](https://github.com/phax/en16931-cii2ubl/issues/28) - thx @bdewein
     * Fixed the mapping of the Due Date Type Code for BT-8. See [issue #29](https://github.com/phax/en16931-cii2ubl/issues/29) - thx @bdewein
