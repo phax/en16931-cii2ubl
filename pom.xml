@@ -57,8 +57,8 @@
   </developers>
   
   <properties>
-    <phive-rules.version>3.1.9</phive-rules.version>
-    <picocli.version>4.7.5</picocli.version>
+    <phive-rules.version>3.1.11</phive-rules.version>
+    <picocli.version>4.7.6</picocli.version>
   </properties>
 
   <dependencyManagement>
