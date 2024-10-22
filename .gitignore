@@ -29,3 +29,6 @@ target/
 .classpath 
 zz
 release.properties
+
+# IDE, IDEA IntelliJ
+.idea/
