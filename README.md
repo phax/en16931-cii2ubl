@@ -94,6 +94,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v2.2.5 - 2024-10-22
+    * Fixed the automatic module name. See [issue #32](https://github.com/phax/en16931-cii2ubl/pull/32) - thx @toherrmann
 * v2.2.4 - 2024-06-17
     * Fixed a regression from v2.2.3. See [issue #31](https://github.com/phax/en16931-cii2ubl/issues/31) - thx @msccip
 * v2.2.3 - 2024-06-12
