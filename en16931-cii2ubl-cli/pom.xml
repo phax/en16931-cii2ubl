@@ -84,7 +84,9 @@
           <instructions>
             <Main-Class>com.helger.en16931.cii2ubl.cli.CIIToUBLConverter</Main-Class>
             <Automatic-Module-Name>com.helger.en16931.cii2ubl.cli</Automatic-Module-Name>
-            <Export-Package>com.helger.en16931.cii2ubl.cli.*</Export-Package>
+            <Export-Package>
+              com.helger.en16931.cii2ubl.cli
+            </Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
           </instructions>
         </configuration>
