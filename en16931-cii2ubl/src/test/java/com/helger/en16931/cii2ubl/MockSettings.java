@@ -25,7 +25,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.diver.api.version.VESID;
+import com.helger.diver.api.coord.DVRCoordinate;
 import com.helger.phive.api.executorset.ValidationExecutorSetRegistry;
 import com.helger.phive.en16931.EN16931Validation;
 import com.helger.phive.xml.source.IValidationSourceXML;
@@ -93,8 +93,8 @@ final class MockSettings
                                                               // "03.01a-INVOICE_uncefact.xml",
                                                               "03.02a-INVOICE_uncefact.xml" };
 
-  static final VESID VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1311;
-  static final VESID VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1311;
+  static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1313.getWithVersionLatestRelease ();
+  static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1313.getWithVersionLatestRelease ();
 
   static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
   static
