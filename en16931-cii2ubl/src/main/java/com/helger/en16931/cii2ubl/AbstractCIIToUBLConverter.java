@@ -88,6 +88,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
                                                                                                     "81 83 261 262 296 308 381 396 420 458 532");
   private static final ICommonsSet <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
                                                                                                 "80 82 84 130 202 203 204 211 295 325 326 380 383 384 385 386 387 388 389 390 393 394 395 456 457 527 575 623 633 751 780 935");
+  private static final ICommonsSet <String> OTHER_PAYMENT_MEANS_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                                       "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 31 32 33 34 35 36 37 38 39 40 41 43 44 " +
+                                                                                                            "45 46 47 50 51 52 53 54 55 56 57 60 61 62 63 64 65 66 67 68 70 74 75 76 77 78 91 92 93 94 95 96 97 ZZZ");
+  
   static
   {
     // XRechnung 2.1 extensions
@@ -523,10 +527,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   protected static boolean isPaymentMeansCodeOtherKnown (@Nullable final String s)
   {
-    // 1 = Instrument not defined
-    // 57 = Standing agreement
-    // 68 = Online payment service
-    return "1".equals (s) || "57".equals (s) || "68".equals (s);
+    return OTHER_PAYMENT_MEANS_CODES.contains (s);
   }
 
   protected static boolean isOriginatorDocumentReferenceTypeCode (@Nullable final String s)
