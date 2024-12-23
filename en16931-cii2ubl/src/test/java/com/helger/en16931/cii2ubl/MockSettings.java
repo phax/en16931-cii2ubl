@@ -50,7 +50,8 @@ final class MockSettings
                                                        "issue20.xml",
                                                        "issue22.xml",
                                                        "issue23.xml",
-                                                       "issue28.xml" };
+                                                       "issue28.xml",
+                                                       "issue34.xml" };
   private static final String [] TEST_FILES_XRECHNUNG = { "01.01_comprehensive_test_uncefact.xml" };
   private static final String [] TEST_FILES_XRECHNUNG_122 = { "01.01a-INVOICE_uncefact.xml",
                                                               "01.02a-INVOICE_uncefact.xml",

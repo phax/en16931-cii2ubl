@@ -94,6 +94,8 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+* v2.2.6 - 2024-12-23
+    * Supporting all values of the UNTDID 4461 code list. See [issue #34](https://github.com/phax/en16931-cii2ubl/pull/34) - thx @shenazz
 * v2.2.5 - 2024-10-22
     * Fixed the automatic module name. See [issue #32](https://github.com/phax/en16931-cii2ubl/pull/32) - thx @toherrmann
 * v2.2.4 - 2024-06-17

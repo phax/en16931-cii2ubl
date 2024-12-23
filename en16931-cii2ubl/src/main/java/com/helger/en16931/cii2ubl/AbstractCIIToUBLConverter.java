@@ -523,6 +523,11 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   protected static boolean isPaymentMeansCodeOtherKnown (@Nullable final String s)
   {
+    // Allow all other codes of UNTDID 4461 (for BT-81)
+    // Based on issue #34
+    if (true)
+      return true;
+
     // 1 = Instrument not defined
     // 57 = Standing agreement
     // 68 = Online payment service
