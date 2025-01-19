@@ -53,6 +53,7 @@ import com.helger.en16931.cii2ubl.EUBLCreationMode;
 import com.helger.ubl21.UBL21Marshaller;
 import com.helger.ubl22.UBL22Marshaller;
 import com.helger.ubl23.UBL23Marshaller;
+import com.helger.ubl24.UBL24Marshaller;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -64,78 +65,43 @@ import picocli.CommandLine.Parameters;
  *
  * @author Philip Helger
  */
-@Command (description = "CII to UBL Converter for EN 16931 invoices",
-          name = "CIItoUBLConverter",
-          mixinStandardHelpOptions = true,
-          separator = " ")
+@Command (description = "CII to UBL Converter for EN 16931 invoices", name = "CIItoUBLConverter", mixinStandardHelpOptions = true, separator = " ")
 public class CIIToUBLConverter implements Callable <Integer>
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverter.class);
 
-  @Option (names = "--ubl",
-           paramLabel = "version",
-           defaultValue = "2.1",
-           description = "Version of the target UBL Format: '2.1', '2.2', '2.3' or '2.4' (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--ubl", paramLabel = "version", defaultValue = "2.1", description = "Version of the target UBL Format: '2.1', '2.2', '2.3' or '2.4' (default: '${DEFAULT-VALUE}')")
   private String m_sUBLVersion;
 
-  @Option (names = "--mode",
-           paramLabel = "mode",
-           defaultValue = "AUTOMATIC",
-           description = "Allowed values: ${COMPLETION-CANDIDATES} (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--mode", paramLabel = "mode", defaultValue = "AUTOMATIC", description = "Allowed values: ${COMPLETION-CANDIDATES} (default: '${DEFAULT-VALUE}')")
   private EUBLCreationMode m_eMode;
 
-  @Option (names = { "-t", "--target" },
-           paramLabel = "directory",
-           defaultValue = ".",
-           description = "The target directory for result output (default: '${DEFAULT-VALUE}')")
+  @Option (names = { "-t",
+                     "--target" }, paramLabel = "directory", defaultValue = ".", description = "The target directory for result output (default: '${DEFAULT-VALUE}')")
   private String m_sOutputDir;
 
-  @Option (names = "--output-suffix",
-           paramLabel = "filename part",
-           defaultValue = "-ubl",
-           description = "The suffix added to the output filename (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--output-suffix", paramLabel = "filename part", defaultValue = "-ubl", description = "The suffix added to the output filename (default: '${DEFAULT-VALUE}')")
   private String m_sOutputFileSuffix;
 
-  @Option (names = "--ubl-vatscheme",
-           paramLabel = "vat scheme",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME,
-           description = "The UBL VAT scheme to be used (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--ubl-vatscheme", paramLabel = "vat scheme", defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME, description = "The UBL VAT scheme to be used (default: '${DEFAULT-VALUE}')")
   private String m_sVATScheme;
 
-  @Option (names = "--ubl-customizationid",
-           paramLabel = "ID",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_CUSTOMIZATION_ID,
-           description = "The UBL customization ID to be used (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--ubl-customizationid", paramLabel = "ID", description = "The UBL customization ID to be used")
   private String m_sCustomizationID;
 
-  @Option (names = "--ubl-profileid",
-           paramLabel = "ID",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_PROFILE_ID,
-           description = "The UBL profile ID to be used (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--ubl-profileid", paramLabel = "ID", description = "The UBL profile ID to be used")
   private String m_sProfileID;
 
-  @Option (names = "--ubl-cardaccountnetworkid",
-           paramLabel = "ID",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID,
-           description = "The UBL CardAccount network ID to be used (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--ubl-cardaccountnetworkid", paramLabel = "ID", defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID, description = "The UBL CardAccount network ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sCardAccountNetworkID;
 
-  @Option (names = "--ubl-defaultorderrefid",
-           paramLabel = "ID",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_ORDER_REF_ID,
-           description = "The UBL default order reference ID to be used (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--ubl-defaultorderrefid", paramLabel = "ID", defaultValue = AbstractCIIToUBLConverter.DEFAULT_ORDER_REF_ID, description = "The UBL default order reference ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sDefaultOrderRefID;
 
-  @Option (names = "--verbose",
-           paramLabel = "boolean",
-           defaultValue = "false",
-           description = "Enable debug logging (default: '${DEFAULT-VALUE}')")
+  @Option (names = "--verbose", paramLabel = "boolean", defaultValue = "false", description = "Enable debug logging (default: '${DEFAULT-VALUE}')")
   private boolean m_bVerbose;
 
-  @Option (names = "--disable-wildcard-expansion",
-           paramLabel = "boolean",
-           defaultValue = "false",
-           description = "Disable wildcard expansion of filenames")
+  @Option (names = "--disable-wildcard-expansion", paramLabel = "boolean", defaultValue = "false", description = "Disable wildcard expansion of filenames")
   private boolean m_bDisableWildcardExpansion;
 
   @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more CII file(s)")
@@ -356,7 +322,23 @@ public class CIIToUBLConverter implements Callable <Integer>
                                                       aDestFile);
                   }
                   else
-                    throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");
+                    if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_24.InvoiceType)
+                    {
+                      eSuccess = UBL24Marshaller.invoice ()
+                                                .setFormattedOutput (bFormattedOutput)
+                                                .write ((oasis.names.specification.ubl.schema.xsd.invoice_24.InvoiceType) aUBL,
+                                                        aDestFile);
+                    }
+                    else
+                      if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_24.CreditNoteType)
+                      {
+                        eSuccess = UBL24Marshaller.creditNote ()
+                                                  .setFormattedOutput (bFormattedOutput)
+                                                  .write ((oasis.names.specification.ubl.schema.xsd.creditnote_24.CreditNoteType) aUBL,
+                                                          aDestFile);
+                      }
+                      else
+                        throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");
 
         if (eSuccess.isSuccess ())
           LOGGER.info ("Successfully wrote UBL file '" + aDestFile.getAbsolutePath () + "'");
