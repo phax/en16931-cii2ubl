@@ -632,10 +632,28 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final InvoiceType aUBLInvoice = new InvoiceType ();
     if (false)
       aUBLInvoice.setUBLVersionID (UBL_VERSION);
-    if (StringHelper.hasText (getCustomizationID ()))
-      aUBLInvoice.setCustomizationID (getCustomizationID ());
+
+    final ExchangedDocumentContextType aEDC = aCIIInvoice.getExchangedDocumentContext ();
+    if (aEDC != null)
+    {
+      if (aEDC.hasBusinessProcessSpecifiedDocumentContextParameterEntries ())
+      {
+        // BT-23
+        aUBLInvoice.setProfileID (aEDC.getBusinessProcessSpecifiedDocumentContextParameterAtIndex (0).getIDValue ());
+      }
+      if (aEDC.hasGuidelineSpecifiedDocumentContextParameterEntries ())
+      {
+        // BT-24
+        aUBLInvoice.setCustomizationID (aEDC.getGuidelineSpecifiedDocumentContextParameterAtIndex (0).getIDValue ());
+      }
+    }
+
+    // Overwrite with custom values, if provided
     if (StringHelper.hasText (getProfileID ()))
       aUBLInvoice.setProfileID (getProfileID ());
+    if (StringHelper.hasText (getCustomizationID ()))
+      aUBLInvoice.setCustomizationID (getCustomizationID ());
+
     if (aED != null)
       aUBLInvoice.setID (aED.getIDValue ());
 
@@ -1501,10 +1519,28 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final CreditNoteType aUBLCreditNote = new CreditNoteType ();
     if (false)
       aUBLCreditNote.setUBLVersionID (UBL_VERSION);
-    if (StringHelper.hasText (getCustomizationID ()))
-      aUBLCreditNote.setCustomizationID (getCustomizationID ());
+
+    final ExchangedDocumentContextType aEDC = aCIICreditNote.getExchangedDocumentContext ();
+    if (aEDC != null)
+    {
+      if (aEDC.hasBusinessProcessSpecifiedDocumentContextParameterEntries ())
+      {
+        // BT-23
+        aUBLCreditNote.setProfileID (aEDC.getBusinessProcessSpecifiedDocumentContextParameterAtIndex (0).getIDValue ());
+      }
+      if (aEDC.hasGuidelineSpecifiedDocumentContextParameterEntries ())
+      {
+        // BT-24
+        aUBLCreditNote.setCustomizationID (aEDC.getGuidelineSpecifiedDocumentContextParameterAtIndex (0).getIDValue ());
+      }
+    }
+
+    // Overwrite with custom values, if provided
     if (StringHelper.hasText (getProfileID ()))
       aUBLCreditNote.setProfileID (getProfileID ());
+    if (StringHelper.hasText (getCustomizationID ()))
+      aUBLCreditNote.setCustomizationID (getCustomizationID ());
+
     if (aED != null)
       aUBLCreditNote.setID (aED.getIDValue ());
 
@@ -2309,9 +2345,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       case AUTOMATIC:
         final ETriState eIsInvoice = isInvoiceType (aCIIInvoice, aErrorList);
         // Default to invoice
-        return eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList) : convertToCreditNote (
-                                                                                                                       aCIIInvoice,
-                                                                                                                       aErrorList);
+        return eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList)
+                                                   : convertToCreditNote (aCIIInvoice, aErrorList);
       case INVOICE:
         return convertToInvoice (aCIIInvoice, aErrorList);
       case CREDIT_NOTE:
