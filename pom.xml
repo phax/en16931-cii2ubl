@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2019-2024 Philip Helger
+    Copyright (C) 2019-2025 Philip Helger
     http://www.helger.com
     philip[at]helger[dot]com
 
@@ -57,7 +57,7 @@
   </developers>
   
   <properties>
-    <phive-rules.version>3.2.2</phive-rules.version>
+    <phive-rules.version>3.2.4</phive-rules.version>
     <picocli.version>4.7.6</picocli.version>
   </properties>
 
