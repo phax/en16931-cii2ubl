@@ -114,11 +114,11 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return true;
   }
 
-  protected static boolean ifNotEmpty (@Nonnull final Consumer <? super String> aConsumer, @Nullable final String aObj)
+  protected static boolean ifNotEmpty (@Nonnull final Consumer <? super String> aConsumer, @Nullable final String s)
   {
-    if (aObj == null)
+    if (StringHelper.hasNoText (s))
       return false;
-    aConsumer.accept (aObj);
+    aConsumer.accept (s);
     return true;
   }
 
@@ -303,9 +303,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate parseDate (@Nullable final String sDate,
-                                        @Nullable final String sFormat,
-                                        @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (@Nullable final String sDate, @Nullable final String sFormat, @Nonnull final IErrorList aErrorList)
   {
     if (StringHelper.hasNoText (sDate))
       return null;
@@ -355,8 +353,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nonnull
-  protected static ETriState parseIndicator (@Nullable final IndicatorType aIndicator,
-                                             @Nonnull final IErrorList aErrorList)
+  protected static ETriState parseIndicator (@Nullable final IndicatorType aIndicator, @Nonnull final IErrorList aErrorList)
   {
     if (aIndicator == null)
       return ETriState.UNDEFINED;
@@ -376,8 +373,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       if ("false".equals (sIndicator))
         return ETriState.FALSE;
 
-      aErrorList.add (buildError (null,
-                                  "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
+      aErrorList.add (buildError (null, "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
       return ETriState.UNDEFINED;
     }
 
@@ -578,8 +574,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static ICommonsList <IDType> getAllUsableGlobalIDs (@Nonnull final TradePartyType aParty)
   {
     return CommonsArrayList.createFiltered (aParty.getGlobalID (),
-                                            x -> StringHelper.hasText (x.getValue ()) &&
-                                                 StringHelper.hasText (x.getSchemeID ()));
+                                            x -> StringHelper.hasText (x.getValue ()) && StringHelper.hasText (x.getSchemeID ()));
   }
 
   /**
@@ -658,10 +653,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
         if (bPosQuantity)
         {
           // This looks like an inconsistency
-          aErrorList.add (buildWarn (null,
-                                     "A negative line extension amount with quantity " +
-                                           aQuantity +
-                                           " looks interesting."));
+          aErrorList.add (buildWarn (null, "A negative line extension amount with quantity " + aQuantity + " looks interesting."));
         }
       }
     }
@@ -707,18 +699,14 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
         if (bNegQuantity)
         {
           // This looks like an inconsistency
-          aErrorList.add (buildWarn (null,
-                                     "A positive line extension amount with quantity " +
-                                           aQuantity +
-                                           " looks interesting."));
+          aErrorList.add (buildWarn (null, "A positive line extension amount with quantity " + aQuantity + " looks interesting."));
         }
       }
     }
   }
 
   @Nonnull
-  protected static ETriState isInvoiceType (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
-                                            @Nonnull final IErrorList aErrorList)
+  protected static ETriState isInvoiceType (@Nonnull final CrossIndustryInvoiceType aCIIInvoice, @Nonnull final IErrorList aErrorList)
   {
     ETriState eIsInvoice = ETriState.UNDEFINED;
 
@@ -739,13 +727,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
     // Check total
     final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
-    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null
-                                                                       : aTransaction.getApplicableHeaderTradeSettlement ();
+    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
     final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
                                                                                   : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
-    final AmountType aDuePayable = aTotal == null ||
-                                   aTotal.hasNoDuePayableAmountEntries () ? null
-                                                                          : aTotal.getDuePayableAmount ().get (0);
+    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null : aTotal.getDuePayableAmount ().get (0);
 
     if (eIsInvoice.isUndefined () && aDuePayable != null)
     {
@@ -763,8 +748,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     else
     {
       if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("Determined the provided CII document to be " +
-                      (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
+        LOGGER.debug ("Determined the provided CII document to be " + (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
     }
     return eIsInvoice;
   }
@@ -804,6 +788,5 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    *         <code>null</code> in case of error.
    */
   @Nullable
-  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice,
-                                                @Nonnull ErrorList aErrorList);
+  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice, @Nonnull ErrorList aErrorList);
 }
