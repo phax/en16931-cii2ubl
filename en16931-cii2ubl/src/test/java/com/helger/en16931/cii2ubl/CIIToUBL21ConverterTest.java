@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.Serializable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.junit.Test;
@@ -115,7 +116,7 @@ public final class CIIToUBL21ConverterTest
   }
 
   @Nullable
-  private static Serializable _convert (final CrossIndustryInvoiceType aInvoice)
+  private static Serializable _convert (@Nonnull final CrossIndustryInvoiceType aInvoice)
   {
     return new CIIToUBL21Converter ().convertCIItoUBL (aInvoice, new ErrorList ());
   }
