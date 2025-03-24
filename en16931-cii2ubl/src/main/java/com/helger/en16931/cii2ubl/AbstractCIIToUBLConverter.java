@@ -106,7 +106,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected AbstractCIIToUBLConverter ()
   {}
 
-  protected static <T> boolean ifNotNull (@Nonnull final Consumer <? super T> aConsumer, @Nullable final T aObj)
+  protected static <T> boolean ifNotNull (@Nullable final T aObj, @Nonnull final Consumer <? super T> aConsumer)
   {
     if (aObj == null)
       return false;
@@ -114,7 +114,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return true;
   }
 
-  protected static boolean ifNotEmpty (@Nonnull final Consumer <? super String> aConsumer, @Nullable final String s)
+  protected static boolean ifNotEmpty (@Nullable final String s, @Nonnull final Consumer <? super String> aConsumer)
   {
     if (StringHelper.hasNoText (s))
       return false;

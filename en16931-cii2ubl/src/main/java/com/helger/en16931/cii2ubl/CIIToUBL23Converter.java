@@ -368,11 +368,11 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
 
     final UniversalCommunicationType aTel = aDTC.getTelephoneUniversalCommunication ();
     if (aTel != null)
-      ifNotEmpty (aUBLContact::setTelephone, aTel.getCompleteNumberValue ());
+      ifNotEmpty (aTel.getCompleteNumberValue (), aUBLContact::setTelephone);
 
     final UniversalCommunicationType aEmail = aDTC.getEmailURIUniversalCommunication ();
     if (aEmail != null)
-      ifNotEmpty (aUBLContact::setElectronicMail, aEmail.getURIIDValue ());
+      ifNotEmpty (aEmail.getURIIDValue (), aUBLContact::setElectronicMail);
 
     if (aUBLContact.getName () == null &&
         aUBLContact.getTelephone () == null &&
@@ -595,7 +595,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         // Mandatory element
         aUBLOrderRef.setID (getDefaultOrderRefID ());
       }
-      ifNotEmpty (aUBLOrderRef::setSalesOrderID, aSellerOrderRef.getIssuerAssignedIDValue ());
+      ifNotEmpty (aSellerOrderRef.getIssuerAssignedIDValue (), aUBLOrderRef::setSalesOrderID);
     }
 
     // Ignore defacto empty elements
@@ -697,7 +697,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     // Note
     if (aED != null)
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
-        ifNotNull (aUBLInvoice::addNote, _copyNote (aEDNote));
+        ifNotNull (_copyNote (aEDNote), aUBLInvoice::addNote);
 
     // BT-7 TaxPointDate
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
@@ -1041,7 +1041,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
 
         for (final TextType aDesc : aPaymentTerms.getDescription ())
-          ifNotNull (aUBLPaymenTerms::addNote, _copyNote (aDesc));
+          ifNotNull (_copyNote (aDesc), aUBLPaymenTerms::addNote);
 
         if (aUBLPaymenTerms.hasNoteEntries ())
           aUBLInvoice.addPaymentTerms (aUBLPaymenTerms);
@@ -1203,7 +1203,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
 
       // Note
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
-        ifNotNull (aUBLInvoiceLine::addNote, _copyNote (aLineNote));
+        ifNotNull (_copyNote (aLineNote), aUBLInvoiceLine::addNote);
 
       // Line extension amount
       boolean bLineExtensionAmountIsNegative = false;
@@ -1306,7 +1306,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       {
         final TextType aDescription = aLineProduct.getDescription ();
         if (aDescription != null)
-          ifNotNull (aUBLItem::addDescription, copyName (aDescription, new DescriptionType ()));
+          ifNotNull (copyName (aDescription, new DescriptionType ()), aUBLItem::addDescription);
 
         if (aLineProduct.hasNameEntries ())
           aUBLItem.setName (copyName (aLineProduct.getNameAtIndex (0), new NameType ()));
@@ -1584,7 +1584,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
     // Note
     if (aED != null)
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
-        ifNotNull (aUBLCreditNote::addNote, _copyNote (aEDNote));
+        ifNotNull (_copyNote (aEDNote), aUBLCreditNote::addNote);
 
     // BT-7 TaxPointDate
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
@@ -1918,7 +1918,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
 
         for (final TextType aDesc : aPaymentTerms.getDescription ())
-          ifNotNull (aUBLPaymenTerms::addNote, _copyNote (aDesc));
+          ifNotNull (_copyNote (aDesc), aUBLPaymenTerms::addNote);
 
         if (aUBLPaymenTerms.hasNoteEntries ())
           aUBLCreditNote.addPaymentTerms (aUBLPaymenTerms);
@@ -2080,7 +2080,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
 
       // Note
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
-        ifNotNull (aUBLCreditNoteLine::addNote, _copyNote (aLineNote));
+        ifNotNull (_copyNote (aLineNote), aUBLCreditNoteLine::addNote);
 
       // Line extension amount
       boolean bLineExtensionAmountIsNegative = false;
@@ -2183,7 +2183,7 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       {
         final TextType aDescription = aLineProduct.getDescription ();
         if (aDescription != null)
-          ifNotNull (aUBLItem::addDescription, copyName (aDescription, new DescriptionType ()));
+          ifNotNull (copyName (aDescription, new DescriptionType ()), aUBLItem::addDescription);
 
         if (aLineProduct.hasNameEntries ())
           aUBLItem.setName (copyName (aLineProduct.getNameAtIndex (0), new NameType ()));
