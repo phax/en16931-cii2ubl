@@ -461,38 +461,32 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
     }
 
     // BG-17 CREDIT TRANSFER
+    final CreditorFinancialAccountType aPayeeCreditorAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
     final boolean bIsBG17 = isPaymentMeansCodeCreditTransfer (sTypeCode);
     if (bIsBG17)
     {
-      final CreditorFinancialAccountType aAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
-      if (aAccount == null)
-        aErrorList.add (buildError (null,
-                                    "The element 'PayeePartyCreditorFinancialAccount' is missing for Credit Transfer"));
-      else
+      final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+
+      // BT-84 mandatory
+      // ID/@scheme ID must be empty for the EN16931 Schematrons
+      aUBLFinancialAccount.setID (_copyID (aPayeeCreditorAccount.getIBANID ()));
+      if (aUBLFinancialAccount.getID () == null)
+        aUBLFinancialAccount.setID (_copyID (aPayeeCreditorAccount.getProprietaryID ()));
+
+      // BT-85
+      aUBLFinancialAccount.setName (copyName (aPayeeCreditorAccount.getAccountName (), new NameType ()));
+
+      // BT-86
+      final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
+      if (aInstitution != null)
       {
-        final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
-
-        // BT-84 mandatory
-        // ID/@scheme ID must be empty for the EN16931 Schematrons
-        aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
-        if (aUBLFinancialAccount.getID () == null)
-          aUBLFinancialAccount.setID (_copyID (aAccount.getProprietaryID ()));
-
-        // BT-85
-        aUBLFinancialAccount.setName (copyName (aAccount.getAccountName (), new NameType ()));
-
-        // BT-86
-        final CreditorFinancialInstitutionType aInstitution = aPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution ();
-        if (aInstitution != null)
-        {
-          final BranchType aUBLBranch = new BranchType ();
-          aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
-          if (aUBLBranch.getID () != null)
-            aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
-        }
-
-        aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
+        final BranchType aUBLBranch = new BranchType ();
+        aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
+        if (aUBLBranch.getID () != null)
+          aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
       }
+
+      aUBLPaymentMeans.setPayeeFinancialAccount (aUBLFinancialAccount);
     }
 
     // BG-18 PAYMENT CARD INFORMATION
@@ -2346,8 +2340,9 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       case AUTOMATIC:
         final ETriState eIsInvoice = isInvoiceType (aCIIInvoice, aErrorList);
         // Default to invoice
-        return eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList)
-                                                   : convertToCreditNote (aCIIInvoice, aErrorList);
+        return eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList) : convertToCreditNote (
+                                                                                                                       aCIIInvoice,
+                                                                                                                       aErrorList);
       case INVOICE:
         return convertToInvoice (aCIIInvoice, aErrorList);
       case CREDIT_NOTE:
