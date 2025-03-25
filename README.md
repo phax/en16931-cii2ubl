@@ -94,10 +94,11 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v2.3.0 - work in progress
+* v2.3.0 - 2025-03-25
     * Removed the default values for BT-24 (`CustomizationID`) and BT-23 (`ProfileID`)
     * Emitting UBL 2.4 documents correctly
     * Taking the values of BT-23 and BT-24 from the source CII fields. See [issue #37](https://github.com/phax/en16931-cii2ubl/issues/37) - thx @shenazz
+    * Handling BG-17 only if `PayeePartyCreditorFinancialAccount` is present. See [issue #38](https://github.com/phax/en16931-cii2ubl/issues/38) - thx @msccip
 * v2.2.6 - 2024-12-23
     * Supporting all values of the UNTDID 4461 code list. See [issue #34](https://github.com/phax/en16931-cii2ubl/pull/34) - thx @shenazz
 * v2.2.5 - 2024-10-22
