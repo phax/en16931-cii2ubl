@@ -47,7 +47,7 @@ Replace `x.y.z` with the effective version you want to use:
 Call it via `java -jar en16931-cii2ubl-cli-full.jar` followed by the options and parameters.
 
 ```
-[INFO] CII to UBL Converter v2.2.6 (build 2024-12-23T17:42:25Z)
+[INFO] CII to UBL Converter v2.3.0-SNAPSHOT (build 2025-03-25T07:31:28Z)
 Missing required parameter: 'source files'
 Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion] [--verbose]
                          [--mode mode] [--output-suffix filename part] [-t
@@ -72,14 +72,11 @@ CII to UBL Converter for EN 16931 invoices
                            The UBL CardAccount network ID to be used (default:
                              'mapped-from-cii')
       --ubl-customizationid ID
-                           The UBL customization ID to be used (default: 'urn:
-                             cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:
-                             2017:poacc:billing:3.0')
+                           The UBL customization ID to be used
       --ubl-defaultorderrefid ID
                            The UBL default order reference ID to be used
                              (default: '')
-      --ubl-profileid ID   The UBL profile ID to be used (default: 'urn:fdc:
-                             peppol.eu:2017:poacc:billing:01:1.0')
+      --ubl-profileid ID   The UBL profile ID to be used
       --ubl-vatscheme vat scheme
                            The UBL VAT scheme to be used (default: 'VAT')
   -V, --version            Print version information and exit.
