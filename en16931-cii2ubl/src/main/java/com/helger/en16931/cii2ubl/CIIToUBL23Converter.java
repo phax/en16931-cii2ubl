@@ -1465,12 +1465,13 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         }
       }
 
-      swapQuantityAndPriceIfNeeded (bLineExtensionAmountIsNegative,
-                                    aUBLInvoiceLine.getInvoicedQuantityValue (),
-                                    aUBLInvoiceLine::setInvoicedQuantity,
-                                    bUsePrice ? aUBLPrice.getPriceAmountValue () : null,
-                                    bUsePrice ? aUBLPrice::setPriceAmount : null,
-                                    aErrorList);
+      if (aUBLInvoiceLine.getInvoicedQuantityValue () != null)
+        swapQuantityAndPriceIfNeeded (bLineExtensionAmountIsNegative,
+                                      aUBLInvoiceLine.getInvoicedQuantityValue (),
+                                      aUBLInvoiceLine::setInvoicedQuantity,
+                                      bUsePrice ? aUBLPrice.getPriceAmountValue () : null,
+                                      bUsePrice ? aUBLPrice::setPriceAmount : null,
+                                      aErrorList);
 
       if (bUsePrice)
       {
@@ -2282,12 +2283,13 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
         }
       }
 
-      swapQuantityAndPriceIfNeeded (bLineExtensionAmountIsNegative,
-                                    aUBLCreditNoteLine.getCreditedQuantityValue (),
-                                    aUBLCreditNoteLine::setCreditedQuantity,
-                                    bUsePrice ? aUBLPrice.getPriceAmountValue () : null,
-                                    bUsePrice ? aUBLPrice::setPriceAmount : null,
-                                    aErrorList);
+      if (aUBLCreditNoteLine.getCreditedQuantityValue () != null)
+        swapQuantityAndPriceIfNeeded (bLineExtensionAmountIsNegative,
+                                      aUBLCreditNoteLine.getCreditedQuantityValue (),
+                                      aUBLCreditNoteLine::setCreditedQuantity,
+                                      bUsePrice ? aUBLPrice.getPriceAmountValue () : null,
+                                      bUsePrice ? aUBLPrice::setPriceAmount : null,
+                                      aErrorList);
 
       // Allowance charge
       final TradePriceType aGrossTradePrice = aLineAgreement.getGrossPriceProductTradePrice ();
