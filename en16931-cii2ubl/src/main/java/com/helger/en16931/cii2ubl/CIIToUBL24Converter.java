@@ -547,8 +547,11 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       if (aCreditorRefID != null)
       {
         final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_24.IDType aSellerID = _copyID (aCreditorRefID);
-        aSellerID.setSchemeID ("SEPA");
-        aSellerIDHandler.accept (aSellerID);
+        if (aSellerID != null)
+        {
+          aSellerID.setSchemeID ("SEPA");
+          aSellerIDHandler.accept (aSellerID);
+        }
       }
 
       // BT-91
