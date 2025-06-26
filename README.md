@@ -91,7 +91,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v2.3.1 - work in progress
+* v2.3.1 - 2025-06-26
     * Avoid `NullPointerException` if a CII line item has no quantity
 * v2.3.0 - 2025-03-25
     * Removed the default values for BT-24 (`CustomizationID`) and BT-23 (`ProfileID`)
