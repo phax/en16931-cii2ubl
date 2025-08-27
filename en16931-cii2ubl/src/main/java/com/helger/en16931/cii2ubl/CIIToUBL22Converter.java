@@ -22,18 +22,17 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.equals.EqualsHelper;
+import com.helger.base.numeric.BigHelper;
+import com.helger.base.state.ETriState;
+import com.helger.base.string.StringHelper;
+import com.helger.collection.CollectionFind;
+import com.helger.diagnostics.error.list.ErrorList;
+import com.helger.diagnostics.error.list.IErrorList;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.equals.EqualsHelper;
-import com.helger.commons.error.list.ErrorList;
-import com.helger.commons.error.list.IErrorList;
-import com.helger.commons.math.MathHelper;
-import com.helger.commons.state.ETriState;
-import com.helger.commons.string.StringHelper;
-
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.*;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.*;
 import oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType;
@@ -76,7 +75,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType ();
     final StringBuilder aSB = new StringBuilder ();
 
-    if (StringHelper.hasText (aNote.getSubjectCodeValue ()))
+    if (StringHelper.isNotEmpty (aNote.getSubjectCodeValue ()))
       aSB.append ('#').append (aNote.getSubjectCodeValue ()).append ('#');
 
     boolean bFirst = true;
@@ -105,7 +104,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       return null;
 
     final String sID = aRD.getIssuerAssignedIDValue ();
-    if (StringHelper.hasNoText (sID))
+    if (StringHelper.isEmpty (sID))
       return null;
 
     final DocumentReferenceType ret = new DocumentReferenceType ();
@@ -147,7 +146,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     }
 
     final String sURI = aRD.getURIIDValue ();
-    if (StringHelper.hasText (sURI))
+    if (StringHelper.isNotEmpty (sURI))
     {
       AttachmentType aUBLAttachment = ret.getAttachment ();
       if (aUBLAttachment == null)
@@ -168,23 +167,23 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
   private static AddressType _convertPostalAddress (@Nonnull final TradeAddressType aPostalAddress)
   {
     final AddressType ret = new AddressType ();
-    if (StringHelper.hasText (aPostalAddress.getLineOneValue ()))
+    if (StringHelper.isNotEmpty (aPostalAddress.getLineOneValue ()))
       ret.setStreetName (aPostalAddress.getLineOneValue ());
-    if (StringHelper.hasText (aPostalAddress.getLineTwoValue ()))
+    if (StringHelper.isNotEmpty (aPostalAddress.getLineTwoValue ()))
       ret.setAdditionalStreetName (aPostalAddress.getLineTwoValue ());
-    if (StringHelper.hasText (aPostalAddress.getLineThreeValue ()))
+    if (StringHelper.isNotEmpty (aPostalAddress.getLineThreeValue ()))
     {
       final AddressLineType aUBLAddressLine = new AddressLineType ();
       aUBLAddressLine.setLine (aPostalAddress.getLineThreeValue ());
       ret.addAddressLine (aUBLAddressLine);
     }
-    if (StringHelper.hasText (aPostalAddress.getCityNameValue ()))
+    if (StringHelper.isNotEmpty (aPostalAddress.getCityNameValue ()))
       ret.setCityName (aPostalAddress.getCityNameValue ());
-    if (StringHelper.hasText (aPostalAddress.getPostcodeCodeValue ()))
+    if (StringHelper.isNotEmpty (aPostalAddress.getPostcodeCodeValue ()))
       ret.setPostalZone (aPostalAddress.getPostcodeCodeValue ());
     if (aPostalAddress.hasCountrySubDivisionNameEntries ())
       ret.setCountrySubentity (aPostalAddress.getCountrySubDivisionNameAtIndex (0).getValue ());
-    if (StringHelper.hasText (aPostalAddress.getCountryIDValue ()))
+    if (StringHelper.isNotEmpty (aPostalAddress.getCountryIDValue ()))
     {
       final CountryType aUBLCountry = new CountryType ();
       aUBLCountry.setIdentificationCode (aPostalAddress.getCountryIDValue ());
@@ -227,8 +226,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     if (aUBLID != null)
     {
       // Avoid duplicate IDs
-      if (!CollectionHelper.containsAny (aParty.getPartyIdentification (),
-                                         x -> EqualsHelper.equals (aUBLID, x.getID ())))
+      if (!CollectionFind.containsAny (aParty.getPartyIdentification (), x -> EqualsHelper.equals (aUBLID, x.getID ())))
       {
         final PartyIdentificationType aUBLPartyIdentification = new PartyIdentificationType ();
         aUBLPartyIdentification.setID (aUBLID);
@@ -257,7 +255,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
     // BT-27, BT-44, BT-59, BT-62, BT-70
     final TextType aName = aParty.getName ();
-    if (aName != null && StringHelper.hasText (aName.getValue ()))
+    if (aName != null && StringHelper.isNotEmpty (aName.getValue ()))
     {
       // Some map to PartyLegalEntity some to PartyName
       if (bUseLegalEntityName)
@@ -294,7 +292,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     aUBLPartyTaxScheme.setCompanyID (aTaxRegistration.getIDValue ());
 
     String sSchemeID = aTaxRegistration.getID ().getSchemeID ();
-    if (StringHelper.hasNoText (sSchemeID))
+    if (StringHelper.isEmpty (sSchemeID))
       sSchemeID = getVATScheme ();
     else
     {
@@ -326,7 +324,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final LegalOrganizationType aSLO = aTradeParty.getSpecifiedLegalOrganization ();
     if (aSLO != null)
     {
-      if (StringHelper.hasText (aSLO.getTradingBusinessNameValue ()))
+      if (StringHelper.isNotEmpty (aSLO.getTradingBusinessNameValue ()))
       {
         final PartyNameType aUBLPartyName = new PartyNameType ();
         aUBLPartyName.setName (aSLO.getTradingBusinessNameValue ());
@@ -338,7 +336,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     }
 
     for (final TextType aDesc : aTradeParty.getDescription ())
-      if (StringHelper.hasText (aDesc.getValue ()))
+      if (StringHelper.isNotEmpty (aDesc.getValue ()))
       {
         // Use the first only
         aUBLPartyLegalEntity.setCompanyLegalForm (aDesc.getValue ());
@@ -396,7 +394,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                      @Nonnull final AllowanceChargeType aUBLAllowanceCharge,
                                      @Nullable final String sDefaultCurrencyCode)
   {
-    if (StringHelper.hasText (aAllowanceCharge.getReasonCodeValue ()))
+    if (StringHelper.isNotEmpty (aAllowanceCharge.getReasonCodeValue ()))
       aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
 
     if (aAllowanceCharge.getReason () != null)
@@ -425,7 +423,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
       aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
       if (aTradeTax.getRateApplicablePercentValue () != null)
-        aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+        aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
       final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
       aUBLTaxScheme.setID (getVATScheme ());
       aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -507,17 +505,17 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCardAccount.setPrimaryAccountNumberID (copyID (aCard.getID (), new PrimaryAccountNumberIDType ()));
 
         // No CII field present
-        if (StringHelper.hasText (getCardAccountNetworkID ()))
+        if (StringHelper.isNotEmpty (getCardAccountNetworkID ()))
           aUBLCardAccount.setNetworkID (getCardAccountNetworkID ());
 
         // BT-88
-        if (StringHelper.hasText (aCard.getCardholderNameValue ()))
+        if (StringHelper.isNotEmpty (aCard.getCardholderNameValue ()))
           aUBLCardAccount.setHolderName (aCard.getCardholderNameValue ());
 
-        if (StringHelper.hasNoText (aUBLCardAccount.getPrimaryAccountNumberIDValue ()))
+        if (StringHelper.isEmpty (aUBLCardAccount.getPrimaryAccountNumberIDValue ()))
           aErrorList.add (buildError (null, "The Payment card primary account number is missing"));
         else
-          if (StringHelper.hasNoText (aUBLCardAccount.getNetworkIDValue ()))
+          if (StringHelper.isEmpty (aUBLCardAccount.getNetworkIDValue ()))
             aErrorList.add (buildError (null, "The Payment card network ID is missing"));
           else
             aUBLPaymentMeans.setCardAccount (aUBLCardAccount);
@@ -595,8 +593,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     }
 
     // Ignore defacto empty elements
-    if (StringHelper.hasNoText (aUBLOrderRef.getIDValue ()) &&
-        StringHelper.hasNoText (aUBLOrderRef.getSalesOrderIDValue ()))
+    if (StringHelper.isEmpty (aUBLOrderRef.getIDValue ()) &&
+        StringHelper.isEmpty (aUBLOrderRef.getSalesOrderIDValue ()))
       return null;
 
     return aUBLOrderRef;
@@ -646,9 +644,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     }
 
     // Overwrite with custom values, if provided
-    if (StringHelper.hasText (getProfileID ()))
+    if (StringHelper.isNotEmpty (getProfileID ()))
       aUBLInvoice.setProfileID (getProfileID ());
-    if (StringHelper.hasText (getCustomizationID ()))
+    if (StringHelper.isNotEmpty (getCustomizationID ()))
       aUBLInvoice.setCustomizationID (getCustomizationID ());
 
     if (aED != null)
@@ -724,7 +722,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     for (final TradeAccountingAccountType aAccount : aHeaderSettlement.getReceivableSpecifiedTradeAccountingAccount ())
     {
       final String sID = aAccount.getIDValue ();
-      if (StringHelper.hasText (sID))
+      if (StringHelper.isNotEmpty (sID))
       {
         // Use the first ID
         aUBLInvoice.setAccountingCost (sID);
@@ -757,7 +755,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       if (aHeaderSettlement.hasApplicableTradeTaxEntries ())
       {
         final TradeTaxType aTradeTax = aHeaderSettlement.getApplicableTradeTaxAtIndex (0);
-        if (StringHelper.hasText (aTradeTax.getDueDateTypeCodeValue ()))
+        if (StringHelper.isNotEmpty (aTradeTax.getDueDateTypeCodeValue ()))
           aUBLPeriod.addDescriptionCode (new DescriptionCodeType (mapDueDateTypeCode (aTradeTax.getDueDateTypeCodeValue ())));
       }
 
@@ -848,7 +846,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       if (aSpecifiedProcuring != null)
       {
         final String sID = aSpecifiedProcuring.getIDValue ();
-        if (StringHelper.hasText (sID))
+        if (StringHelper.isNotEmpty (sID))
         {
           final ProjectReferenceType aUBLProjectRef = new ProjectReferenceType ();
           aUBLProjectRef.setID (sID);
@@ -1121,8 +1119,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
-          aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
-        if (StringHelper.hasText (aTradeTax.getExemptionReasonCodeValue ()))
+          aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+        if (StringHelper.isNotEmpty (aTradeTax.getExemptionReasonCodeValue ()))
           aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
         if (aTradeTax.getExemptionReason () != null)
         {
@@ -1176,7 +1174,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           // https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
           // Fixed in release 1.3.4 of EN rules, but check left in for
           // compatibility
-          if (MathHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
+          if (BigHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
             aUBLMonetaryTotal.setPayableRoundingAmount (copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
                                                                     new PayableRoundingAmountType (),
                                                                     sDefaultCurrencyCode));
@@ -1257,7 +1255,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       if (aLineAgreement != null)
       {
         final ReferencedDocumentType aBuyerOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
-        if (aBuyerOrderReference != null && StringHelper.hasText (aBuyerOrderReference.getLineIDValue ()))
+        if (aBuyerOrderReference != null && StringHelper.isNotEmpty (aBuyerOrderReference.getLineIDValue ()))
         {
           final OrderLineReferenceType aUBLOrderLineReference = new OrderLineReferenceType ();
           aUBLOrderLineReference.setLineID (copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
@@ -1312,7 +1310,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aBuyerAssignedID));
-          if (StringHelper.hasText (aUBLID.getIDValue ()))
+          if (StringHelper.isNotEmpty (aUBLID.getIDValue ()))
             aUBLItem.setBuyersItemIdentification (aUBLID);
         }
 
@@ -1321,7 +1319,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aSellerAssignedID));
-          if (StringHelper.hasText (aUBLID.getIDValue ()))
+          if (StringHelper.isNotEmpty (aUBLID.getIDValue ()))
             aUBLItem.setSellersItemIdentification (aUBLID);
         }
 
@@ -1330,7 +1328,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aGlobalID));
-          if (StringHelper.hasText (aUBLID.getIDValue ()))
+          if (StringHelper.isNotEmpty (aUBLID.getIDValue ()))
             aUBLItem.setStandardItemIdentification (aUBLID);
         }
 
@@ -1364,7 +1362,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
-          aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+          aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -1534,9 +1532,9 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     }
 
     // Overwrite with custom values, if provided
-    if (StringHelper.hasText (getProfileID ()))
+    if (StringHelper.isNotEmpty (getProfileID ()))
       aUBLCreditNote.setProfileID (getProfileID ());
-    if (StringHelper.hasText (getCustomizationID ()))
+    if (StringHelper.isNotEmpty (getCustomizationID ()))
       aUBLCreditNote.setCustomizationID (getCustomizationID ());
 
     if (aED != null)
@@ -1612,7 +1610,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     for (final TradeAccountingAccountType aAccount : aHeaderSettlement.getReceivableSpecifiedTradeAccountingAccount ())
     {
       final String sID = aAccount.getIDValue ();
-      if (StringHelper.hasText (sID))
+      if (StringHelper.isNotEmpty (sID))
       {
         // Use the first ID
         aUBLCreditNote.setAccountingCost (sID);
@@ -1645,7 +1643,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       if (aHeaderSettlement.hasApplicableTradeTaxEntries ())
       {
         final TradeTaxType aTradeTax = aHeaderSettlement.getApplicableTradeTaxAtIndex (0);
-        if (StringHelper.hasText (aTradeTax.getDueDateTypeCodeValue ()))
+        if (StringHelper.isNotEmpty (aTradeTax.getDueDateTypeCodeValue ()))
           aUBLPeriod.addDescriptionCode (new DescriptionCodeType (mapDueDateTypeCode (aTradeTax.getDueDateTypeCodeValue ())));
       }
 
@@ -1736,7 +1734,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       if (aSpecifiedProcuring != null)
       {
         final String sID = aSpecifiedProcuring.getIDValue ();
-        if (StringHelper.hasText (sID))
+        if (StringHelper.isNotEmpty (sID))
         {
           final ProjectReferenceType aUBLProjectRef = new ProjectReferenceType ();
           aUBLProjectRef.setID (sID);
@@ -1999,8 +1997,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
-          aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
-        if (StringHelper.hasText (aTradeTax.getExemptionReasonCodeValue ()))
+          aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+        if (StringHelper.isNotEmpty (aTradeTax.getExemptionReasonCodeValue ()))
           aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
         if (aTradeTax.getExemptionReason () != null)
         {
@@ -2054,7 +2052,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           // https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
           // Fixed in release 1.3.4 of EN rules, but check left in for
           // compatibility
-          if (MathHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
+          if (BigHelper.isNE0 (aSTSHMS.getRoundingAmountAtIndex (0).getValue ()))
             aUBLMonetaryTotal.setPayableRoundingAmount (copyAmount (aSTSHMS.getRoundingAmountAtIndex (0),
                                                                     new PayableRoundingAmountType (),
                                                                     sDefaultCurrencyCode));
@@ -2135,7 +2133,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       if (aLineAgreement != null)
       {
         final ReferencedDocumentType aBuyerOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
-        if (aBuyerOrderReference != null && StringHelper.hasText (aBuyerOrderReference.getLineIDValue ()))
+        if (aBuyerOrderReference != null && StringHelper.isNotEmpty (aBuyerOrderReference.getLineIDValue ()))
         {
           final OrderLineReferenceType aUBLOrderLineReference = new OrderLineReferenceType ();
           aUBLOrderLineReference.setLineID (copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
@@ -2190,7 +2188,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aBuyerAssignedID));
-          if (StringHelper.hasText (aUBLID.getIDValue ()))
+          if (StringHelper.isNotEmpty (aUBLID.getIDValue ()))
             aUBLItem.setBuyersItemIdentification (aUBLID);
         }
 
@@ -2199,7 +2197,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aSellerAssignedID));
-          if (StringHelper.hasText (aUBLID.getIDValue ()))
+          if (StringHelper.isNotEmpty (aUBLID.getIDValue ()))
             aUBLItem.setSellersItemIdentification (aUBLID);
         }
 
@@ -2208,7 +2206,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         {
           final ItemIdentificationType aUBLID = new ItemIdentificationType ();
           aUBLID.setID (_copyID (aGlobalID));
-          if (StringHelper.hasText (aUBLID.getIDValue ()))
+          if (StringHelper.isNotEmpty (aUBLID.getIDValue ()))
             aUBLItem.setStandardItemIdentification (aUBLID);
         }
 
@@ -2242,7 +2240,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
-          aUBLTaxCategory.setPercent (MathHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+          aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);

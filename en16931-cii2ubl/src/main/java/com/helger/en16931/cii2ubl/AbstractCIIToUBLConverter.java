@@ -21,31 +21,31 @@ import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.function.Consumer;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.annotation.Nonempty;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.numeric.BigHelper;
+import com.helger.base.state.ETriState;
+import com.helger.base.string.StringHelper;
+import com.helger.base.string.StringImplode;
+import com.helger.base.trait.IGenericImplTrait;
 import com.helger.cii.d16b.CIID16BCrossIndustryInvoiceTypeMarshaller;
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.datetime.PDTFromString;
-import com.helger.commons.error.IError;
-import com.helger.commons.error.SingleError;
-import com.helger.commons.error.list.ErrorList;
-import com.helger.commons.error.list.IErrorList;
-import com.helger.commons.math.MathHelper;
-import com.helger.commons.state.ETriState;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.traits.IGenericImplTrait;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.datetime.format.PDTFromString;
+import com.helger.diagnostics.error.IError;
+import com.helger.diagnostics.error.SingleError;
+import com.helger.diagnostics.error.list.ErrorList;
+import com.helger.diagnostics.error.list.IErrorList;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -82,10 +82,10 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverter.class);
 
   // Source: EN 16931 validation artefacts
-  private static final ICommonsSet <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                                    "81 83 261 262 296 308 381 396 420 458 532");
-  private static final ICommonsSet <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                                "80 82 84 130 202 203 204 211 295 325 326 380 383 384 385 386 387 388 389 390 393 394 395 456 457 527 575 623 633 751 780 935");
+  private static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                            "81 83 261 262 296 308 381 396 420 458 532");
+  private static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                        "80 82 84 130 202 203 204 211 295 325 326 380 383 384 385 386 387 388 389 390 393 394 395 456 457 527 575 623 633 751 780 935");
   static
   {
     // XRechnung 2.1 extensions
@@ -116,7 +116,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   protected static boolean ifNotEmpty (@Nullable final String s, @Nonnull final Consumer <? super String> aConsumer)
   {
-    if (StringHelper.hasNoText (s))
+    if (StringHelper.isEmpty (s))
       return false;
     aConsumer.accept (s);
     return true;
@@ -234,7 +234,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static IError buildInfo (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
   {
     return SingleError.builderInfo ()
-                      .errorFieldName (aPath == null ? null : StringHelper.getImploded ('/', aPath))
+                      .errorFieldName (aPath == null ? null : StringImplode.getImploded ('/', aPath))
                       .errorText (sErrorMsg)
                       .build ();
   }
@@ -243,7 +243,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static IError buildWarn (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
   {
     return SingleError.builderWarn ()
-                      .errorFieldName (aPath == null ? null : StringHelper.getImploded ('/', aPath))
+                      .errorFieldName (aPath == null ? null : StringImplode.getImploded ('/', aPath))
                       .errorText (sErrorMsg)
                       .build ();
   }
@@ -252,14 +252,13 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static IError buildError (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
   {
     return SingleError.builderError ()
-                      .errorFieldName (aPath == null ? null : StringHelper.getImploded ('/', aPath))
+                      .errorFieldName (aPath == null ? null : StringImplode.getImploded ('/', aPath))
                       .errorText (sErrorMsg)
                       .build ();
   }
 
   /**
-   * Get the pattern based on
-   * https://service.unece.org/trade/untdid/d16b/tred/tred2379.htm
+   * Get the pattern based on https://service.unece.org/trade/untdid/d16b/tred/tred2379.htm
    *
    * @param sFormat
    *        Format to use. May be <code>null</code>.
@@ -303,9 +302,11 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate parseDate (@Nullable final String sDate, @Nullable final String sFormat, @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (@Nullable final String sDate,
+                                        @Nullable final String sFormat,
+                                        @Nonnull final IErrorList aErrorList)
   {
-    if (StringHelper.hasNoText (sDate))
+    if (StringHelper.isEmpty (sDate))
       return null;
 
     // Default to 102
@@ -353,7 +354,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nonnull
-  protected static ETriState parseIndicator (@Nullable final IndicatorType aIndicator, @Nonnull final IErrorList aErrorList)
+  protected static ETriState parseIndicator (@Nullable final IndicatorType aIndicator,
+                                             @Nonnull final IErrorList aErrorList)
   {
     if (aIndicator == null)
       return ETriState.UNDEFINED;
@@ -373,7 +375,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       if ("false".equals (sIndicator))
         return ETriState.FALSE;
 
-      aErrorList.add (buildError (null, "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
+      aErrorList.add (buildError (null,
+                                  "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
       return ETriState.UNDEFINED;
     }
 
@@ -397,7 +400,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       return null;
 
     // Avoid empty element
-    if (StringHelper.hasNoText (aCIIID.getValue ()))
+    if (StringHelper.isEmpty (aCIIID.getValue ()))
       return null;
 
     aUBLID.setValue (aCIIID.getValue ());
@@ -419,7 +422,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       return null;
 
     // Avoid empty element
-    if (StringHelper.hasNoText (aName.getValue ()))
+    if (StringHelper.isEmpty (aName.getValue ()))
       return null;
 
     ret.setValue (aName.getValue ());
@@ -436,7 +439,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       return null;
 
     // Avoid empty element
-    if (StringHelper.hasNoText (aCode.getValue ()))
+    if (StringHelper.isEmpty (aCode.getValue ()))
       return null;
 
     ret.setValue (aCode.getValue ());
@@ -463,7 +466,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aQuantity.getValue () == null)
       return null;
 
-    ret.setValue (MathHelper.getWithoutTrailingZeroes (aQuantity.getValue ()));
+    ret.setValue (BigHelper.getWithoutTrailingZeroes (aQuantity.getValue ()));
     ret.setUnitCode (aQuantity.getUnitCode ());
     ret.setUnitCodeListID (aQuantity.getUnitCodeListID ());
     ret.setUnitCodeListAgencyID (aQuantity.getUnitCodeListAgencyID ());
@@ -483,9 +486,9 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (aAmount.getValue () == null)
       return null;
 
-    ret.setValue (MathHelper.getWithoutTrailingZeroes (aAmount.getValue ()));
+    ret.setValue (BigHelper.getWithoutTrailingZeroes (aAmount.getValue ()));
     ret.setCurrencyID (aAmount.getCurrencyID ());
-    if (StringHelper.hasNoText (ret.getCurrencyID ()))
+    if (StringHelper.isEmpty (ret.getCurrencyID ()))
       ret.setCurrencyID (sDefaultCurrencyCode);
     ret.setCurrencyCodeListVersionID (aAmount.getCurrencyCodeListVersionID ());
     return ret;
@@ -556,7 +559,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   protected static boolean isLT0Strict (@Nullable final BigDecimal aBD)
   {
-    return aBD != null && MathHelper.isLT0 (aBD);
+    return aBD != null && BigHelper.isLT0 (aBD);
   }
 
   protected static boolean canUseGlobalID (@Nonnull final TradePartyType aParty)
@@ -565,7 +568,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     // else
     if (aParty.hasGlobalIDEntries ())
       for (final IDType aID : aParty.getGlobalID ())
-        if (StringHelper.hasText (aID.getValue ()) && StringHelper.hasText (aID.getSchemeID ()))
+        if (StringHelper.isNotEmpty (aID.getValue ()) && StringHelper.isNotEmpty (aID.getSchemeID ()))
           return true;
     return false;
   }
@@ -574,13 +577,13 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected static ICommonsList <IDType> getAllUsableGlobalIDs (@Nonnull final TradePartyType aParty)
   {
     return CommonsArrayList.createFiltered (aParty.getGlobalID (),
-                                            x -> StringHelper.hasText (x.getValue ()) && StringHelper.hasText (x.getSchemeID ()));
+                                            x -> StringHelper.isNotEmpty (x.getValue ()) &&
+                                                 StringHelper.isNotEmpty (x.getSchemeID ()));
   }
 
   /**
-   * The goal is to have a positive price, because of EN validation rule BT-146.
-   * This method fiddles with Quantity and Price to align this as best as
-   * possible.
+   * The goal is to have a positive price, because of EN validation rule BT-146. This method fiddles
+   * with Quantity and Price to align this as best as possible.
    *
    * @param bLineExtensionAmountIsNegative
    *        is the line sum negative?
@@ -607,12 +610,12 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     if (bLineExtensionAmountIsNegative)
     {
       // We have a negative line amount
-      final boolean bPosQuantity = MathHelper.isGE0 (aQuantity);
+      final boolean bPosQuantity = BigHelper.isGE0 (aQuantity);
       final boolean bNegQuantity = !bPosQuantity;
 
       if (bHasPrice)
       {
-        final boolean bNegPrice = MathHelper.isLT0 (aPriceAmount);
+        final boolean bNegPrice = BigHelper.isLT0 (aPriceAmount);
 
         if (bNegQuantity == bNegPrice)
         {
@@ -653,18 +656,21 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
         if (bPosQuantity)
         {
           // This looks like an inconsistency
-          aErrorList.add (buildWarn (null, "A negative line extension amount with quantity " + aQuantity + " looks interesting."));
+          aErrorList.add (buildWarn (null,
+                                     "A negative line extension amount with quantity " +
+                                           aQuantity +
+                                           " looks interesting."));
         }
       }
     }
     else
     {
       // We have a positive line amount
-      final boolean bNegQuantity = MathHelper.isLT0 (aQuantity);
+      final boolean bNegQuantity = BigHelper.isLT0 (aQuantity);
 
       if (bHasPrice)
       {
-        final boolean bNegPrice = MathHelper.isLT0 (aPriceAmount);
+        final boolean bNegPrice = BigHelper.isLT0 (aPriceAmount);
 
         if (bNegQuantity && bNegPrice)
         {
@@ -699,14 +705,18 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
         if (bNegQuantity)
         {
           // This looks like an inconsistency
-          aErrorList.add (buildWarn (null, "A positive line extension amount with quantity " + aQuantity + " looks interesting."));
+          aErrorList.add (buildWarn (null,
+                                     "A positive line extension amount with quantity " +
+                                           aQuantity +
+                                           " looks interesting."));
         }
       }
     }
   }
 
   @Nonnull
-  protected static ETriState isInvoiceType (@Nonnull final CrossIndustryInvoiceType aCIIInvoice, @Nonnull final IErrorList aErrorList)
+  protected static ETriState isInvoiceType (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
+                                            @Nonnull final IErrorList aErrorList)
   {
     ETriState eIsInvoice = ETriState.UNDEFINED;
 
@@ -727,14 +737,17 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
     // Check total
     final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
-    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction.getApplicableHeaderTradeSettlement ();
-    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
-                                                                                  : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
-    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null : aTotal.getDuePayableAmount ().get (0);
+    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction
+                                                                                            .getApplicableHeaderTradeSettlement ();
+    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null : aSettlement
+                                                                                                      .getSpecifiedTradeSettlementHeaderMonetarySummation ();
+    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null : aTotal
+                                                                                                           .getDuePayableAmount ()
+                                                                                                           .get (0);
 
     if (eIsInvoice.isUndefined () && aDuePayable != null)
     {
-      eIsInvoice = ETriState.valueOf (MathHelper.isGE0 (aDuePayable.getValue ()));
+      eIsInvoice = ETriState.valueOf (BigHelper.isGE0 (aDuePayable.getValue ()));
     }
 
     if (eIsInvoice.isUndefined ())
@@ -748,7 +761,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     else
     {
       if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("Determined the provided CII document to be " + (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
+        LOGGER.debug ("Determined the provided CII document to be " +
+                      (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
     }
     return eIsInvoice;
   }
@@ -760,8 +774,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    *        Source file with CII to be parsed. May not be <code>null</code>.
    * @param aErrorList
    *        Error list to be filled. May not be <code>null</code>.
-   * @return The parsed Invoice or CreditNote as UBL 2.x. May be
-   *         <code>null</code> in case of error.
+   * @return The parsed Invoice or CreditNote as UBL 2.x. May be <code>null</code> in case of error.
    */
   @Nullable
   public Serializable convertCIItoUBL (@Nonnull final File aFile, @Nonnull final ErrorList aErrorList)
@@ -779,14 +792,14 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    * Convert CII to UBL
    *
    * @param aCIIInvoice
-   *        The CII invoice to be converted. May not be <code>null</code>.
-   *        Ideally this is a valid CII invoice only and not some handcrafted
-   *        domain object.
+   *        The CII invoice to be converted. May not be <code>null</code>. Ideally this is a valid
+   *        CII invoice only and not some handcrafted domain object.
    * @param aErrorList
    *        Error list to be filled. May not be <code>null</code>.
-   * @return The parsed {@link InvoiceType} or {@link CreditNoteType}. May be
-   *         <code>null</code> in case of error.
+   * @return The parsed {@link InvoiceType} or {@link CreditNoteType}. May be <code>null</code> in
+   *         case of error.
    */
   @Nullable
-  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice, @Nonnull ErrorList aErrorList);
+  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice,
+                                                @Nonnull ErrorList aErrorList);
 }

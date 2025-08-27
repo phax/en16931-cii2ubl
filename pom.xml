@@ -23,10 +23,10 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>2.1.4</version>
+    <version>3.0.1</version>
   </parent>
   <artifactId>en16931-cii2ubl-parent-pom</artifactId>
-  <version>2.3.2-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>en16931-cii2ubl-parent-pom</name>
   <inceptionYear>2019</inceptionYear>
@@ -57,7 +57,7 @@
   </developers>
   
   <properties>
-    <phive-rules.version>3.2.11</phive-rules.version>
+    <phive-rules.version>4.0.0</phive-rules.version>
     <picocli.version>4.7.7</picocli.version>
   </properties>
 
@@ -66,21 +66,21 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>11.2.6</version>
+        <version>12.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.ubl</groupId>
         <artifactId>ph-ubl-parent-pom</artifactId>
-        <version>9.0.3</version>
+        <version>10.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.cii</groupId>
         <artifactId>ph-cii-parent-pom</artifactId>
-        <version>3.1.0</version>
+        <version>4.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -100,13 +100,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <source>8</source>
-        </configuration>
-      </plugin> 
     </plugins>
   </build>
 </project>

@@ -27,8 +27,8 @@ import java.time.Month;
 
 import org.junit.Test;
 
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.error.list.ErrorList;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.diagnostics.error.list.ErrorList;
 
 /**
  * Test class for class {@link AbstractCIIToUBLConverter}.

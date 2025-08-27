@@ -24,15 +24,13 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.Serializable;
 
-import javax.annotation.Nullable;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.error.list.ErrorList;
-import com.helger.commons.io.file.FilenameHelper;
-import com.helger.commons.io.resource.FileSystemResource;
+import com.helger.diagnostics.error.list.ErrorList;
+import com.helger.io.file.FilenameHelper;
+import com.helger.io.resource.FileSystemResource;
 import com.helger.jaxb.GenericJAXBMarshaller;
 import com.helger.jaxb.JAXBContextCache;
 import com.helger.phive.api.execute.ValidationExecutionManager;
@@ -42,6 +40,7 @@ import com.helger.phive.api.validity.IValidityDeterminator;
 import com.helger.phive.xml.source.ValidationSourceXML;
 import com.helger.ubl24.UBL24Marshaller;
 
+import jakarta.annotation.Nullable;
 import oasis.names.specification.ubl.schema.xsd.creditnote_24.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_24.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;

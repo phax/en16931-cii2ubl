@@ -91,125 +91,167 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-* v2.3.1 - 2025-06-26
-    * Avoid `NullPointerException` if a CII line item has no quantity
-* v2.3.0 - 2025-03-25
-    * Removed the default values for BT-24 (`CustomizationID`) and BT-23 (`ProfileID`)
-    * Emitting UBL 2.4 documents correctly
-    * Taking the values of BT-23 and BT-24 from the source CII fields. See [issue #37](https://github.com/phax/en16931-cii2ubl/issues/37) - thx @shenazz
-    * Handling BG-17 only if `PayeePartyCreditorFinancialAccount` is present. See [issue #38](https://github.com/phax/en16931-cii2ubl/issues/38) - thx @msccip
-* v2.2.6 - 2024-12-23
-    * Supporting all values of the UNTDID 4461 code list. See [issue #34](https://github.com/phax/en16931-cii2ubl/pull/34) - thx @shenazz
-* v2.2.5 - 2024-10-22
-    * Fixed the automatic module name. See [issue #32](https://github.com/phax/en16931-cii2ubl/pull/32) - thx @toherrmann
-* v2.2.4 - 2024-06-17
-    * Fixed a regression from v2.2.3. See [issue #31](https://github.com/phax/en16931-cii2ubl/issues/31) - thx @msccip
-* v2.2.3 - 2024-06-12
-    * Added additional mapping of BT-41. See [issue #28](https://github.com/phax/en16931-cii2ubl/issues/28) - thx @bdewein
-    * Fixed the mapping of the Due Date Type Code for BT-8. See [issue #29](https://github.com/phax/en16931-cii2ubl/issues/29) - thx @bdewein
-    * Fixed the mapping of BT-27 and BT-28. See [issue #26](https://github.com/phax/en16931-cii2ubl/issues/26) - thx @bdewein
-    * Fixed the item price mapping around BT-146, BT-147, BT-148, BT-149 and BT-150. See [issue #27](https://github.com/phax/en16931-cii2ubl/issues/27) - thx @bdewein
-* v2.2.2 - 2024-04-12
-    * Added support for providing the default UBL order reference ID, in case the empty String is not good enough. See [issue #23](https://github.com/phax/en16931-cii2ubl/issues/23) - thx @lkumai
-* v2.2.1 - 2024-03-29
-    * Updated to ph-commons 11.1.5
-    * Ensured Java 21 compatibility
-* v2.2.0 - 2024-03-08
-    * Updated to ph-ubl 9.0.0
-    * Tested output against EN 16931 rules v1.3.10 and v1.3.11 - no changes necessary
-    * Updated to create UBL 2.4-CS01
-    * Added support for BT-8 mapping. See [issue #22](https://github.com/phax/en16931-cii2ubl/issues/22)
-* v2.1.0 - 2023-04-28
-    * Updated to ph-ubl 8.0.1
-    * Added support for converting to UBL 2.4
-* v2.0.3 - 2023-04-20
-    * Improved mapping of references to external documents in additional document references. See [issue #20](https://github.com/phax/en16931-cii2ubl/issues/20) - thanks @msccip
-* v2.0.2 - 2023-03-30
-    * Changed the default mode of the CLI version from `INVOICE` to `AUTOMATIC`. See [issue #19](https://github.com/phax/en16931-cii2ubl/issues/19) - thanks @msccip
-* v2.0.1 - 2023-03-15
-    * Added manual wildcard expansion of filenames
-    * Added new CLI option `--disable-wildcard-expansion` to disable the wildcard expansion and stick to the old resolution logic
-* v2.0.0 - 2023-02-20
-    * Using Java 11 as the baseline
-    * Updated to ph-commons 11
-    * Updated to JAXB 4.0
-    * Added the new CLI parameter `--verbose` for a few more details
-    * Improved logging
-    * Successfully tested the CLI parameter with wildcard parameters (because the Java Windows Runtime performs automatic wildcard expansion)
-* v1.4.10 - 2022-12-16
-    * Fixed the conversion of the `TypeCode` element in `AdditionalReferencedDocument`. See [issue #18](https://github.com/phax/en16931-cii2ubl/issues/18) - thanks @L3Mars
-* v1.4.9 - 2022-11-15
-    * Fixed an unnecessary division by 100 for creating `MultiplierFactorNumeric`. See [issue #17](https://github.com/phax/en16931-cii2ubl/issues/17) - thanks @L3Mars
-    * Tested output against EN 16931 rules v1.3.9 - no changes necessary
-* v1.4.8 - 2022-09-28
-    * Added new option `--output-suffix` to customize the output file suffix, that is currently hard coded to `-ubl`
-    * Fixed a problem with the mapping of BT-147, BT-148, BT-149 and BT-150. See [issue #15](https://github.com/phax/en16931-cii2ubl/issues/15). Thanks to @cambid for pointing that out
-* v1.4.7 - 2022-02-15
-    * Further improved `null`/empty handling to avoid creation of empty elements
-* v1.4.6 - 2022-02-12
-    * Allowing the additional Payment Means Type Codes `1`, `42` and `68`. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
-    * For decimal values, trailing zeroes are no longer emitted. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
-    * Improved not creating empty UBL elements. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
-    * The `SubjectCode` of `IncludedNote` elements is copied over. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
-    * Improved the Party ID handling and allowing for multiple seller IDs. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
-* v1.4.5 - 2021-12-20
-    * Tested output against EN 16931 rules v1.3.7 - no changes necessary
-    * Fixed creating invalid UBL if `SellerAssignedID` is empty. See [issue #12](https://github.com/phax/en16931-cii2ubl/issues/12) - thanks @DerHamm
-* v1.4.4 - 2021-10-14
-    * Improved sign swapping of Quantity and Price to avoid negative prices (BT-146)
-* v1.4.3 - 2021-10-07
-    * Tested output against EN 16931 rules v1.3.6 - no changes necessary
-    * Changed determination if Invoice or CreditNote primarily to `rsm:ExchangedDocument/ram:TypeCode` instead of the payable amount
-* v1.4.2 - 2021-06-10
-    * Changed the default customization ID to `urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0`
-    * If the UBL `LineExtensionAmount` is negative, but the line `Quantity` is positive, the `Quantity` will be changed to negative. Customizable via `setSwapQuantitySignIfNeeded(boolean)`
-* v1.4.1 - 2021-05-02
-    * Updated to ph-commons 10.1
-    * Tested output against EN 16931 rules v1.3.5 - no changes necessary
-* v1.4.0 - 2021-03-22
-    * Updated to ph-commons 10
-* v1.3.0 - 2021-01-05
-    * Added support for different CII time formats (2, 3, 4, 101, 102, 103 and 105) where `102` is the default
-    * The error handling for the commandline client was improved (checking errors before writing UBL) (see [issue #9](https://github.com/phax/en16931-cii2ubl/issues/9))
-    * Added the possibility to create UBL 2.3
-    * Made the API more open to directly convert to Invoice or CreditNote
-    * Improved the handling of payment means to be more EN compliant. See [issue #7](https://github.com/phax/en16931-cii2ubl/issues/7).
-    * Added a possibility to retrieve the internal converter version number
-* v1.2.5 - 2020-11-30
-    * Added Jakarta Activation dependency to the standalone CLI version. See [issue #6](https://github.com/phax/en16931-cii2ubl/issues/6).
-* v1.2.4 - 2020-10-20
-    * Tested with EN 16031 validation rules 1.3.3
-    * Not emitting the `LegalMonetaryTotal/PayableRoundingAmount` if the value is `0` as a work around for https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
-* v1.2.3 - 2020-09-17
-    * Updated to Jakarta JAXB 2.3.3
-* v1.2.2 - 2020-08-30
-    * Updated to ph-commons 9.4.7
-    * Updated to ph-cii 2.3.0
-    * Updated to ph-ubl 6.4.0
-* v1.2.1 - 2020-05-26
-    * Updated to new Maven groupIds
-* v1.2.0 - 2020-03-09
-    * Verified against EN 16931 validation artefacts 1.3.0 - no changes in the output
-    * Added commandline interface (CLI). See [PR #3](https://github.com/phax/en16931-cii2ubl/pull/3). Thanks to @rkottmann
-    * Fixed creating invalid UBL if `SellerOrderReferencedDocument` is present but `BuyerOrderReferencedDocument` is not set (see [issue #5](https://github.com/phax/en16931-cii2ubl/issues/5))
-    * Made default VAT scheme, UBL `CustomizationID`, UBL `ProfileID` and the `PaymentMeans/CardAccount/NetworkID` customizable. See [issue #1](https://github.com/phax/en16931-cii2ubl/issues/1) and [issue #2](https://github.com/phax/en16931-cii2ubl/issues/2).
-    * Fixed embedded attachment mapping. See [issue #4](https://github.com/phax/en16931-cii2ubl/issues/4).
-* v1.1.5 - 2019-09-13
-    * Added possibility to enforce invoice creation
-    * Verified against EN 16931 validation artefacts 1.3.0
-* v1.1.4 - 2019-07-15
-    * Updated to EN 16931 validation artefacts 1.2.3
-* v1.1.3 - 2019-05-15
-    * Updated to EN 16931 validation artefacts 1.2.1
-* v1.1.2 - 2019-04-26
-    * Updated to EN 16931 validation artefacts 1.2.0
-* v1.1.1 - 2019-02-27
-    * Improved delivery date handling
-    * Improved price base quantity handling
-* v1.1.0 - 2019-02-26
-    * Added support to create UBL 2.1 Invoice and CreditNote
-* v1.0.0 - 2019-02-26
-    * Initial release creating UBL 2.2 Invoice and CreditNote
+v3.0.0 - 2025-08-27
+* Requires Java 17 as the minimum version
+* Updated to ph-commons 12.0.0
+
+v2.3.1 - 2025-06-26
+* Avoid `NullPointerException` if a CII line item has no quantity
+
+v2.3.0 - 2025-03-25
+* Removed the default values for BT-24 (`CustomizationID`) and BT-23 (`ProfileID`)
+* Emitting UBL 2.4 documents correctly
+* Taking the values of BT-23 and BT-24 from the source CII fields. See [issue #37](https://github.com/phax/en16931-cii2ubl/issues/37) - thx @shenazz
+* Handling BG-17 only if `PayeePartyCreditorFinancialAccount` is present. See [issue #38](https://github.com/phax/en16931-cii2ubl/issues/38) - thx @msccip
+
+v2.2.6 - 2024-12-23
+* Supporting all values of the UNTDID 4461 code list. See [issue #34](https://github.com/phax/en16931-cii2ubl/pull/34) - thx @shenazz
+
+v2.2.5 - 2024-10-22
+* Fixed the automatic module name. See [issue #32](https://github.com/phax/en16931-cii2ubl/pull/32) - thx @toherrmann
+
+v2.2.4 - 2024-06-17
+* Fixed a regression from v2.2.3. See [issue #31](https://github.com/phax/en16931-cii2ubl/issues/31) - thx @msccip
+
+v2.2.3 - 2024-06-12
+* Added additional mapping of BT-41. See [issue #28](https://github.com/phax/en16931-cii2ubl/issues/28) - thx @bdewein
+* Fixed the mapping of the Due Date Type Code for BT-8. See [issue #29](https://github.com/phax/en16931-cii2ubl/issues/29) - thx @bdewein
+* Fixed the mapping of BT-27 and BT-28. See [issue #26](https://github.com/phax/en16931-cii2ubl/issues/26) - thx @bdewein
+* Fixed the item price mapping around BT-146, BT-147, BT-148, BT-149 and BT-150. See [issue #27](https://github.com/phax/en16931-cii2ubl/issues/27) - thx @bdewein
+
+v2.2.2 - 2024-04-12
+* Added support for providing the default UBL order reference ID, in case the empty String is not good enough. See [issue #23](https://github.com/phax/en16931-cii2ubl/issues/23) - thx @lkumai
+
+v2.2.1 - 2024-03-29
+* Updated to ph-commons 11.1.5
+* Ensured Java 21 compatibility
+
+v2.2.0 - 2024-03-08
+* Updated to ph-ubl 9.0.0
+* Tested output against EN 16931 rules v1.3.10 and v1.3.11 - no changes necessary
+* Updated to create UBL 2.4-CS01
+* Added support for BT-8 mapping. See [issue #22](https://github.com/phax/en16931-cii2ubl/issues/22)
+
+v2.1.0 - 2023-04-28
+* Updated to ph-ubl 8.0.1
+* Added support for converting to UBL 2.4
+
+v2.0.3 - 2023-04-20
+* Improved mapping of references to external documents in additional document references. See [issue #20](https://github.com/phax/en16931-cii2ubl/issues/20) - thanks @msccip
+
+v2.0.2 - 2023-03-30
+* Changed the default mode of the CLI version from `INVOICE` to `AUTOMATIC`. See [issue #19](https://github.com/phax/en16931-cii2ubl/issues/19) - thanks @msccip
+
+v2.0.1 - 2023-03-15
+* Added manual wildcard expansion of filenames
+* Added new CLI option `--disable-wildcard-expansion` to disable the wildcard expansion and stick to the old resolution logic
+
+v2.0.0 - 2023-02-20
+* Using Java 11 as the baseline
+* Updated to ph-commons 11
+* Updated to JAXB 4.0
+* Added the new CLI parameter `--verbose` for a few more details
+* Improved logging
+* Successfully tested the CLI parameter with wildcard parameters (because the Java Windows Runtime performs automatic wildcard expansion)
+
+v1.4.10 - 2022-12-16
+* Fixed the conversion of the `TypeCode` element in `AdditionalReferencedDocument`. See [issue #18](https://github.com/phax/en16931-cii2ubl/issues/18) - thanks @L3Mars
+
+v1.4.9 - 2022-11-15
+* Fixed an unnecessary division by 100 for creating `MultiplierFactorNumeric`. See [issue #17](https://github.com/phax/en16931-cii2ubl/issues/17) - thanks @L3Mars
+* Tested output against EN 16931 rules v1.3.9 - no changes necessary
+
+v1.4.8 - 2022-09-28
+* Added new option `--output-suffix` to customize the output file suffix, that is currently hard coded to `-ubl`
+* Fixed a problem with the mapping of BT-147, BT-148, BT-149 and BT-150. See [issue #15](https://github.com/phax/en16931-cii2ubl/issues/15). Thanks to @cambid for pointing that out
+
+v1.4.7 - 2022-02-15
+* Further improved `null`/empty handling to avoid creation of empty elements
+
+v1.4.6 - 2022-02-12
+* Allowing the additional Payment Means Type Codes `1`, `42` and `68`. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
+* For decimal values, trailing zeroes are no longer emitted. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
+* Improved not creating empty UBL elements. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
+* The `SubjectCode` of `IncludedNote` elements is copied over. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
+* Improved the Party ID handling and allowing for multiple seller IDs. See [issue #13](https://github.com/phax/en16931-cii2ubl/issues/13)
+
+v1.4.5 - 2021-12-20
+* Tested output against EN 16931 rules v1.3.7 - no changes necessary
+* Fixed creating invalid UBL if `SellerAssignedID` is empty. See [issue #12](https://github.com/phax/en16931-cii2ubl/issues/12) - thanks @DerHamm
+
+v1.4.4 - 2021-10-14
+* Improved sign swapping of Quantity and Price to avoid negative prices (BT-146)
+
+v1.4.3 - 2021-10-07
+* Tested output against EN 16931 rules v1.3.6 - no changes necessary
+* Changed determination if Invoice or CreditNote primarily to `rsm:ExchangedDocument/ram:TypeCode` instead of the payable amount
+
+v1.4.2 - 2021-06-10
+* Changed the default customization ID to `urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0`
+* If the UBL `LineExtensionAmount` is negative, but the line `Quantity` is positive, the `Quantity` will be changed to negative. Customizable via `setSwapQuantitySignIfNeeded(boolean)`
+
+v1.4.1 - 2021-05-02
+* Updated to ph-commons 10.1
+* Tested output against EN 16931 rules v1.3.5 - no changes necessary
+
+v1.4.0 - 2021-03-22
+* Updated to ph-commons 10
+
+v1.3.0 - 2021-01-05
+* Added support for different CII time formats (2, 3, 4, 101, 102, 103 and 105) where `102` is the default
+* The error handling for the commandline client was improved (checking errors before writing UBL) (see [issue #9](https://github.com/phax/en16931-cii2ubl/issues/9))
+* Added the possibility to create UBL 2.3
+* Made the API more open to directly convert to Invoice or CreditNote
+* Improved the handling of payment means to be more EN compliant. See [issue #7](https://github.com/phax/en16931-cii2ubl/issues/7).
+* Added a possibility to retrieve the internal converter version number
+
+v1.2.5 - 2020-11-30
+* Added Jakarta Activation dependency to the standalone CLI version. See [issue #6](https://github.com/phax/en16931-cii2ubl/issues/6).
+
+v1.2.4 - 2020-10-20
+* Tested with EN 16031 validation rules 1.3.3
+* Not emitting the `LegalMonetaryTotal/PayableRoundingAmount` if the value is `0` as a work around for https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/242
+
+v1.2.3 - 2020-09-17
+* Updated to Jakarta JAXB 2.3.3
+
+v1.2.2 - 2020-08-30
+* Updated to ph-commons 9.4.7
+* Updated to ph-cii 2.3.0
+* Updated to ph-ubl 6.4.0
+
+v1.2.1 - 2020-05-26
+* Updated to new Maven groupIds
+
+v1.2.0 - 2020-03-09
+* Verified against EN 16931 validation artefacts 1.3.0 - no changes in the output
+* Added commandline interface (CLI). See [PR #3](https://github.com/phax/en16931-cii2ubl/pull/3). Thanks to @rkottmann
+* Fixed creating invalid UBL if `SellerOrderReferencedDocument` is present but `BuyerOrderReferencedDocument` is not set (see [issue #5](https://github.com/phax/en16931-cii2ubl/issues/5))
+* Made default VAT scheme, UBL `CustomizationID`, UBL `ProfileID` and the `PaymentMeans/CardAccount/NetworkID` customizable. See [issue #1](https://github.com/phax/en16931-cii2ubl/issues/1) and [issue #2](https://github.com/phax/en16931-cii2ubl/issues/2).
+* Fixed embedded attachment mapping. See [issue #4](https://github.com/phax/en16931-cii2ubl/issues/4).
+
+v1.1.5 - 2019-09-13
+* Added possibility to enforce invoice creation
+* Verified against EN 16931 validation artefacts 1.3.0
+
+v1.1.4 - 2019-07-15
+* Updated to EN 16931 validation artefacts 1.2.3
+
+v1.1.3 - 2019-05-15
+* Updated to EN 16931 validation artefacts 1.2.1
+
+v1.1.2 - 2019-04-26
+* Updated to EN 16931 validation artefacts 1.2.0
+
+v1.1.1 - 2019-02-27
+* Improved delivery date handling
+* Improved price base quantity handling
+
+v1.1.0 - 2019-02-26
+* Added support to create UBL 2.1 Invoice and CreditNote
+
+v1.0.0 - 2019-02-26
+* Initial release creating UBL 2.2 Invoice and CreditNote
 
 ---
 
