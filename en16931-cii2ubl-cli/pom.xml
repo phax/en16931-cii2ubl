@@ -87,7 +87,7 @@
             <Export-Package>
               com.helger.en16931.cii2ubl.cli
             </Export-Package>
-            <Import-Package>!javax.annotation.*,*</Import-Package>
+            <Import-Package>!jakarta.annotation.*,*</Import-Package>
           </instructions>
         </configuration>
       </plugin>
