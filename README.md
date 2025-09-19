@@ -91,6 +91,9 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v3.0.1 - 2025-09-19
+* Added the mapping of BT-86 for DirectDebit case
+
 v3.0.0 - 2025-08-27
 * Requires Java 17 as the minimum version
 * Updated to ph-commons 12.0.0

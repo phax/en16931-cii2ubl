@@ -551,19 +551,30 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
+      final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
+
       // BT-91
       final DebtorFinancialAccountType aAccount = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
       if (aAccount != null)
       {
-        final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
         aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
         // Name is not mapped
         if (false)
           aUBLFinancialAccount.setName (copyName (aAccount.getAccountName (), new NameType ()));
-
-        if (aUBLFinancialAccount.getID () != null)
-          aUBLPaymentMandate.setPayerFinancialAccount (aUBLFinancialAccount);
       }
+
+      // BT-86
+      final DebtorFinancialInstitutionType aInstitution = aPaymentMeans.getPayerSpecifiedDebtorFinancialInstitution ();
+      if (aInstitution != null)
+      {
+        final BranchType aUBLBranch = new BranchType ();
+        aUBLBranch.setID (_copyID (aInstitution.getBICID ()));
+        if (aUBLBranch.getID () != null)
+          aUBLFinancialAccount.setFinancialInstitutionBranch (aUBLBranch);
+      }
+
+      if (aUBLFinancialAccount.getID () != null || aUBLFinancialAccount.getFinancialInstitutionBranch () != null)
+        aUBLPaymentMandate.setPayerFinancialAccount (aUBLFinancialAccount);
 
       aUBLPaymentMeans.setPaymentMandate (aUBLPaymentMandate);
     }
