@@ -47,8 +47,7 @@ Replace `x.y.z` with the effective version you want to use:
 Call it via `java -jar en16931-cii2ubl-cli-full.jar` followed by the options and parameters.
 
 ```
-[INFO] CII to UBL Converter v3.0.1-SNAPSHOT (build 2025-09-19T12:48:03Z)
-Missing required parameter: 'source files'
+[INFO] CII to UBL Converter v3.0.1 (build 2025-09-19T12:55:25Z)
 Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion] [--verbose]
                          [--mode mode] [--output-suffix filename part] [-t
                          directory] [--ubl version] [--ubl-cardaccountnetworkid
