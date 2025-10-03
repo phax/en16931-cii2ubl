@@ -57,7 +57,7 @@
   </developers>
   
   <properties>
-    <phive-rules.version>4.0.1</phive-rules.version>
+    <phive-rules.version>4.0.3</phive-rules.version>
     <picocli.version>4.7.7</picocli.version>
   </properties>
 
@@ -66,7 +66,7 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>12.0.2</version>
+        <version>12.0.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
