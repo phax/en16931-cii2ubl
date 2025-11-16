@@ -24,6 +24,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.Serializable;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +41,6 @@ import com.helger.phive.api.validity.IValidityDeterminator;
 import com.helger.phive.xml.source.ValidationSourceXML;
 import com.helger.ubl21.UBL21Marshaller;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -115,7 +115,7 @@ public final class CIIToUBL21ConverterTest
   }
 
   @Nullable
-  private static Serializable _convert (@Nonnull final CrossIndustryInvoiceType aInvoice)
+  private static Serializable _convert (@NonNull final CrossIndustryInvoiceType aInvoice)
   {
     return new CIIToUBL21Converter ().convertCIItoUBL (aInvoice, new ErrorList ());
   }

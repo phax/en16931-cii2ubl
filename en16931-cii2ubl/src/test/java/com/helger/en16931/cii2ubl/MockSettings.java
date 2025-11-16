@@ -19,6 +19,8 @@ package com.helger.en16931.cii2ubl;
 
 import java.io.File;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.collection.commons.CommonsArrayList;
@@ -27,8 +29,6 @@ import com.helger.diver.api.coord.DVRCoordinate;
 import com.helger.phive.api.executorset.ValidationExecutorSetRegistry;
 import com.helger.phive.en16931.EN16931Validation;
 import com.helger.phive.xml.source.IValidationSourceXML;
-
-import jakarta.annotation.Nonnull;
 
 final class MockSettings
 {
@@ -103,13 +103,13 @@ final class MockSettings
     EN16931Validation.initEN16931 (VES_REGISTRY);
   }
 
-  @Nonnull
+  @NonNull
   public static File getBaseDir ()
   {
     return new File (BASE_TEST_DIR);
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   @ReturnsMutableCopy
   public static ICommonsList <File> getAllTestFiles ()

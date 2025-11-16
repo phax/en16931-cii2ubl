@@ -24,6 +24,8 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +46,6 @@ import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.diagnostics.error.list.IErrorList;
 import com.helger.jaxb.validation.WrappedCollectingValidationEventHandler;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -106,7 +106,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   protected AbstractCIIToUBLConverter ()
   {}
 
-  protected static <T> boolean ifNotNull (@Nullable final T aObj, @Nonnull final Consumer <? super T> aConsumer)
+  protected static <T> boolean ifNotNull (@Nullable final T aObj, @NonNull final Consumer <? super T> aConsumer)
   {
     if (aObj == null)
       return false;
@@ -114,7 +114,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return true;
   }
 
-  protected static boolean ifNotEmpty (@Nullable final String s, @Nonnull final Consumer <? super String> aConsumer)
+  protected static boolean ifNotEmpty (@Nullable final String s, @NonNull final Consumer <? super String> aConsumer)
   {
     if (StringHelper.isEmpty (s))
       return false;
@@ -122,84 +122,84 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return true;
   }
 
-  @Nonnull
+  @NonNull
   public final EUBLCreationMode getUBLCreationMode ()
   {
     return m_eCreationMode;
   }
 
-  @Nonnull
-  public final IMPLTYPE setUBLCreationMode (@Nonnull final EUBLCreationMode eCreationMode)
+  @NonNull
+  public final IMPLTYPE setUBLCreationMode (@NonNull final EUBLCreationMode eCreationMode)
   {
     ValueEnforcer.notNull (eCreationMode, "CreationMode");
     m_eCreationMode = eCreationMode;
     return thisAsT ();
   }
 
-  @Nonnull
+  @NonNull
   public final String getVATScheme ()
   {
     return m_sVATScheme;
   }
 
-  @Nonnull
-  public final IMPLTYPE setVATScheme (@Nonnull final String sVATScheme)
+  @NonNull
+  public final IMPLTYPE setVATScheme (@NonNull final String sVATScheme)
   {
     ValueEnforcer.notNull (sVATScheme, "VATScheme");
     m_sVATScheme = sVATScheme;
     return thisAsT ();
   }
 
-  @Nonnull
+  @NonNull
   public final String getCustomizationID ()
   {
     return m_sCustomizationID;
   }
 
-  @Nonnull
-  public final IMPLTYPE setCustomizationID (@Nonnull final String sCustomizationID)
+  @NonNull
+  public final IMPLTYPE setCustomizationID (@NonNull final String sCustomizationID)
   {
     ValueEnforcer.notNull (sCustomizationID, "CustomizationID");
     m_sCustomizationID = sCustomizationID;
     return thisAsT ();
   }
 
-  @Nonnull
+  @NonNull
   public final String getProfileID ()
   {
     return m_sProfileID;
   }
 
-  @Nonnull
-  public final IMPLTYPE setProfileID (@Nonnull final String sProfileID)
+  @NonNull
+  public final IMPLTYPE setProfileID (@NonNull final String sProfileID)
   {
     ValueEnforcer.notNull (sProfileID, "ProfileID");
     m_sProfileID = sProfileID;
     return thisAsT ();
   }
 
-  @Nonnull
+  @NonNull
   public final String getCardAccountNetworkID ()
   {
     return m_sCardAccountNetworkID;
   }
 
-  @Nonnull
-  public final IMPLTYPE setCardAccountNetworkID (@Nonnull final String sCardAccountNetworkID)
+  @NonNull
+  public final IMPLTYPE setCardAccountNetworkID (@NonNull final String sCardAccountNetworkID)
   {
     ValueEnforcer.notNull (sCardAccountNetworkID, "CardAccountNetworkID");
     m_sCardAccountNetworkID = sCardAccountNetworkID;
     return thisAsT ();
   }
 
-  @Nonnull
+  @NonNull
   public final String getDefaultOrderRefID ()
   {
     return m_sDefaultOrderRefID;
   }
 
-  @Nonnull
-  public final IMPLTYPE setDefaultOrderRefID (@Nonnull final String sDefaultOrderRefID)
+  @NonNull
+  public final IMPLTYPE setDefaultOrderRefID (@NonNull final String sDefaultOrderRefID)
   {
     ValueEnforcer.notNull (sDefaultOrderRefID, "DefaultOrderRefID");
     m_sDefaultOrderRefID = sDefaultOrderRefID;
@@ -211,7 +211,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return m_bSwapQuantitySignIfNeeded;
   }
 
-  @Nonnull
+  @NonNull
   public final IMPLTYPE setSwapQuantitySignIfNeeded (final boolean bSwapQuantitySignIfNeeded)
   {
     m_bSwapQuantitySignIfNeeded = bSwapQuantitySignIfNeeded;
@@ -223,15 +223,15 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return m_bSwapPriceSignIfNeeded;
   }
 
-  @Nonnull
+  @NonNull
   public final IMPLTYPE setSwapPriceSignIfNeeded (final boolean bSwapPriceSignIfNeeded)
   {
     m_bSwapPriceSignIfNeeded = bSwapPriceSignIfNeeded;
     return thisAsT ();
   }
 
-  @Nonnull
-  protected static IError buildInfo (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
+  @NonNull
+  protected static IError buildInfo (@Nullable final String [] aPath, @NonNull final String sErrorMsg)
   {
     return SingleError.builderInfo ()
                       .errorFieldName (aPath == null ? null : StringImplode.getImploded ('/', aPath))
@@ -239,8 +239,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
                       .build ();
   }
 
-  @Nonnull
-  protected static IError buildWarn (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
+  @NonNull
+  protected static IError buildWarn (@Nullable final String [] aPath, @NonNull final String sErrorMsg)
   {
     return SingleError.builderWarn ()
                       .errorFieldName (aPath == null ? null : StringImplode.getImploded ('/', aPath))
@@ -248,8 +248,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
                       .build ();
   }
 
-  @Nonnull
-  protected static IError buildError (@Nullable final String [] aPath, @Nonnull final String sErrorMsg)
+  @NonNull
+  protected static IError buildError (@Nullable final String [] aPath, @NonNull final String sErrorMsg)
   {
     return SingleError.builderError ()
                       .errorFieldName (aPath == null ? null : StringImplode.getImploded ('/', aPath))
@@ -267,44 +267,32 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    * @return <code>null</code> if the format is unknown.
    */
   @Nullable
-  protected static String getDatePattern (@Nonnull @Nonempty final String sFormat, @Nonnull final IErrorList aErrorList)
+  protected static String getDatePattern (@NonNull @Nonempty final String sFormat, @NonNull final IErrorList aErrorList)
   {
     ValueEnforcer.notEmpty (sFormat, "Format");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
 
-    switch (sFormat)
+    return switch (sFormat)
     {
-      // DDMMYY
-      case "2":
-        return "ddMMuu";
-      // MMDDYY
-      case "3":
-        return "MMdduu";
-      // DDMMCCYY
-      case "4":
-        return "ddMMuuuu";
-      // YYMMDD
-      case "101":
-        return "uuMMdd";
-      // CCYYMMDD
-      case DEFAULT_DATE_TIME_FORMAT:
-        return "uuuuMMdd";
-      // YYWWD
-      case "103":
-        return "YYwwee";
-      // YYDDD
-      case "105":
-        return "uuDDD";
-      default:
+      case "2" -> "ddMMuu";
+      case "3" -> "MMdduu";
+      case "4" -> "ddMMuuuu";
+      case "101" -> "uuMMdd";
+      case DEFAULT_DATE_TIME_FORMAT -> "uuuuMMdd";
+      case "103" -> "YYwwee";
+      case "105" -> "uuDDD";
+      default ->
+      {
         aErrorList.add (buildError (null, "Unsupported date format '" + sFormat + "'"));
-        return null;
-    }
+        yield null;
+      }
+    };
   }
 
   @Nullable
   protected static LocalDate parseDate (@Nullable final String sDate,
                                         @Nullable final String sFormat,
-                                        @Nonnull final IErrorList aErrorList)
+                                        @NonNull final IErrorList aErrorList)
   {
     if (StringHelper.isEmpty (sDate))
       return null;
@@ -324,8 +312,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate parseDate (@Nullable final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType.DateTimeString aDateObj,
-                                        @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType.@Nullable DateTimeString aDateObj,
+                                        @NonNull final IErrorList aErrorList)
   {
     if (aDateObj == null)
       return null;
@@ -334,8 +322,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate parseDate (@Nullable final un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType.DateTimeString aDateObj,
-                                        @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (final un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType.@Nullable DateTimeString aDateObj,
+                                        @NonNull final IErrorList aErrorList)
   {
     if (aDateObj == null)
       return null;
@@ -344,8 +332,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   }
 
   @Nullable
-  protected static LocalDate parseDate (@Nullable final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType.DateString aDateObj,
-                                        @Nonnull final IErrorList aErrorList)
+  protected static LocalDate parseDate (final un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType.@Nullable DateString aDateObj,
+                                        @NonNull final IErrorList aErrorList)
   {
     if (aDateObj == null)
       return null;
@@ -353,9 +341,9 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return parseDate (aDateObj.getValue (), aDateObj.getFormat (), aErrorList);
   }
 
-  @Nonnull
+  @NonNull
   protected static ETriState parseIndicator (@Nullable final IndicatorType aIndicator,
-                                             @Nonnull final IErrorList aErrorList)
+                                             @NonNull final IErrorList aErrorList)
   {
     if (aIndicator == null)
       return ETriState.UNDEFINED;
@@ -394,7 +382,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    */
   @Nullable
   protected static <T extends com.helger.xsds.ccts.cct.schemamodule.IdentifierType> T copyID (@Nullable final IDType aCIIID,
-                                                                                              @Nonnull final T aUBLID)
+                                                                                              @NonNull final T aUBLID)
   {
     if (aCIIID == null)
       return null;
@@ -416,7 +404,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   @Nullable
   protected static <T extends com.helger.xsds.ccts.cct.schemamodule.TextType> T copyName (@Nullable final TextType aName,
-                                                                                          @Nonnull final T ret)
+                                                                                          @NonNull final T ret)
   {
     if (aName == null)
       return null;
@@ -433,7 +421,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   @Nullable
   protected static <T extends com.helger.xsds.ccts.cct.schemamodule.CodeType> T copyCode (@Nullable final CodeType aCode,
-                                                                                          @Nonnull final T ret)
+                                                                                          @NonNull final T ret)
   {
     if (aCode == null)
       return null;
@@ -457,7 +445,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   @Nullable
   protected static <T extends com.helger.xsds.ccts.cct.schemamodule.QuantityType> T copyQuantity (@Nullable final QuantityType aQuantity,
-                                                                                                  @Nonnull final T ret)
+                                                                                                  @NonNull final T ret)
   {
     if (aQuantity == null)
       return null;
@@ -476,7 +464,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
 
   @Nullable
   protected static <T extends com.helger.xsds.ccts.cct.schemamodule.AmountType> T copyAmount (@Nullable final AmountType aAmount,
-                                                                                              @Nonnull final T ret,
+                                                                                              @NonNull final T ret,
                                                                                               @Nullable final String sDefaultCurrencyCode)
   {
     if (aAmount == null)
@@ -562,7 +550,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return aBD != null && BigHelper.isLT0 (aBD);
   }
 
-  protected static boolean canUseGlobalID (@Nonnull final TradePartyType aParty)
+  protected static boolean canUseGlobalID (@NonNull final TradePartyType aParty)
   {
     // GloablID, if global identifier exists and can be stated in @schemeID, ID
     // else
@@ -573,8 +561,8 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     return false;
   }
 
-  @Nonnull
-  protected static ICommonsList <IDType> getAllUsableGlobalIDs (@Nonnull final TradePartyType aParty)
+  @NonNull
+  protected static ICommonsList <IDType> getAllUsableGlobalIDs (@NonNull final TradePartyType aParty)
   {
     return CommonsArrayList.createFiltered (aParty.getGlobalID (),
                                             x -> StringHelper.isNotEmpty (x.getValue ()) &&
@@ -599,11 +587,11 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    *        The error list to be filled. May not be <code>null</code>.
    */
   protected void swapQuantityAndPriceIfNeeded (final boolean bLineExtensionAmountIsNegative,
-                                               @Nonnull final BigDecimal aQuantity,
-                                               @Nonnull final Consumer <BigDecimal> aQuantitySetter,
+                                               @NonNull final BigDecimal aQuantity,
+                                               @NonNull final Consumer <BigDecimal> aQuantitySetter,
                                                @Nullable final BigDecimal aPriceAmount,
                                                @Nullable final Consumer <BigDecimal> aPriceAmountSetter,
-                                               @Nonnull final IErrorList aErrorList)
+                                               @NonNull final IErrorList aErrorList)
   {
     final boolean bHasPrice = aPriceAmount != null && aPriceAmountSetter != null;
 
@@ -714,9 +702,9 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
     }
   }
 
-  @Nonnull
-  protected static ETriState isInvoiceType (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
-                                            @Nonnull final IErrorList aErrorList)
+  @NonNull
+  protected static ETriState isInvoiceType (@NonNull final CrossIndustryInvoiceType aCIIInvoice,
+                                            @NonNull final IErrorList aErrorList)
   {
     ETriState eIsInvoice = ETriState.UNDEFINED;
 
@@ -777,7 +765,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    * @return The parsed Invoice or CreditNote as UBL 2.x. May be <code>null</code> in case of error.
    */
   @Nullable
-  public Serializable convertCIItoUBL (@Nonnull final File aFile, @Nonnull final ErrorList aErrorList)
+  public Serializable convertCIItoUBL (@NonNull final File aFile, @NonNull final ErrorList aErrorList)
   {
     // Parse XML and convert to domain model
     final CrossIndustryInvoiceType aCIIInvoice = new CIID16BCrossIndustryInvoiceTypeMarshaller ().setValidationEventHandler (new WrappedCollectingValidationEventHandler (aErrorList))
@@ -800,6 +788,6 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
    *         case of error.
    */
   @Nullable
-  public abstract Serializable convertCIItoUBL (@Nonnull CrossIndustryInvoiceType aCIIInvoice,
-                                                @Nonnull ErrorList aErrorList);
+  public abstract Serializable convertCIItoUBL (@NonNull CrossIndustryInvoiceType aCIIInvoice,
+                                                @NonNull ErrorList aErrorList);
 }

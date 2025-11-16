@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,6 @@ import com.helger.ubl22.UBL22Marshaller;
 import com.helger.ubl23.UBL23Marshaller;
 import com.helger.ubl24.UBL24Marshaller;
 
-import jakarta.annotation.Nonnull;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -135,14 +135,14 @@ public class CIIToUBLConverter implements Callable <Integer>
   @Parameters (arity = "1..*", paramLabel = "source files", description = "One or more CII file(s)")
   private List <String> m_aSourceFilenames;
 
-  private void _verboseLog (@Nonnull final Supplier <String> aSupplier)
+  private void _verboseLog (@NonNull final Supplier <String> aSupplier)
   {
     if (m_bVerbose)
       LOGGER.info (aSupplier.get ());
   }
 
-  @Nonnull
-  private String _normalizeOutputDirectory (@Nonnull final String sDirectory)
+  @NonNull
+  private String _normalizeOutputDirectory (@NonNull final String sDirectory)
   {
     _verboseLog ( () -> "CLI option UBL output directory '" + sDirectory + "'");
     final String ret = Paths.get (sDirectory).toAbsolutePath ().normalize ().toString ();
@@ -151,14 +151,14 @@ public class CIIToUBLConverter implements Callable <Integer>
     return ret;
   }
 
-  @Nonnull
-  private static File _normalizeFile (@Nonnull final Path aPath)
+  @NonNull
+  private static File _normalizeFile (@NonNull final Path aPath)
   {
     return aPath.toAbsolutePath ().normalize ().toFile ();
   }
 
-  @Nonnull
-  private ICommonsList <File> _resolveWildcards (@Nonnull final List <String> aFilenames) throws IOException
+  @NonNull
+  private ICommonsList <File> _resolveWildcards (@NonNull final List <String> aFilenames) throws IOException
   {
     final ICommonsList <File> ret = new CommonsArrayList <> (aFilenames.size ());
 
@@ -188,8 +188,8 @@ public class CIIToUBLConverter implements Callable <Integer>
     return ret;
   }
 
-  @Nonnull
-  private ICommonsList <File> _normalizeInputFiles (@Nonnull final List <String> aFilenames) throws IOException
+  @NonNull
+  private ICommonsList <File> _normalizeInputFiles (@NonNull final List <String> aFilenames) throws IOException
   {
     final ICommonsList <File> aFiles;
     if (m_bDisableWildcardExpansion)
@@ -237,7 +237,7 @@ public class CIIToUBLConverter implements Callable <Integer>
     return ret;
   }
 
-  private static void _log (@Nonnull final IError aError)
+  private static void _log (@NonNull final IError aError)
   {
     final String sMsg = "  " + aError.getAsString (Locale.US);
     if (aError.isError ())

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.Serializable;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,6 @@ import com.helger.phive.api.validity.IValidityDeterminator;
 import com.helger.phive.xml.source.ValidationSourceXML;
 import com.helger.ubl24.UBL24Marshaller;
 
-import jakarta.annotation.Nullable;
 import oasis.names.specification.ubl.schema.xsd.creditnote_24.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_24.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;

@@ -90,6 +90,10 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v3.1.0 - 2025-11-16
+* Updated to ph-commons 12.1.0
+* Using JSpecify annotations
+
 v3.0.1 - 2025-09-19
 * Added the mapping of BT-86 for DirectDebit case
 

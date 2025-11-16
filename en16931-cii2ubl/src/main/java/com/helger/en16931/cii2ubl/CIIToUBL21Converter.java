@@ -22,6 +22,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.equals.EqualsHelper;
 import com.helger.base.numeric.BigHelper;
@@ -31,8 +34,6 @@ import com.helger.collection.CollectionFind;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.diagnostics.error.list.IErrorList;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.*;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.*;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
@@ -60,14 +61,12 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
   public CIIToUBL21Converter ()
   {}
 
-  @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _copyID (@Nullable final IDType aCIIID)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.@Nullable IDType _copyID (@Nullable final IDType aCIIID)
   {
     return copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType ());
   }
 
-  @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType _copyNote (@Nullable final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aNote)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.@Nullable NoteType _copyNote (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.@Nullable NoteType aNote)
   {
     if (aNote == null)
       return null;
@@ -90,15 +89,14 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     return aUBLNote;
   }
 
-  @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType _copyNote (@Nullable final TextType aText)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.@Nullable NoteType _copyNote (@Nullable final TextType aText)
   {
     return copyName (aText, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.NoteType ());
   }
 
   @Nullable
   private static DocumentReferenceType _convertDocumentReference (@Nullable final ReferencedDocumentType aRD,
-                                                                  @Nonnull final IErrorList aErrorList)
+                                                                  @NonNull final IErrorList aErrorList)
   {
     if (aRD == null)
       return null;
@@ -163,8 +161,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     return ret;
   }
 
-  @Nonnull
-  private static AddressType _convertPostalAddress (@Nonnull final TradeAddressType aPostalAddress)
+  @NonNull
+  private static AddressType _convertPostalAddress (@NonNull final TradeAddressType aPostalAddress)
   {
     final AddressType ret = new AddressType ();
     if (StringHelper.isNotEmpty (aPostalAddress.getLineOneValue ()))
@@ -192,8 +190,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     return ret;
   }
 
-  @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType _extractFirstPartyID (@Nonnull final TradePartyType aParty)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.@Nullable IDType _extractFirstPartyID (@NonNull final TradePartyType aParty)
   {
     final IDType aID;
     if (canUseGlobalID (aParty))
@@ -210,8 +207,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     return aID == null ? null : _copyID (aID);
   }
 
-  private static void _extractAllPartyIDs (@Nonnull final TradePartyType aParty,
-                                           @Nonnull final Consumer <? super oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType> aIDConsumer)
+  private static void _extractAllPartyIDs (@NonNull final TradePartyType aParty,
+                                           @NonNull final Consumer <? super oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType> aIDConsumer)
   {
     if (canUseGlobalID (aParty))
       getAllUsableGlobalIDs (aParty).forEach (x -> aIDConsumer.accept (_copyID (x)));
@@ -220,8 +217,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         aIDConsumer.accept (_copyID (aID));
   }
 
-  private static void _addPartyID (@Nullable final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType aUBLID,
-                                   @Nonnull final PartyType aParty)
+  private static void _addPartyID (final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.@Nullable IDType aUBLID,
+                                   @NonNull final PartyType aParty)
   {
     if (aUBLID != null)
     {
@@ -235,8 +232,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     }
   }
 
-  @Nonnull
-  private static PartyType _convertParty (@Nonnull final TradePartyType aParty,
+  @NonNull
+  private static PartyType _convertParty (@NonNull final TradePartyType aParty,
                                           final boolean bMultiID,
                                           final boolean bUseLegalEntityName)
   {
@@ -282,8 +279,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     return ret;
   }
 
-  @Nonnull
-  private PartyTaxSchemeType _convertPartyTaxScheme (@Nonnull final TaxRegistrationType aTaxRegistration)
+  @NonNull
+  private PartyTaxSchemeType _convertPartyTaxScheme (@NonNull final TaxRegistrationType aTaxRegistration)
   {
     if (aTaxRegistration.getID () == null)
       return null;
@@ -307,8 +304,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     return aUBLPartyTaxScheme;
   }
 
-  private static void _convertPartyLegalEntity (@Nonnull final TradePartyType aTradeParty,
-                                                @Nonnull final PartyType aUBLParty)
+  private static void _convertPartyLegalEntity (@NonNull final TradePartyType aTradeParty,
+                                                @NonNull final PartyType aUBLParty)
   {
     final PartyLegalEntityType aUBLPartyLegalEntity;
     if (aUBLParty.hasPartyLegalEntityEntries ())
@@ -351,7 +348,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
   }
 
   @Nullable
-  private static ContactType _convertContact (@Nonnull final TradePartyType aTradeParty)
+  private static ContactType _convertContact (@NonNull final TradePartyType aTradeParty)
   {
     if (!aTradeParty.hasDefinedTradeContactEntries ())
       return null;
@@ -381,17 +378,16 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     return aUBLContact;
   }
 
-  @Nullable
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType _copyAmount (@Nullable final AmountType aAmount,
-                                                                                                           @Nullable final String sDefaultCurrencyCode)
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.@Nullable AmountType _copyAmount (@Nullable final AmountType aAmount,
+                                                                                                                     @Nullable final String sDefaultCurrencyCode)
   {
     return copyAmount (aAmount,
                        new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.AmountType (),
                        sDefaultCurrencyCode);
   }
 
-  private void _copyAllowanceCharge (@Nonnull final TradeAllowanceChargeType aAllowanceCharge,
-                                     @Nonnull final AllowanceChargeType aUBLAllowanceCharge,
+  private void _copyAllowanceCharge (@NonNull final TradeAllowanceChargeType aAllowanceCharge,
+                                     @NonNull final AllowanceChargeType aUBLAllowanceCharge,
                                      @Nullable final String sDefaultCurrencyCode)
   {
     if (StringHelper.isNotEmpty (aAllowanceCharge.getReasonCodeValue ()))
@@ -431,11 +427,11 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
     }
   }
 
-  private void _convertPaymentMeans (@Nonnull final HeaderTradeSettlementType aHeaderSettlement,
-                                     @Nonnull final TradeSettlementPaymentMeansType aPaymentMeans,
-                                     @Nonnull final Consumer <oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType> aSellerIDHandler,
-                                     @Nonnull final Consumer <PaymentMeansType> aPaymentMeansSuccessHandler,
-                                     @Nonnull final ErrorList aErrorList)
+  private void _convertPaymentMeans (@NonNull final HeaderTradeSettlementType aHeaderSettlement,
+                                     @NonNull final TradeSettlementPaymentMeansType aPaymentMeans,
+                                     @NonNull final Consumer <oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType> aSellerIDHandler,
+                                     @NonNull final Consumer <PaymentMeansType> aPaymentMeansSuccessHandler,
+                                     @NonNull final ErrorList aErrorList)
   {
     final String sTypeCode = aPaymentMeans.getTypeCodeValue ();
 
@@ -613,8 +609,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
   }
 
   @Nullable
-  public InvoiceType convertToInvoice (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
-                                       @Nonnull final ErrorList aErrorList)
+  public InvoiceType convertToInvoice (@NonNull final CrossIndustryInvoiceType aCIIInvoice,
+                                       @NonNull final ErrorList aErrorList)
   {
     ValueEnforcer.notNull (aCIIInvoice, "CIIInvoice");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
@@ -1501,8 +1497,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
   }
 
   @Nullable
-  public CreditNoteType convertToCreditNote (@Nonnull final CrossIndustryInvoiceType aCIICreditNote,
-                                             @Nonnull final ErrorList aErrorList)
+  public CreditNoteType convertToCreditNote (@NonNull final CrossIndustryInvoiceType aCIICreditNote,
+                                             @NonNull final ErrorList aErrorList)
   {
     ValueEnforcer.notNull (aCIICreditNote, "CIICreditNote");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
@@ -2347,25 +2343,24 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
 
   @Override
   @Nullable
-  public Serializable convertCIItoUBL (@Nonnull final CrossIndustryInvoiceType aCIIInvoice,
-                                       @Nonnull final ErrorList aErrorList)
+  public Serializable convertCIItoUBL (@NonNull final CrossIndustryInvoiceType aCIIInvoice,
+                                       @NonNull final ErrorList aErrorList)
   {
     ValueEnforcer.notNull (aCIIInvoice, "CIIInvoice");
     ValueEnforcer.notNull (aErrorList, "ErrorList");
 
-    switch (getUBLCreationMode ())
+    return switch (getUBLCreationMode ())
     {
-      case AUTOMATIC:
+      case AUTOMATIC ->
+      {
         final ETriState eIsInvoice = isInvoiceType (aCIIInvoice, aErrorList);
         // Default to invoice
-        return eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList) : convertToCreditNote (
-                                                                                                                       aCIIInvoice,
-                                                                                                                       aErrorList);
-      case INVOICE:
-        return convertToInvoice (aCIIInvoice, aErrorList);
-      case CREDIT_NOTE:
-        return convertToCreditNote (aCIIInvoice, aErrorList);
-    }
-    throw new IllegalStateException ("Unsupported creation mode");
+        yield eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList) : convertToCreditNote (
+                                                                                                                      aCIIInvoice,
+                                                                                                                      aErrorList);
+      }
+      case INVOICE -> convertToInvoice (aCIIInvoice, aErrorList);
+      case CREDIT_NOTE -> convertToCreditNote (aCIIInvoice, aErrorList);
+    };
   }
 }
