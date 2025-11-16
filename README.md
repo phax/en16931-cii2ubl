@@ -3,7 +3,7 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.helger/en16931-cii2ubl/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.helger/en16931-cii2ubl) 
 [![javadoc](https://javadoc.io/badge2/com.helger/en16931-cii2ubl/javadoc.svg)](https://javadoc.io/doc/com.helger/en16931-cii2ubl)
 
-Converter for unidirectional EN16931 invoices from CII D16B to UBL 2.1, 2.2, 2.3 or 2.4.
+Unidirectional converter for EN16931 invoices from CII D16B to UBL 2.1, 2.2, 2.3 or 2.4.
 
 This is a Java 11+ library that converts a Cross Industry Invoice (CII) into a Universal Business Language (UBL) document following the rules of the European Norm (EN) 16931 that defines a common semantic data model for electronic invoices in Europe.
 
