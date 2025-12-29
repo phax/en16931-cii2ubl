@@ -94,8 +94,8 @@ final class MockSettings
                                                               // "03.01a-INVOICE_uncefact.xml",
                                                               "03.02a-INVOICE_uncefact.xml" };
 
-  static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1313.getWithVersionLatestRelease ();
-  static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1313.getWithVersionLatestRelease ();
+  static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1315.getWithVersionLatestRelease ();
+  static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1315.getWithVersionLatestRelease ();
 
   static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
   static

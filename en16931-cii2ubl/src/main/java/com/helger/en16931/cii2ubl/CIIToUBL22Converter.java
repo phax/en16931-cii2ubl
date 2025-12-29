@@ -1674,7 +1674,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       if (aUBLDocRef != null)
       {
         final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
-        aUBLBillingRef.setCreditNoteDocumentReference (aUBLDocRef);
+        // Must be the InvoiceDocumentReference - even for CreditNotes
+        aUBLBillingRef.setInvoiceDocumentReference (aUBLDocRef);
         aUBLCreditNote.addBillingReference (aUBLBillingRef);
       }
     }

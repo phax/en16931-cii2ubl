@@ -90,6 +90,9 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v3.1.1 - 2025-12-29
+* Fixed invalid mapping to `BillingReference/CreditNoteDocumentReference`. See [issue #43](https://github.com/phax/en16931-cii2ubl/issues/43) - thx @ycheuv-lgtm
+
 v3.1.0 - 2025-11-16
 * Updated to ph-commons 12.1.0
 * Using JSpecify annotations
