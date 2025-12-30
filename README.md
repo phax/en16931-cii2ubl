@@ -1,7 +1,9 @@
 # en16931-cii2ubl
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.helger/en16931-cii2ubl/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.helger/en16931-cii2ubl) 
+<!-- ph-badge-start -->
+[![Maven Central](https://img.shields.io/maven-central/v/com.helger/en16931-cii2ubl)](https://img.shields.io/maven-central/v/com.helger/en16931-cii2ubl)
 [![javadoc](https://javadoc.io/badge2/com.helger/en16931-cii2ubl/javadoc.svg)](https://javadoc.io/doc/com.helger/en16931-cii2ubl)
+<!-- ph-badge-end -->
 
 Unidirectional converter for EN16931 invoices from CII D16B to UBL 2.1, 2.2, 2.3 or 2.4.
 
