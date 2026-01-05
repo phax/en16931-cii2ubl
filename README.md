@@ -49,7 +49,7 @@ Replace `x.y.z` with the effective version you want to use:
 Call it via `java -jar en16931-cii2ubl-cli-full.jar` followed by the options and parameters.
 
 ```
-[INFO] CII to UBL Converter v3.0.1 (build 2025-09-19T12:55:25Z)
+[INFO] CII to UBL Converter v3.1.2 (build 2026-01-05T14:22:44Z)
 Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion] [--verbose]
                          [--mode mode] [--output-suffix filename part] [-t
                          directory] [--ubl version] [--ubl-cardaccountnetworkid
@@ -93,7 +93,7 @@ CII to UBL Converter for EN 16931 invoices
 # News and noteworthy
 
 v3.1.2 - 206-05-01
-* Fixed a bug in the BG-17 towards UBL 2.4. See [issue #44](https://github.com/phax/en16931-cii2ubl/issues/44) - thx @matmen
+* Fixed a bug in the BG-17 conversion towards UBL 2.4. See [issue #44](https://github.com/phax/en16931-cii2ubl/issues/44) - thx @matmen
 
 v3.1.1 - 2025-12-29
 * Fixed invalid mapping to `BillingReference/CreditNoteDocumentReference`. See [issue #43](https://github.com/phax/en16931-cii2ubl/issues/43) - thx @ycheuv-lgtm
