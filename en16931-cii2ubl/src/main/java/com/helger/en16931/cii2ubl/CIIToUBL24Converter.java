@@ -456,7 +456,7 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
 
     // BG-17 CREDIT TRANSFER
     final CreditorFinancialAccountType aPayeeCreditorAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
-    final boolean bIsBG17 = isPaymentMeansCodeCreditTransfer (sTypeCode);
+    final boolean bIsBG17 = isPaymentMeansCodeCreditTransfer (sTypeCode) && aPayeeCreditorAccount != null;
     if (bIsBG17)
     {
       final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
