@@ -92,7 +92,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-v3.1.2 - 206-05-01
+v3.1.2 - 2026-01-05
 * Fixed a bug in the BG-17 conversion towards UBL 2.4. See [issue #44](https://github.com/phax/en16931-cii2ubl/issues/44) - thx @matmen
 
 v3.1.1 - 2025-12-29
