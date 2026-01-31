@@ -1,5 +1,5 @@
 @REM
-@REM Copyright (C) 2019-2025 Philip Helger
+@REM Copyright (C) 2019-2026 Philip Helger
 @REM http://www.helger.com
 @REM philip[at]helger[dot]com
 @REM
