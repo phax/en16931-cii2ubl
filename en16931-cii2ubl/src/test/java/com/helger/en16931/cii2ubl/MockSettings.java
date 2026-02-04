@@ -127,6 +127,12 @@ final class MockSettings
                                                               "03.05a-INVOICE_uncefact.xml",
                                                               "03.06a-INVOICE_uncefact.xml",
                                                               "03.07a-INVOICE_uncefact.xml" };
+  private static final String [] TEST_FILES_XRECHNUNG_TECHNICAL = { "01.01_comprehensive_test_uncefact.xml",
+                                                                    "01.02_comprehensive_test_uncefact.xml",
+                                                                    "01.03_comprehensive_test_uncefact.xml",
+                                                                    "01.04_comprehensive_test_uncefact.xml",
+                                                                    "01.05_minimal_test_uncefact.xml",
+                                                                    "01.06_minimal_test_uncefact.xml" };
 
   static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1315.getWithVersionLatestRelease ();
   static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1315.getWithVersionLatestRelease ();
@@ -161,6 +167,8 @@ final class MockSettings
       ret.add (new File (BASE_TEST_DIR + "xrechnung/2.0.0", sFile));
     for (final String sFile : TEST_FILES_XRECHNUNG_302)
       ret.add (new File (BASE_TEST_DIR + "xrechnung/3.0.2", sFile));
+    for (final String sFile : TEST_FILES_XRECHNUNG_TECHNICAL)
+      ret.add (new File (BASE_TEST_DIR + "xrechnung/technical", sFile));
     return ret;
   }
 }

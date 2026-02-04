@@ -66,6 +66,7 @@ public final class CIIToUBL24ConverterTest
     for (final File aFile : MockSettings.getAllTestFiles ())
     {
       LOGGER.info ("Converting " + aFile.toString () + " to UBL 2.4");
+      assertTrue ("Not existing: " + aFile.getAbsolutePath (), aFile.exists ());
 
       // Main conversion
       final ErrorList aErrorList = new ErrorList ();
@@ -78,10 +79,8 @@ public final class CIIToUBL24ConverterTest
                                        FilenameHelper.getBaseName (aFile.getName ()) + "-ubl.xml");
       final ValidationResultList aResultList;
 
-      if (aInvoice instanceof InvoiceType)
+      if (aInvoice instanceof final InvoiceType aUBLInvoice)
       {
-        final InvoiceType aUBLInvoice = (InvoiceType) aInvoice;
-
         // Check UBL XSD scheme
         final GenericJAXBMarshaller <InvoiceType> aWriter = UBL24Marshaller.invoice ().setFormattedOutput (true);
         aWriter.write (aUBLInvoice, aDestFile);
