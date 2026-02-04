@@ -72,7 +72,7 @@ final class MockSettings
                                                               "02.02a-INVOICE_uncefact.xml",
                                                               "02.03a-INVOICE_uncefact.xml",
                                                               "02.04a-INVOICE_uncefact.xml",
-                                                              // "03.01a-INVOICE_uncefact.xml",
+                                                              "03.01a-INVOICE_uncefact.xml",
                                                               "03.02a-INVOICE_uncefact.xml" };
   private static final String [] TEST_FILES_XRECHNUNG_200 = { "01.01a-INVOICE_uncefact.xml",
                                                               "01.02a-INVOICE_uncefact.xml",
@@ -91,8 +91,42 @@ final class MockSettings
                                                               "01.15a-INVOICE_uncefact.xml",
                                                               "02.01a-INVOICE_uncefact.xml",
                                                               "02.02a-INVOICE_uncefact.xml",
-                                                              // "03.01a-INVOICE_uncefact.xml",
+                                                              "03.01a-INVOICE_uncefact.xml",
                                                               "03.02a-INVOICE_uncefact.xml" };
+  private static final String [] TEST_FILES_XRECHNUNG_302 = { "01.01a-INVOICE_uncefact.xml",
+                                                              "01.02a-INVOICE_uncefact.xml",
+                                                              "01.03a-INVOICE_uncefact.xml",
+                                                              "01.04a-INVOICE_uncefact.xml",
+                                                              "01.05a-INVOICE_uncefact.xml",
+                                                              "01.06a-INVOICE_uncefact.xml",
+                                                              "01.07a-INVOICE_uncefact.xml",
+                                                              "01.08a-INVOICE_uncefact.xml",
+                                                              "01.09a-INVOICE_uncefact.xml",
+                                                              "01.10a-INVOICE_uncefact.xml",
+                                                              "01.11a-INVOICE_uncefact.xml",
+                                                              "01.12a-INVOICE_uncefact.xml",
+                                                              "01.13a-INVOICE_uncefact.xml",
+                                                              "01.14a-INVOICE_uncefact.xml",
+                                                              "01.15a-INVOICE_uncefact.xml",
+                                                              // No 01.16a
+                                                              "01.17a-INVOICE_uncefact.xml",
+                                                              "01.18a-INVOICE_uncefact.xml",
+                                                              "01.19a-INVOICE_uncefact.xml",
+                                                              "01.20a-INVOICE_uncefact.xml",
+                                                              "01.21a-INVOICE_uncefact.xml",
+                                                              "02.01a-INVOICE_uncefact.xml",
+                                                              "02.02a-INVOICE_uncefact.xml",
+                                                              "02.03a-INVOICE_uncefact.xml",
+                                                              "02.04a-INVOICE_uncefact.xml",
+                                                              "02.05a-INVOICE_uncefact.xml",
+                                                              "02.06a-INVOICE_uncefact.xml",
+                                                              "03.01a-INVOICE_uncefact.xml",
+                                                              "03.02a-INVOICE_uncefact.xml",
+                                                              "03.03a-INVOICE_uncefact.xml",
+                                                              "03.04a-INVOICE_uncefact.xml",
+                                                              "03.05a-INVOICE_uncefact.xml",
+                                                              "03.06a-INVOICE_uncefact.xml",
+                                                              "03.07a-INVOICE_uncefact.xml" };
 
   static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1315.getWithVersionLatestRelease ();
   static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1315.getWithVersionLatestRelease ();
@@ -125,6 +159,8 @@ final class MockSettings
       ret.add (new File (BASE_TEST_DIR + "xrechnung/1.2.2", sFile));
     for (final String sFile : TEST_FILES_XRECHNUNG_200)
       ret.add (new File (BASE_TEST_DIR + "xrechnung/2.0.0", sFile));
+    for (final String sFile : TEST_FILES_XRECHNUNG_302)
+      ret.add (new File (BASE_TEST_DIR + "xrechnung/3.0.2", sFile));
     return ret;
   }
 }
