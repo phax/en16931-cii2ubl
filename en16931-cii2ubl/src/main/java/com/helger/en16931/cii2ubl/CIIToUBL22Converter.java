@@ -677,7 +677,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.setIssueDate (aIssueDate);
     }
 
-    // DueDate
+    // BT-9 DueDate
     {
       LocalDate aDueDate = null;
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
@@ -1565,7 +1565,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCreditNote.setIssueDate (aIssueDate);
     }
 
-    // DueDate
+    // BT-9 DueDate
+    final LocalDate aPaymentDueDate;
     {
       LocalDate aDueDate = null;
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
@@ -1575,8 +1576,8 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           if (aDueDate != null)
             break;
         }
-      if (aDueDate != null)
-        aUBLCreditNote.setDueDate (aDueDate);
+      // Will be set in PaymentMeans/PaymentDueDate
+      aPaymentDueDate = aDueDate;
     }
 
     // CreditNoteTypeCode
@@ -1903,7 +1904,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         _convertPaymentMeans (aHeaderSettlement,
                               aPaymentMeans,
                               x -> _addPartyID (x, aUBLCreditNote.getAccountingSupplierParty ().getParty ()),
-                              aUBLCreditNote::addPaymentMeans,
+                              aPM -> {
+                                if (aPaymentDueDate != null)
+                                  aPM.setPaymentDueDate (aPaymentDueDate);
+                                aUBLCreditNote.addPaymentMeans (aPM);
+                              },
                               aErrorList);
 
         // Allowed again in 1.2.1: exactly 2

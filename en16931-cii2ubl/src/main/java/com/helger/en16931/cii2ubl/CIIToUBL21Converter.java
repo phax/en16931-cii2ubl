@@ -678,7 +678,7 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         aUBLInvoice.setIssueDate (aIssueDate);
     }
 
-    // DueDate
+    // BT-9 DueDate
     {
       LocalDate aDueDate = null;
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
@@ -1566,21 +1566,20 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         aUBLCreditNote.setIssueDate (aIssueDate);
     }
 
-    // DueDate (UBL 2.2+ only)
-    // {
-    // LocalDate aDueDate = null;
-    // for (final TradePaymentTermsType aPaymentTerms :
-    // aHeaderSettlement.getSpecifiedTradePaymentTerms ())
-    // if (aPaymentTerms.getDueDateDateTime () != null)
-    // {
-    // aDueDate = parseDate (aPaymentTerms.getDueDateDateTime
-    // ().getDateTimeString (), aErrorList);
-    // if (aDueDate != null)
-    // break;
-    // }
-    // if (aDueDate != null)
-    // aUBLCreditNote.setDueDate (aDueDate);
-    // }
+    // BT-9 DueDate
+    final LocalDate aPaymentDueDate;
+    {
+      LocalDate aDueDate = null;
+      for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
+        if (aPaymentTerms.getDueDateDateTime () != null)
+        {
+          aDueDate = parseDate (aPaymentTerms.getDueDateDateTime ().getDateTimeString (), aErrorList);
+          if (aDueDate != null)
+            break;
+        }
+      // Will be set in PaymentMeans/PaymentDueDate
+      aPaymentDueDate = aDueDate;
+    }
 
     // CreditNoteTypeCode
     if (aED != null)
@@ -1907,7 +1906,11 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
         _convertPaymentMeans (aHeaderSettlement,
                               aPaymentMeans,
                               x -> _addPartyID (x, aUBLCreditNote.getAccountingSupplierParty ().getParty ()),
-                              aUBLCreditNote::addPaymentMeans,
+                              aPM -> {
+                                if (aPaymentDueDate != null)
+                                  aPM.setPaymentDueDate (aPaymentDueDate);
+                                aUBLCreditNote.addPaymentMeans (aPM);
+                              },
                               aErrorList);
 
         // Allowed again in 1.2.1: exactly 2
