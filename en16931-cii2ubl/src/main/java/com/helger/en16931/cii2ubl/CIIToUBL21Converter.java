@@ -1907,7 +1907,8 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
                               aPaymentMeans,
                               x -> _addPartyID (x, aUBLCreditNote.getAccountingSupplierParty ().getParty ()),
                               aPM -> {
-                                if (aPaymentDueDate != null)
+                                // Add only to the first PaymentMeans
+                                if (aPaymentDueDate != null && aUBLCreditNote.getPaymentMeansCount () == 0)
                                   aPM.setPaymentDueDate (aPaymentDueDate);
                                 aUBLCreditNote.addPaymentMeans (aPM);
                               },

@@ -37,6 +37,7 @@ final class MockSettings
                                                         "CII_business_example_02.xml",
                                                         "CII_example1.xml",
                                                         "CII_example1a.xml",
+                                                        "CII_example1-CreditNote.xml",
                                                         "CII_example2.xml",
                                                         "CII_example3.xml",
                                                         "CII_example4.xml",
