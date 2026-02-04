@@ -94,6 +94,7 @@ CII to UBL Converter for EN 16931 invoices
 
 v3.1.3 - 2026-02-02
 * Fixed the BT-9 mapping of CreditNotes. See [issue #45](https://github.com/phax/en16931-cii2ubl/issues/45) - thx @AWickSimova
+* The list of allowed Invoice Type Codes was extended: Added 71, 81, 102, 218, 219, 331, 382, 471, 472, 473, 500, 501, 502, 503, 553, 817 and 870
 
 v3.1.2 - 2026-01-05
 * Fixed a bug in the BG-17 conversion towards UBL 2.4. See [issue #44](https://github.com/phax/en16931-cii2ubl/issues/44) - thx @matmen

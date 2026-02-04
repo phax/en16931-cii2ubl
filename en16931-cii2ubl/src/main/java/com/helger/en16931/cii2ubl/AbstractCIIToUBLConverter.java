@@ -82,17 +82,11 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverter.class);
 
   // Source: EN 16931 validation artefacts
+  // Last update: 2026-02-04 from 1.3.15
   private static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
                                                                                             "81 83 261 262 296 308 381 396 420 458 532");
   private static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                        "80 82 84 130 202 203 204 211 295 325 326 380 383 384 385 386 387 388 389 390 393 394 395 456 457 527 575 623 633 751 780 935");
-  static
-  {
-    // XRechnung 2.1 extensions
-    INVOICE_TYPE_CODES.add ("875");
-    INVOICE_TYPE_CODES.add ("876");
-    INVOICE_TYPE_CODES.add ("877");
-  }
+                                                                                        "71 80 81 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 502 503 527 553 575 623 633 751 780 817 870 875 876 877 935");
 
   private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
   private String m_sVATScheme = DEFAULT_VAT_SCHEME;
