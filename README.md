@@ -92,6 +92,9 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v3.1.3 - 2026-02-02
+* Fixed the BT-9 mapping of CreditNotes. See [issue #45](https://github.com/phax/en16931-cii2ubl/issues/45) - thx @AWickSimova
+
 v3.1.2 - 2026-01-05
 * Fixed a bug in the BG-17 conversion towards UBL 2.4. See [issue #44](https://github.com/phax/en16931-cii2ubl/issues/44) - thx @matmen
 
