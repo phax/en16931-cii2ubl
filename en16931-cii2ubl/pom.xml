@@ -141,7 +141,7 @@
             <Export-Package>
               com.helger.en16931.cii2ubl
             </Export-Package>
-            <Import-Package>!jakarta.annotation.*,*</Import-Package>
+            <Import-Package>!org.jspecify.annotations.*,*</Import-Package>
             <!-- The latter one has precedence -->
             <Include-Resource>{maven-resources},cii2ubl-version.properties=target/classes/cii2ubl-version.properties</Include-Resource>
           </instructions>
