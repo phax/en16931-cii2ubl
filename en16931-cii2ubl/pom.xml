@@ -26,7 +26,7 @@
     <version>3.1.4-SNAPSHOT</version>
   </parent>
   <artifactId>en16931-cii2ubl</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>en16931-cii2ubl</name>
   <inceptionYear>2019</inceptionYear>
   <url>https://github.com/phax/en16931-cii2ubl/en16931-cii2ubl</url>
@@ -129,24 +129,5 @@
         </excludes>  
       </resource>
     </resources>
-    
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Automatic-Module-Name>com.helger.en16931.cii2ubl</Automatic-Module-Name>
-            <Export-Package>
-              com.helger.en16931.cii2ubl
-            </Export-Package>
-            <Import-Package>!org.jspecify.annotations.*,*</Import-Package>
-            <!-- The latter one has precedence -->
-            <Include-Resource>{maven-resources},cii2ubl-version.properties=target/classes/cii2ubl-version.properties</Include-Resource>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 </project>
