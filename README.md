@@ -92,8 +92,11 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-v3.1.4 - work in progress
+v3.1.4 - 2026-04-13
 * No more OSGI bundle packaging
+* Avoid creating an empty UBL Delivery Party Name element. See [issue #47](https://github.com/phax/en16931-cii2ubl/issues/47)
+* Fixed the Delivery element to also be created when only a delivery date is present but no ShipToParty
+* Unified the CreditNote line-item price handling (BT-147, BT-148, BT-149, BT-150) to match the Invoice logic
 
 v3.1.3 - 2026-02-02
 * Fixed the BT-9 mapping of CreditNotes. See [issue #45](https://github.com/phax/en16931-cii2ubl/issues/45) - thx @AWickSimova
