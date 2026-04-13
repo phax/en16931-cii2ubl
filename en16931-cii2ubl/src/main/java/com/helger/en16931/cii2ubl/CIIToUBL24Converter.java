@@ -1002,7 +1002,7 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
         }
 
         final TextType aName = aShipToParty.getName ();
-        if (aName != null)
+        if (aName != null && StringHelper.isNotEmpty (aName.getValue ()))
         {
           final PartyType aUBLDeliveryParty = new PartyType ();
           final PartyNameType aUBLPartyName = new PartyNameType ();
@@ -1011,7 +1011,6 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           aUBLDelivery.setDeliveryParty (aUBLDeliveryParty);
           bUseDelivery = true;
         }
-
       }
 
       if (bUseDelivery)
@@ -1851,19 +1850,23 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
 
     // Delivery
     {
+      final DeliveryType aUBLDelivery = new DeliveryType ();
+      boolean bUseDelivery = false;
+
+      final SupplyChainEventType aSCE = aHeaderDelivery.getActualDeliverySupplyChainEvent ();
+      if (aSCE != null)
+      {
+        final DateTimeType aODT = aSCE.getOccurrenceDateTime ();
+        if (aODT != null)
+        {
+          aUBLDelivery.setActualDeliveryDate (parseDate (aODT.getDateTimeString (), aErrorList));
+          bUseDelivery = true;
+        }
+      }
+
       final TradePartyType aShipToParty = aHeaderDelivery.getShipToTradeParty ();
       if (aShipToParty != null)
       {
-        final DeliveryType aUBLDelivery = new DeliveryType ();
-
-        final SupplyChainEventType aSCE = aHeaderDelivery.getActualDeliverySupplyChainEvent ();
-        if (aSCE != null)
-        {
-          final DateTimeType aODT = aSCE.getOccurrenceDateTime ();
-          if (aODT != null)
-            aUBLDelivery.setActualDeliveryDate (parseDate (aODT.getDateTimeString (), aErrorList));
-        }
-
         final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_24.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_24.LocationType ();
         boolean bUseLocation = false;
 
@@ -1882,20 +1885,25 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
         }
 
         if (bUseLocation)
+        {
           aUBLDelivery.setDeliveryLocation (aUBLDeliveryLocation);
+          bUseDelivery = true;
+        }
 
         final TextType aName = aShipToParty.getName ();
-        if (aName != null)
+        if (aName != null && StringHelper.isNotEmpty (aName.getValue ()))
         {
           final PartyType aUBLDeliveryParty = new PartyType ();
           final PartyNameType aUBLPartyName = new PartyNameType ();
           aUBLPartyName.setName (copyName (aName, new NameType ()));
           aUBLDeliveryParty.addPartyName (aUBLPartyName);
           aUBLDelivery.setDeliveryParty (aUBLDeliveryParty);
+          bUseDelivery = true;
         }
-
-        aUBLCreditNote.addDelivery (aUBLDelivery);
       }
+
+      if (bUseDelivery)
+        aUBLCreditNote.addDelivery (aUBLDelivery);
     }
 
     // Payment means
