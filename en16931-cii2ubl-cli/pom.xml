@@ -82,7 +82,7 @@
         <configuration>
           <createDependencyReducedPom>false</createDependencyReducedPom>
           <shadedArtifactAttached>true</shadedArtifactAttached>
-          <finalName>${artifactId}-full</finalName>
+          <finalName>${project.artifactId}-full</finalName>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
             <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
