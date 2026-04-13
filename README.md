@@ -92,6 +92,9 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v3.1.5 - 2026-04-13
+* Fixed the "main class" attribute for the manifest
+
 v3.1.4 - 2026-04-13
 * No more OSGI bundle packaging
 * Avoid creating an empty UBL Delivery Party Name element. See [issue #47](https://github.com/phax/en16931-cii2ubl/issues/47)

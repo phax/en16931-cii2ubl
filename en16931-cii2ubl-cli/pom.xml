@@ -89,6 +89,9 @@
               <resource>.RSA</resource>
               <resource>.SF</resource>
             </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <mainClass>com.helger.en16931.cii2ubl.cli.CIIToUBLConverter</mainClass>
+            </transformer>
           </transformers>
         </configuration>
         <executions>
