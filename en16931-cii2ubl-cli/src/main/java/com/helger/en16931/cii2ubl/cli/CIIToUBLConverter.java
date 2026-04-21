@@ -120,6 +120,18 @@ public class CIIToUBLConverter implements Callable <Integer>
            description = "The UBL default order reference ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sDefaultOrderRefID;
 
+  @Option (names = "--swap-quantity-sign",
+           paramLabel = "boolean",
+           defaultValue = "true",
+           description = "Swap quantity sign if needed for credit notes (default: '${DEFAULT-VALUE}')")
+  private boolean m_bSwapQuantitySign;
+
+  @Option (names = "--swap-price-sign",
+           paramLabel = "boolean",
+           defaultValue = "true",
+           description = "Swap price sign if needed for credit notes (default: '${DEFAULT-VALUE}')")
+  private boolean m_bSwapPriceSign;
+
   @Option (names = "--verbose",
            paramLabel = "boolean",
            defaultValue = "false",
@@ -278,7 +290,9 @@ public class CIIToUBLConverter implements Callable <Integer>
               .setCustomizationID (m_sCustomizationID)
               .setProfileID (m_sProfileID)
               .setCardAccountNetworkID (m_sCardAccountNetworkID)
-              .setDefaultOrderRefID (m_sDefaultOrderRefID);
+              .setDefaultOrderRefID (m_sDefaultOrderRefID)
+              .setSwapQuantitySignIfNeeded (m_bSwapQuantitySign)
+              .setSwapPriceSignIfNeeded (m_bSwapPriceSign);
 
     for (final File f : m_aSourceFiles)
     {
