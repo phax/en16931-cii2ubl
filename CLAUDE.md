@@ -37,13 +37,18 @@ Requires Java 17+.
 
 ```
 AbstractCIIToUBLConverter<IMPLTYPE>  (base class, ~787 lines)
-  ├── CIIToUBL21Converter            (~2380 lines each, nearly identical)
+  ├── CIIToUBL21Converter            (~2417 lines each, nearly identical)
   ├── CIIToUBL22Converter            (differences are UBL version-specific
   ├── CIIToUBL23Converter             JAXB types and marshaller classes)
   └── CIIToUBL24Converter
+
+EUBLCreationMode                     (enum: AUTOMATIC, INVOICE, CREDIT_NOTE)
+CIIToUBLVersion                      (version constants loaded from properties)
 ```
 
 The converters are **not auto-generated** — they are manually maintained with slight variations per UBL version (different JAXB type packages).
+
+CLI entry point: `com.helger.en16931.cii2ubl.cli.CIIToUBLConverter` (picocli command, shaded into fat JAR).
 
 ### Conversion Flow
 
@@ -67,6 +72,7 @@ Converters accept an `ErrorList` parameter. Conversion is successful only if a n
 ## Testing
 
 - JUnit 4, test classes mirror converter classes: `CIIToUBL21ConverterTest` etc.
+- `AbstractCIIToUBLConverterTest` — base test class shared by all four converter tests
 - Tests convert all CII example files and validate output against EN 16931 rules (via phive-rules)
 - Test CII files in `en16931-cii2ubl/src/test/resources/external/cii/` (~65+ files: EN 16931 examples, XRechnung 1.2.2/2.0.0/3.0.2, issue-specific test cases)
 - `MockSettings` centralizes test file discovery and validation rule registration
