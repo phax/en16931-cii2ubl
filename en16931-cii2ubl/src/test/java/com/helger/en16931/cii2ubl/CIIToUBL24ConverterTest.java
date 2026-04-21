@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.Serializable;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,7 +34,6 @@ import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.io.file.FilenameHelper;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.jaxb.GenericJAXBMarshaller;
-import com.helger.jaxb.JAXBContextCache;
 import com.helger.phive.api.execute.ValidationExecutionManager;
 import com.helger.phive.api.result.ValidationResult;
 import com.helger.phive.api.result.ValidationResultList;
@@ -61,7 +61,6 @@ public final class CIIToUBL24ConverterTest
   @Test
   public void testConvertAndValidateAll ()
   {
-    JAXBContextCache.setSilentMode (false);
     final String sBasePath = MockSettings.getBaseDir ().getAbsolutePath ();
     for (final File aFile : MockSettings.getAllTestFiles ())
     {
@@ -115,7 +114,7 @@ public final class CIIToUBL24ConverterTest
   }
 
   @Nullable
-  private static Serializable _convert (final CrossIndustryInvoiceType aInvoice)
+  private static Serializable _convert (@NonNull final CrossIndustryInvoiceType aInvoice)
   {
     return new CIIToUBL24Converter ().convertCIItoUBL (aInvoice, new ErrorList ());
   }

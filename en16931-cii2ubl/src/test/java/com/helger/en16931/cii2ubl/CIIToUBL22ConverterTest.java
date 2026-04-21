@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.Serializable;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -113,7 +114,7 @@ public final class CIIToUBL22ConverterTest
   }
 
   @Nullable
-  private static Serializable _convert (final CrossIndustryInvoiceType aInvoice)
+  private static Serializable _convert (@NonNull final CrossIndustryInvoiceType aInvoice)
   {
     return new CIIToUBL22Converter ().convertCIItoUBL (aInvoice, new ErrorList ());
   }
