@@ -362,7 +362,7 @@ public abstract class AbstractCIIToUBLConverter <IMPLTYPE extends AbstractCIIToU
       return ETriState.UNDEFINED;
     }
 
-    throw new IllegalStateException ("Indicator has neither string nor boolen");
+    throw new IllegalStateException ("Indicator has neither string nor boolean");
   }
 
   /**
