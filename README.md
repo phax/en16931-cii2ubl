@@ -94,6 +94,7 @@ CII to UBL Converter for EN 16931 invoices
 
 v3.1.6 - work in progress
 * Added CLI options `--swap-quantity-sign` and `--swap-price-sign` to expose the full converter API
+* Improved BT-90 mapping so that it is correctly set to the `PayeeParty` if present
 
 v3.1.5 - 2026-04-13
 * Fixed the "main class" attribute for the manifest

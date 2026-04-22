@@ -569,9 +569,11 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
             break;
         }
 
-      // BT-90
-      // how to determine if it is the Seller or the Payee?
-      // For direct debit it's always assumed to be the seller
+      // BT-90 Bank assigned creditor identifier
+      // CII has a dedicated CreditorReferenceID element.
+      // In UBL it is placed as a PartyIdentification/ID on the Payee (if
+      // present) or the Seller. The @schemeID="SEPA" is required by the
+      // EN 16931 Schematron to distinguish it from regular BT-29 identifiers.
       final IDType aCreditorRefID = aHeaderSettlement.getCreditorReferenceID ();
       if (aCreditorRefID != null)
       {
@@ -1068,7 +1070,13 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       {
         _convertPaymentMeans (aHeaderSettlement,
                               aPaymentMeans,
-                              x -> _addPartyID (x, aUBLInvoice.getAccountingSupplierParty ().getParty ()),
+                              // BT-90: place on Payee if present, otherwise on Seller
+                              x -> {
+                                if (aUBLInvoice.getPayeeParty () != null)
+                                  _addPartyID (x, aUBLInvoice.getPayeeParty ());
+                                else
+                                  _addPartyID (x, aUBLInvoice.getAccountingSupplierParty ().getParty ());
+                              },
                               aUBLInvoice::addPaymentMeans,
                               aErrorList);
 
@@ -1994,7 +2002,13 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       {
         _convertPaymentMeans (aHeaderSettlement,
                               aPaymentMeans,
-                              x -> _addPartyID (x, aUBLCreditNote.getAccountingSupplierParty ().getParty ()),
+                              // BT-90: place on Payee if present, otherwise on Seller
+                              x -> {
+                                if (aUBLCreditNote.getPayeeParty () != null)
+                                  _addPartyID (x, aUBLCreditNote.getPayeeParty ());
+                                else
+                                  _addPartyID (x, aUBLCreditNote.getAccountingSupplierParty ().getParty ());
+                              },
                               aPM -> {
                                 // Add only to the first PaymentMeans
                                 if (aPaymentDueDate != null && aUBLCreditNote.getPaymentMeansCount () == 0)
