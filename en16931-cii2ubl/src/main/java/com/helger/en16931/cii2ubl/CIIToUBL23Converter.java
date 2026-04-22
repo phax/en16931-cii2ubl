@@ -1341,6 +1341,9 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       }
 
       // BT-128/BT-128-1 Invoice line object identifier
+      // EN 16931 only defines TypeCode="130" at line level. We don't filter here
+      // because _convertDocumentReference already propagates TypeCode as
+      // DocumentTypeCode, and dropping unknown type codes would silently lose data.
       for (final ReferencedDocumentType aLineReferencedDocument : aLineSettlement.getAdditionalReferencedDocument ())
       {
         final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aLineReferencedDocument, aErrorList);
@@ -2277,6 +2280,9 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
       }
 
       // BT-128/BT-128-1 Invoice line object identifier
+      // EN 16931 only defines TypeCode="130" at line level. We don't filter here
+      // because _convertDocumentReference already propagates TypeCode as
+      // DocumentTypeCode, and dropping unknown type codes would silently lose data.
       for (final ReferencedDocumentType aLineReferencedDocument : aLineSettlement.getAdditionalReferencedDocument ())
       {
         final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aLineReferencedDocument, aErrorList);
