@@ -66,6 +66,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     return copyID (aCIIID, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType ());
   }
 
+  // BG-1: BT-21 Invoice note subject code + BT-22 Invoice note
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.@Nullable NoteType _copyNote (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.@Nullable NoteType aNote)
   {
     if (aNote == null)
@@ -94,6 +95,10 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     return copyName (aText, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.NoteType ());
   }
 
+  // BG-3/BG-24: Document reference conversion
+  // Used for BT-25/BT-26 (preceding invoice), BT-122/BT-123/BT-124/BT-125/BT-125-1/BT-125-2 (additional supporting docs),
+  // BT-15 (receiving advice), BT-16 (despatch advice), BT-12 (contract), BT-17 (tender/lot), BT-18/BT-18-1 (invoiced object),
+  // BT-128/BT-128-1 (line object)
   @Nullable
   private static DocumentReferenceType _convertDocumentReference (@Nullable final ReferencedDocumentType aRD,
                                                                   @NonNull final IErrorList aErrorList)
@@ -106,19 +111,20 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       return null;
 
     final DocumentReferenceType ret = new DocumentReferenceType ();
-    // ID value is a mandatory field
+    // BT-122/BT-25/BT-18 ID value is a mandatory field
+    // BT-18-1/BT-128-1 scheme ID
     ret.setID (sID).setSchemeID (aRD.getReferenceTypeCodeValue ());
 
     // Add DocumentTypeCode where possible
     if (isValidDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
       ret.setDocumentTypeCode (aRD.getTypeCodeValue ());
 
-    // IssueDate is optional
+    // BT-26 Preceding Invoice issue date is optional
     final FormattedDateTimeType aFDT = aRD.getFormattedIssueDateTime ();
     if (aFDT != null)
       ret.setIssueDate (parseDate (aFDT.getDateTimeString (), aErrorList));
 
-    // Name is optional
+    // BT-123 Supporting document description is optional
     for (final TextType aItem : aRD.getName ())
     {
       final DocumentDescriptionType aUBLDocDesc = new DocumentDescriptionType ();
@@ -128,14 +134,16 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       ret.addDocumentDescription (aUBLDocDesc);
     }
 
-    // Attachment (0..1 for CII)
+    // BT-125 Attached document (0..1 for CII)
     if (aRD.getAttachmentBinaryObjectCount () > 0)
     {
       final BinaryObjectType aBinObj = aRD.getAttachmentBinaryObjectAtIndex (0);
 
       final AttachmentType aUBLAttachment = new AttachmentType ();
       final EmbeddedDocumentBinaryObjectType aEmbeddedDoc = new EmbeddedDocumentBinaryObjectType ();
+      // BT-125-1 Attached document Mime code
       aEmbeddedDoc.setMimeCode (aBinObj.getMimeCode ());
+      // BT-125-2 Attached document Filename
       aEmbeddedDoc.setFilename (aBinObj.getFilename ());
       aEmbeddedDoc.setValue (aBinObj.getValue ());
       aUBLAttachment.setEmbeddedDocumentBinaryObject (aEmbeddedDoc);
@@ -143,6 +151,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       ret.setAttachment (aUBLAttachment);
     }
 
+    // BT-124 External document location
     final String sURI = aRD.getURIIDValue ();
     if (StringHelper.isNotEmpty (sURI))
     {
@@ -161,26 +170,34 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     return ret;
   }
 
+  // Converts BG-5/BG-8/BG-12/BG-15 postal address
   @NonNull
   private static AddressType _convertPostalAddress (@NonNull final TradeAddressType aPostalAddress)
   {
     final AddressType ret = new AddressType ();
+    // BT-35/BT-50/BT-64/BT-75 Address line 1
     if (StringHelper.isNotEmpty (aPostalAddress.getLineOneValue ()))
       ret.setStreetName (aPostalAddress.getLineOneValue ());
+    // BT-36/BT-51/BT-65/BT-76 Address line 2
     if (StringHelper.isNotEmpty (aPostalAddress.getLineTwoValue ()))
       ret.setAdditionalStreetName (aPostalAddress.getLineTwoValue ());
+    // BT-162/BT-163/BT-164/BT-165 Address line 3
     if (StringHelper.isNotEmpty (aPostalAddress.getLineThreeValue ()))
     {
       final AddressLineType aUBLAddressLine = new AddressLineType ();
       aUBLAddressLine.setLine (aPostalAddress.getLineThreeValue ());
       ret.addAddressLine (aUBLAddressLine);
     }
+    // BT-37/BT-52/BT-66/BT-77 City
     if (StringHelper.isNotEmpty (aPostalAddress.getCityNameValue ()))
       ret.setCityName (aPostalAddress.getCityNameValue ());
+    // BT-38/BT-53/BT-67/BT-78 Post code
     if (StringHelper.isNotEmpty (aPostalAddress.getPostcodeCodeValue ()))
       ret.setPostalZone (aPostalAddress.getPostcodeCodeValue ());
+    // BT-39/BT-54/BT-68/BT-79 Country subdivision
     if (aPostalAddress.hasCountrySubDivisionNameEntries ())
       ret.setCountrySubentity (aPostalAddress.getCountrySubDivisionNameAtIndex (0).getValue ());
+    // BT-40/BT-55/BT-69/BT-80 Country code
     if (StringHelper.isNotEmpty (aPostalAddress.getCountryIDValue ()))
     {
       final CountryType aUBLCountry = new CountryType ();
@@ -239,18 +256,20 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
   {
     final PartyType ret = new PartyType ();
 
+    // BT-34/BT-34-1/BT-49/BT-49-1 Electronic address
     if (aParty.hasURIUniversalCommunicationEntries ())
     {
       final UniversalCommunicationType UC = aParty.getURIUniversalCommunicationAtIndex (0);
       ret.setEndpointID (copyID (UC.getURIID (), new EndpointIDType ()));
     }
 
+    // BT-29/BT-29-1/BT-46/BT-46-1/BT-60/BT-60-1/BT-71/BT-71-1 Party identifier
     if (bMultiID)
       _extractAllPartyIDs (aParty, x -> _addPartyID (x, ret));
     else
       _addPartyID (_extractFirstPartyID (aParty), ret);
 
-    // BT-27, BT-44, BT-59, BT-62, BT-70
+    // BT-27/BT-44/BT-59/BT-62/BT-70 Party name
     final TextType aName = aParty.getName ();
     if (aName != null && StringHelper.isNotEmpty (aName.getValue ()))
     {
@@ -279,6 +298,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     return ret;
   }
 
+  // BT-31/BT-32/BT-48/BT-63 Tax registration
   @NonNull
   private PartyTaxSchemeType _convertPartyTaxScheme (@NonNull final TaxRegistrationType aTaxRegistration)
   {
@@ -304,6 +324,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     return aUBLPartyTaxScheme;
   }
 
+  // BT-28/BT-30/BT-30-1/BT-33/BT-45/BT-47/BT-47-1/BT-61/BT-61-1 Party legal entity
   private static void _convertPartyLegalEntity (@NonNull final TradePartyType aTradeParty,
                                                 @NonNull final PartyType aUBLParty)
   {
@@ -321,6 +342,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final LegalOrganizationType aSLO = aTradeParty.getSpecifiedLegalOrganization ();
     if (aSLO != null)
     {
+      // BT-28/BT-45 Trading name
       if (StringHelper.isNotEmpty (aSLO.getTradingBusinessNameValue ()))
       {
         final PartyNameType aUBLPartyName = new PartyNameType ();
@@ -329,9 +351,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           aUBLParty.addPartyName (aUBLPartyName);
       }
 
+      // BT-30/BT-30-1/BT-47/BT-47-1/BT-61/BT-61-1 Legal registration identifier
       aUBLPartyLegalEntity.setCompanyID (copyID (aSLO.getID (), new CompanyIDType ()));
     }
 
+    // BT-33 Seller additional legal information
     for (final TextType aDesc : aTradeParty.getDescription ())
       if (StringHelper.isNotEmpty (aDesc.getValue ()))
       {
@@ -347,6 +371,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     }
   }
 
+  // BG-6/BG-9 Contact
   @Nullable
   private static ContactType _convertContact (@NonNull final TradePartyType aTradeParty)
   {
@@ -356,17 +381,20 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final TradeContactType aDTC = aTradeParty.getDefinedTradeContactAtIndex (0);
     final ContactType aUBLContact = new ContactType ();
 
+    // BT-41/BT-56 Contact point
     aUBLContact.setName (copyName (aDTC.getPersonName (), new NameType ()));
     if (aUBLContact.getNameValue () == null)
     {
-      // BT-41
+      // BT-41/BT-56 fallback to department name
       aUBLContact.setName (copyName (aDTC.getDepartmentName (), new NameType ()));
     }
 
+    // BT-42/BT-57 Contact telephone number
     final UniversalCommunicationType aTel = aDTC.getTelephoneUniversalCommunication ();
     if (aTel != null)
       ifNotEmpty (aTel.getCompleteNumberValue (), aUBLContact::setTelephone);
 
+    // BT-43/BT-58 Contact email address
     final UniversalCommunicationType aEmail = aDTC.getEmailURIUniversalCommunication ();
     if (aEmail != null)
       ifNotEmpty (aEmail.getURIIDValue (), aUBLContact::setElectronicMail);
@@ -386,34 +414,41 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                        sDefaultCurrencyCode);
   }
 
+  // BG-20/BG-21/BG-27/BG-28 Allowance/Charge details
   private void _copyAllowanceCharge (@NonNull final TradeAllowanceChargeType aAllowanceCharge,
                                      @NonNull final AllowanceChargeType aUBLAllowanceCharge,
                                      @Nullable final String sDefaultCurrencyCode)
   {
+    // BT-98/BT-105/BT-140/BT-145 Reason code
     if (StringHelper.isNotEmpty (aAllowanceCharge.getReasonCodeValue ()))
       aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
 
+    // BT-97/BT-104/BT-139/BT-144 Reason
     if (aAllowanceCharge.getReason () != null)
     {
       final AllowanceChargeReasonType aUBLReason = new AllowanceChargeReasonType ();
       aUBLReason.setValue (aAllowanceCharge.getReasonValue ());
       aUBLAllowanceCharge.addAllowanceChargeReason (aUBLReason);
     }
+    // BT-94/BT-101/BT-138/BT-143 Percentage
     if (aAllowanceCharge.getCalculationPercent () != null)
     {
       // UBL requires values between 0 and 100
       aUBLAllowanceCharge.setMultiplierFactorNumeric (aAllowanceCharge.getCalculationPercentValue ());
     }
+    // BT-92/BT-99/BT-136/BT-141 Amount
     if (aAllowanceCharge.hasActualAmountEntries ())
     {
       aUBLAllowanceCharge.setAmount (_copyAmount (aAllowanceCharge.getActualAmountAtIndex (0), sDefaultCurrencyCode));
     }
 
+    // BT-93/BT-100/BT-137/BT-142 Base amount
     aUBLAllowanceCharge.setBaseAmount (copyAmount (aAllowanceCharge.getBasisAmount (),
                                                    new BaseAmountType (),
                                                    sDefaultCurrencyCode));
 
-    // TaxCategory
+    // BT-95/BT-102 VAT category code and BT-96/BT-103 VAT rate
+    // (not applicable for line-level BG-27/BG-28)
     for (final TradeTaxType aTradeTax : aAllowanceCharge.getCategoryTradeTax ())
     {
       final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -589,6 +624,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
     if (aBuyerOrderRef != null)
       aUBLOrderRef.setID (aBuyerOrderRef.getIssuerAssignedIDValue ());
+    
     if (aSellerOrderRef != null)
     {
       if (aUBLOrderRef.getIDValue () == null)
@@ -656,6 +692,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     if (StringHelper.isNotEmpty (getCustomizationID ()))
       aUBLInvoice.setCustomizationID (getCustomizationID ());
 
+    // BT-1 Invoice number
     if (aED != null)
       aUBLInvoice.setID (aED.getIDValue ());
 
@@ -667,7 +704,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final CustomerPartyType aUBLCustomer = new CustomerPartyType ();
     aUBLInvoice.setAccountingCustomerParty (aUBLCustomer);
 
-    // IssueDate
+    // BT-2 Invoice issue date
     {
       LocalDate aIssueDate = null;
       if (aED != null && aED.getIssueDateTime () != null)
@@ -677,7 +714,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.setIssueDate (aIssueDate);
     }
 
-    // BT-9 DueDate
+    // BT-9 Payment due date
     {
       LocalDate aDueDate = null;
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
@@ -691,16 +728,16 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.setDueDate (aDueDate);
     }
 
-    // InvoiceTypeCode
+    // BT-3 Invoice type code
     if (aED != null)
       aUBLInvoice.setInvoiceTypeCode (aED.getTypeCodeValue ());
 
-    // Note
+    // BG-1 INVOICE NOTE (BT-21/BT-22)
     if (aED != null)
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
         ifNotNull (_copyNote (aEDNote), aUBLInvoice::addNote);
 
-    // BT-7 TaxPointDate
+    // BT-7 Value added tax point date
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
     {
       if (aTradeTax.getTaxPointDate () != null)
@@ -715,17 +752,17 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // DocumentCurrencyCode
+    // BT-5 Invoice currency code
     final String sDefaultCurrencyCode = aHeaderSettlement.getInvoiceCurrencyCodeValue ();
     aUBLInvoice.setDocumentCurrencyCode (sDefaultCurrencyCode);
 
-    // TaxCurrencyCode
+    // BT-6 VAT accounting currency code
     if (aHeaderSettlement.getTaxCurrencyCodeValue () != null)
     {
       aUBLInvoice.setTaxCurrencyCode (aHeaderSettlement.getTaxCurrencyCodeValue ());
     }
 
-    // AccountingCost
+    // BT-19 Buyer accounting reference
     for (final TradeAccountingAccountType aAccount : aHeaderSettlement.getReceivableSpecifiedTradeAccountingAccount ())
     {
       final String sID = aAccount.getIDValue ();
@@ -737,13 +774,13 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // BuyerReferences
+    // BT-10 Buyer reference
     if (aHeaderAgreement.getBuyerReferenceValue () != null)
     {
       aUBLInvoice.setBuyerReference (aHeaderAgreement.getBuyerReferenceValue ());
     }
 
-    // InvoicePeriod
+    // BG-14 INVOICING PERIOD (BT-73/BT-74)
     {
       final PeriodType aUBLPeriod = new PeriodType ();
       final SpecifiedPeriodType aSPT = aHeaderSettlement.getBillingSpecifiedPeriod ();
@@ -772,14 +809,14 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.addInvoicePeriod (aUBLPeriod);
     }
 
-    // OrderReference
+    // BT-13 Purchase order reference + BT-14 Sales order reference
     {
       final OrderReferenceType aUBLOrderRef = _createUBLOrderRef (aHeaderAgreement.getBuyerOrderReferencedDocument (),
                                                                   aHeaderAgreement.getSellerOrderReferencedDocument ());
       aUBLInvoice.setOrderReference (aUBLOrderRef);
     }
 
-    // BillingReference
+    // BG-3 PRECEDING INVOICE REFERENCE (BT-25/BT-26)
     {
       final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderSettlement.getInvoiceReferencedDocument (),
                                                                           aErrorList);
@@ -791,7 +828,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // DespatchDocumentReference
+    // BT-16 Despatch advice reference
     {
       final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getDespatchAdviceReferencedDocument (),
                                                                           aErrorList);
@@ -799,7 +836,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.addDespatchDocumentReference (aUBLDocRef);
     }
 
-    // ReceiptDocumentReference
+    // BT-15 Receiving advice reference
     {
       final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getReceivingAdviceReferencedDocument (),
                                                                           aErrorList);
@@ -807,7 +844,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.addReceiptDocumentReference (aUBLDocRef);
     }
 
-    // OriginatorDocumentReference
+    // BT-17 Tender or lot reference (OriginatorDocumentReference)
     {
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
@@ -825,7 +862,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // ContractDocumentReference
+    // BT-12 Contract reference
     {
       final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderAgreement.getContractReferencedDocument (),
                                                                           aErrorList);
@@ -833,11 +870,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.addContractDocumentReference (aUBLDocRef);
     }
 
-    // AdditionalDocumentReference
+    // BG-24 ADDITIONAL SUPPORTING DOCUMENTS + BT-18/BT-18-1 Invoiced object identifier
     {
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
-        // Except OriginatorDocumentReference
+        // Except OriginatorDocumentReference (BT-17)
         if (!isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
@@ -847,7 +884,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // ProjectReference
+    // BT-11 Project reference
     {
       final ProcuringProjectType aSpecifiedProcuring = aHeaderAgreement.getSpecifiedProcuringProject ();
       if (aSpecifiedProcuring != null)
@@ -862,7 +899,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Supplier Party
+    // BG-4 SELLER
     {
       final TradePartyType aSellerParty = aHeaderAgreement.getSellerTradeParty ();
       if (aSellerParty != null)
@@ -887,14 +924,15 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Customer Party
+    // BG-7 BUYER
     {
       final TradePartyType aBuyerParty = aHeaderAgreement.getBuyerTradeParty ();
       if (aBuyerParty != null)
       {
-        // BT-44
+        // BT-44 Buyer name
         final PartyType aUBLParty = _convertParty (aBuyerParty, false, true);
 
+        // BT-48 Buyer VAT identifier
         for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
@@ -902,8 +940,10 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
 
+        // BT-45/BT-47/BT-47-1 Buyer legal entity
         _convertPartyLegalEntity (aBuyerParty, aUBLParty);
 
+        // BG-9 BUYER CONTACT (BT-56/BT-57/BT-58)
         final ContactType aUBLContact = _convertContact (aBuyerParty);
         if (aUBLContact != null)
           aUBLParty.setContact (aUBLContact);
@@ -912,12 +952,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Payee Party
+    // BG-10 PAYEE
     {
       final TradePartyType aPayeeParty = aHeaderSettlement.getPayeeTradeParty ();
       if (aPayeeParty != null)
       {
-        // BT-59
+        // BT-59 Payee name
         final PartyType aUBLParty = _convertParty (aPayeeParty, false, false);
 
         for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
@@ -935,14 +975,15 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Tax Representative Party
+    // BG-11 SELLER TAX REPRESENTATIVE PARTY
     {
       final TradePartyType aTaxRepresentativeParty = aHeaderAgreement.getSellerTaxRepresentativeTradeParty ();
       if (aTaxRepresentativeParty != null)
       {
-        // BT-62
+        // BT-62 Seller tax representative name
         final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty, false, false);
 
+        // BT-63 Seller tax representative VAT identifier
         for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
@@ -958,11 +999,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Delivery
+    // BG-13 DELIVERY INFORMATION
     {
       final DeliveryType aUBLDelivery = new DeliveryType ();
       boolean bUseDelivery = false;
 
+      // BT-72 Actual delivery date
       final SupplyChainEventType aSCE = aHeaderDelivery.getActualDeliverySupplyChainEvent ();
       if (aSCE != null)
       {
@@ -980,6 +1022,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType ();
         boolean bUseLocation = false;
 
+        // BT-71/BT-71-1 Deliver to location identifier
         final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType aUBLID = _extractFirstPartyID (aShipToParty);
         if (aUBLID != null)
         {
@@ -987,6 +1030,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           bUseLocation = true;
         }
 
+        // BG-15 DELIVER TO ADDRESS (BT-75 to BT-80, BT-165)
         final TradeAddressType aPostalAddress = aShipToParty.getPostalTradeAddress ();
         if (aPostalAddress != null)
         {
@@ -1000,6 +1044,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           bUseDelivery = true;
         }
 
+        // BT-70 Deliver to party name
         final TextType aName = aShipToParty.getName ();
         if (aName != null && StringHelper.isNotEmpty (aName.getValue ()))
         {
@@ -1016,7 +1061,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.addDelivery (aUBLDelivery);
     }
 
-    // Payment means
+    // BG-16 PAYMENT INSTRUCTIONS
     {
       for (final TradeSettlementPaymentMeansType aPaymentMeans : aHeaderSettlement.getSpecifiedTradeSettlementPaymentMeans ())
       {
@@ -1034,7 +1079,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Payment Terms
+    // BT-20 Payment terms
     {
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
       {
@@ -1048,7 +1093,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Allowance Charge
+    // BG-20 DOCUMENT LEVEL ALLOWANCES / BG-21 DOCUMENT LEVEL CHARGES
     {
       for (final TradeAllowanceChargeType aAllowanceCharge : aHeaderSettlement.getSpecifiedTradeAllowanceCharge ())
       {
@@ -1073,12 +1118,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
     final TradeSettlementHeaderMonetarySummationType aSTSHMS = aHeaderSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
 
-    // TaxTotal
+    // BG-23 VAT BREAKDOWN + BT-110/BT-111 Tax totals
     {
       TaxTotalType aUBLTaxTotal = null;
       if (aSTSHMS != null && aSTSHMS.hasTaxTotalAmountEntries ())
       {
-        // For all currencies
+        // BT-110 Invoice total VAT amount / BT-111 Invoice total VAT amount in accounting currency
         for (final AmountType aTaxTotalAmount : aSTSHMS.getTaxTotalAmount ())
         {
           final TaxTotalType aUBLCurTaxTotal = new TaxTotalType ();
@@ -1104,10 +1149,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLInvoice.addTaxTotal (aUBLTaxTotal);
       }
 
+      // BG-23 VAT BREAKDOWN subtotals
       for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
       {
         final TaxSubtotalType aUBLTaxSubtotal = new TaxSubtotalType ();
 
+        // BT-116 VAT category taxable amount
         if (aTradeTax.hasBasisAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxableAmount (copyAmount (aTradeTax.getBasisAmountAtIndex (0),
@@ -1115,6 +1162,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                                         sDefaultCurrencyCode));
         }
 
+        // BT-117 VAT category tax amount
         if (aTradeTax.hasCalculatedAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxAmount (copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
@@ -1123,11 +1171,15 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
+        // BT-118 VAT category code
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
+        // BT-119 VAT category rate
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+        // BT-121 VAT exemption reason code
         if (StringHelper.isNotEmpty (aTradeTax.getExemptionReasonCodeValue ()))
           aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
+        // BT-120 VAT exemption reason text
         if (aTradeTax.getExemptionReason () != null)
         {
           final TaxExemptionReasonType aUBLTaxExemptionReason = new TaxExemptionReasonType ();
@@ -1145,35 +1197,42 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // LegalMonetaryTotal
+    // BG-22 DOCUMENT TOTALS
     {
       final MonetaryTotalType aUBLMonetaryTotal = new MonetaryTotalType ();
       if (aSTSHMS != null)
       {
+        // BT-106 Sum of Invoice line net amount
         if (aSTSHMS.hasLineTotalAmountEntries ())
           aUBLMonetaryTotal.setLineExtensionAmount (copyAmount (aSTSHMS.getLineTotalAmountAtIndex (0),
                                                                 new LineExtensionAmountType (),
                                                                 sDefaultCurrencyCode));
+        // BT-109 Invoice total amount without VAT
         if (aSTSHMS.hasTaxBasisTotalAmountEntries ())
           aUBLMonetaryTotal.setTaxExclusiveAmount (copyAmount (aSTSHMS.getTaxBasisTotalAmountAtIndex (0),
                                                                new TaxExclusiveAmountType (),
                                                                sDefaultCurrencyCode));
+        // BT-112 Invoice total amount with VAT
         if (aSTSHMS.hasGrandTotalAmountEntries ())
           aUBLMonetaryTotal.setTaxInclusiveAmount (copyAmount (aSTSHMS.getGrandTotalAmountAtIndex (0),
                                                                new TaxInclusiveAmountType (),
                                                                sDefaultCurrencyCode));
+        // BT-107 Sum of allowances on document level
         if (aSTSHMS.hasAllowanceTotalAmountEntries ())
           aUBLMonetaryTotal.setAllowanceTotalAmount (copyAmount (aSTSHMS.getAllowanceTotalAmountAtIndex (0),
                                                                  new AllowanceTotalAmountType (),
                                                                  sDefaultCurrencyCode));
+        // BT-108 Sum of charges on document level
         if (aSTSHMS.hasChargeTotalAmountEntries ())
           aUBLMonetaryTotal.setChargeTotalAmount (copyAmount (aSTSHMS.getChargeTotalAmountAtIndex (0),
                                                               new ChargeTotalAmountType (),
                                                               sDefaultCurrencyCode));
+        // BT-113 Paid amount
         if (aSTSHMS.hasTotalPrepaidAmountEntries ())
           aUBLMonetaryTotal.setPrepaidAmount (copyAmount (aSTSHMS.getTotalPrepaidAmountAtIndex (0),
                                                           new PrepaidAmountType (),
                                                           sDefaultCurrencyCode));
+        // BT-114 Rounding amount
         if (aSTSHMS.hasRoundingAmountEntries ())
         {
           // Work around
@@ -1185,6 +1244,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                                                     new PayableRoundingAmountType (),
                                                                     sDefaultCurrencyCode));
         }
+        // BT-115 Amount due for payment
         if (aSTSHMS.hasDuePayableAmountEntries ())
           aUBLMonetaryTotal.setPayableAmount (copyAmount (aSTSHMS.getDuePayableAmountAtIndex (0),
                                                           new PayableAmountType (),
@@ -1193,19 +1253,20 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       aUBLInvoice.setLegalMonetaryTotal (aUBLMonetaryTotal);
     }
 
-    // All invoice lines
+    // BG-25 INVOICE LINE
     for (final SupplyChainTradeLineItemType aLineItem : aSCTT.getIncludedSupplyChainTradeLineItem ())
     {
       final InvoiceLineType aUBLInvoiceLine = new InvoiceLineType ();
 
+      // BT-126 Invoice line identifier
       final DocumentLineDocumentType aDLD = aLineItem.getAssociatedDocumentLineDocument ();
       aUBLInvoiceLine.setID (_copyID (aDLD.getLineID ()));
 
-      // Note
+      // BT-127 Invoice line note
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aLineNote : aDLD.getIncludedNote ())
         ifNotNull (_copyNote (aLineNote), aUBLInvoiceLine::addNote);
 
-      // Line extension amount
+      // BT-131 Invoice line net amount
       boolean bLineExtensionAmountIsNegative = false;
       final LineTradeSettlementType aLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
       final TradeSettlementLineMonetarySummationType aSTSLMS = aLineSettlement.getSpecifiedTradeSettlementLineMonetarySummation ();
@@ -1221,7 +1282,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
-      // Invoiced quantity
+      // BT-129/BT-130 Invoiced quantity and unit of measure
       final LineTradeDeliveryType aLineDelivery = aLineItem.getSpecifiedLineTradeDelivery ();
       if (aLineDelivery != null)
       {
@@ -1232,18 +1293,19 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
-      // Accounting cost
+      // BT-133 Invoice line Buyer accounting reference
       if (aLineSettlement.hasReceivableSpecifiedTradeAccountingAccountEntries ())
       {
         final TradeAccountingAccountType aLineAA = aLineSettlement.getReceivableSpecifiedTradeAccountingAccountAtIndex (0);
         aUBLInvoiceLine.setAccountingCost (aLineAA.getIDValue ());
       }
 
-      // Invoice period
+      // BG-26 INVOICE LINE PERIOD (BT-134/BT-135)
       final SpecifiedPeriodType aLineBillingPeriod = aLineSettlement.getBillingSpecifiedPeriod ();
       if (aLineBillingPeriod != null)
       {
         final PeriodType aUBLLinePeriod = new PeriodType ();
+
         final DateTimeType aStartDT = aLineBillingPeriod.getStartDateTime ();
         if (aStartDT != null)
           aUBLLinePeriod.setStartDate (parseDate (aStartDT.getDateTimeString (), aErrorList));
@@ -1256,7 +1318,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           aUBLInvoiceLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
-      // Order line reference
+      // BT-132 Referenced purchase order line reference
       final LineTradeAgreementType aLineAgreement = aLineItem.getSpecifiedLineTradeAgreement ();
       if (aLineAgreement != null)
       {
@@ -1269,7 +1331,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
-      // Document reference
+      // BT-128/BT-128-1 Invoice line object identifier
       for (final ReferencedDocumentType aLineReferencedDocument : aLineSettlement.getAdditionalReferencedDocument ())
       {
         final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aLineReferencedDocument, aErrorList);
@@ -1277,7 +1339,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           aUBLInvoiceLine.addDocumentReference (aUBLDocRef);
       }
 
-      // Allowance charge
+      // BG-27 INVOICE LINE ALLOWANCES / BG-28 INVOICE LINE CHARGES
       for (final TradeAllowanceChargeType aLineAllowanceCharge : aLineSettlement.getSpecifiedTradeAllowanceCharge ())
       {
         ETriState eIsCharge = ETriState.UNDEFINED;
@@ -1299,18 +1361,21 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
-      // Item
+      // BG-31 ITEM INFORMATION
       final ItemType aUBLItem = new ItemType ();
       final TradeProductType aLineProduct = aLineItem.getSpecifiedTradeProduct ();
       if (aLineProduct != null)
       {
+        // BT-154 Item description
         final TextType aDescription = aLineProduct.getDescription ();
         if (aDescription != null)
           ifNotNull (copyName (aDescription, new DescriptionType ()), aUBLItem::addDescription);
 
+        // BT-153 Item name
         if (aLineProduct.hasNameEntries ())
           aUBLItem.setName (copyName (aLineProduct.getNameAtIndex (0), new NameType ()));
 
+        // BT-156 Item Buyer's identifier
         final IDType aBuyerAssignedID = aLineProduct.getBuyerAssignedID ();
         if (aBuyerAssignedID != null)
         {
@@ -1320,6 +1385,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLItem.setBuyersItemIdentification (aUBLID);
         }
 
+        // BT-155 Item Seller's identifier
         final IDType aSellerAssignedID = aLineProduct.getSellerAssignedID ();
         if (aSellerAssignedID != null)
         {
@@ -1329,6 +1395,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLItem.setSellersItemIdentification (aUBLID);
         }
 
+        // BT-157/BT-157-1 Item standard identifier
         final IDType aGlobalID = aLineProduct.getGlobalID ();
         if (aGlobalID != null)
         {
@@ -1338,6 +1405,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLItem.setStandardItemIdentification (aUBLID);
         }
 
+        // BT-159 Item country of origin
         final TradeCountryType aOriginCountry = aLineProduct.getOriginTradeCountry ();
         if (aOriginCountry != null)
         {
@@ -1348,7 +1416,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           aUBLItem.setOriginCountry (aUBLCountry);
         }
 
-        // Commodity Classification
+        // BT-158/BT-158-1/BT-158-2 Item classification identifier
         for (final ProductClassificationType aLineProductClassification : aLineProduct.getDesignatedProductClassification ())
         {
           final CodeType aClassCode = aLineProductClassification.getClassCode ();
@@ -1363,6 +1431,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
+      // BG-30 LINE VAT INFORMATION (BT-151/BT-152)
       for (final TradeTaxType aTradeTax : aLineSettlement.getApplicableTradeTax ())
       {
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -1377,6 +1446,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
       if (aLineProduct != null)
       {
+        // BG-32 ITEM ATTRIBUTES (BT-160/BT-161)
         for (final ProductCharacteristicType aAPC : aLineProduct.getApplicableProductCharacteristic ())
           if (aAPC.hasDescriptionEntries ())
           {
@@ -1543,6 +1613,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     if (StringHelper.isNotEmpty (getCustomizationID ()))
       aUBLCreditNote.setCustomizationID (getCustomizationID ());
 
+    // BT-1 Invoice number
     if (aED != null)
       aUBLCreditNote.setID (aED.getIDValue ());
 
@@ -1554,7 +1625,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
     final CustomerPartyType aUBLCustomer = new CustomerPartyType ();
     aUBLCreditNote.setAccountingCustomerParty (aUBLCustomer);
 
-    // IssueDate
+    // BT-2 Invoice issue date
     {
       LocalDate aIssueDate = null;
       if (aED != null && aED.getIssueDateTime () != null)
@@ -1564,7 +1635,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCreditNote.setIssueDate (aIssueDate);
     }
 
-    // BT-9 DueDate
+    // BT-9 Payment due date
     final LocalDate aPaymentDueDate;
     {
       LocalDate aDueDate = null;
@@ -1579,11 +1650,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       aPaymentDueDate = aDueDate;
     }
 
-    // CreditNoteTypeCode
+    // BT-3 Invoice type code
     if (aED != null)
       aUBLCreditNote.setCreditNoteTypeCode (aED.getTypeCodeValue ());
 
-    // Note
+    // BG-1 INVOICE NOTE (BT-21/BT-22)
     if (aED != null)
       for (final un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType aEDNote : aED.getIncludedNote ())
         ifNotNull (_copyNote (aEDNote), aUBLCreditNote::addNote);
@@ -1603,17 +1674,17 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // DocumentCurrencyCode
+    // BT-5 Invoice currency code
     final String sDefaultCurrencyCode = aHeaderSettlement.getInvoiceCurrencyCodeValue ();
     aUBLCreditNote.setDocumentCurrencyCode (sDefaultCurrencyCode);
 
-    // TaxCurrencyCode
+    // BT-6 VAT accounting currency code
     if (aHeaderSettlement.getTaxCurrencyCodeValue () != null)
     {
       aUBLCreditNote.setTaxCurrencyCode (aHeaderSettlement.getTaxCurrencyCodeValue ());
     }
 
-    // AccountingCost
+    // BT-19 Buyer accounting reference
     for (final TradeAccountingAccountType aAccount : aHeaderSettlement.getReceivableSpecifiedTradeAccountingAccount ())
     {
       final String sID = aAccount.getIDValue ();
@@ -1625,13 +1696,13 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // BuyerReferences
+    // BT-10 Buyer reference
     if (aHeaderAgreement.getBuyerReferenceValue () != null)
     {
       aUBLCreditNote.setBuyerReference (aHeaderAgreement.getBuyerReferenceValue ());
     }
 
-    // CreditNotePeriod
+    // BG-14 INVOICING PERIOD (BT-73/BT-74)
     {
       final PeriodType aUBLPeriod = new PeriodType ();
       final SpecifiedPeriodType aSPT = aHeaderSettlement.getBillingSpecifiedPeriod ();
@@ -1660,14 +1731,14 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCreditNote.addInvoicePeriod (aUBLPeriod);
     }
 
-    // OrderReference
+    // BT-13 Purchase order reference + BT-14 Sales order reference
     {
       final OrderReferenceType aUBLOrderRef = _createUBLOrderRef (aHeaderAgreement.getBuyerOrderReferencedDocument (),
                                                                   aHeaderAgreement.getSellerOrderReferencedDocument ());
       aUBLCreditNote.setOrderReference (aUBLOrderRef);
     }
 
-    // BillingReference
+    // BG-3 PRECEDING INVOICE REFERENCE (BT-25/BT-26)
     {
       final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderSettlement.getInvoiceReferencedDocument (),
                                                                           aErrorList);
@@ -1680,7 +1751,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // DespatchDocumentReference
+    // BT-16 Despatch advice reference
     {
       final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getDespatchAdviceReferencedDocument (),
                                                                           aErrorList);
@@ -1688,7 +1759,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCreditNote.addDespatchDocumentReference (aUBLDocRef);
     }
 
-    // ReceiptDocumentReference
+    // BT-15 Receiving advice reference
     {
       final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getReceivingAdviceReferencedDocument (),
                                                                           aErrorList);
@@ -1696,7 +1767,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCreditNote.addReceiptDocumentReference (aUBLDocRef);
     }
 
-    // OriginatorDocumentReference
+    // BT-17 Tender or lot reference (OriginatorDocumentReference)
     {
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
@@ -1714,7 +1785,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // ContractDocumentReference
+    // BT-12 Contract reference
     {
       final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderAgreement.getContractReferencedDocument (),
                                                                           aErrorList);
@@ -1722,11 +1793,11 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCreditNote.addContractDocumentReference (aUBLDocRef);
     }
 
-    // AdditionalDocumentReference
+    // BG-24 ADDITIONAL SUPPORTING DOCUMENTS + BT-18/BT-18-1 Invoiced object identifier
     {
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
-        // Except OriginatorDocumentReference
+        // Except OriginatorDocumentReference (BT-17)
         if (!isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
@@ -1736,7 +1807,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // ProjectReference
+    // BT-11 Project reference
     {
       final ProcuringProjectType aSpecifiedProcuring = aHeaderAgreement.getSpecifiedProcuringProject ();
       if (aSpecifiedProcuring != null)
@@ -1751,14 +1822,15 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Supplier Party
+    // BG-4 SELLER
     {
       final TradePartyType aSellerParty = aHeaderAgreement.getSellerTradeParty ();
       if (aSellerParty != null)
       {
-        // BT-27
+        // BT-27 Seller name
         final PartyType aUBLParty = _convertParty (aSellerParty, true, true);
 
+        // BT-31/BT-32 Seller VAT/tax registration
         for (final TaxRegistrationType aTaxRegistration : aSellerParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
@@ -1766,8 +1838,10 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
 
+        // BT-28/BT-30/BT-30-1/BT-33 Seller legal entity
         _convertPartyLegalEntity (aSellerParty, aUBLParty);
 
+        // BG-6 SELLER CONTACT (BT-41/BT-42/BT-43)
         final ContactType aUBLContact = _convertContact (aSellerParty);
         if (aUBLContact != null)
           aUBLParty.setContact (aUBLContact);
@@ -1776,14 +1850,15 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Customer Party
+    // BG-7 BUYER
     {
       final TradePartyType aBuyerParty = aHeaderAgreement.getBuyerTradeParty ();
       if (aBuyerParty != null)
       {
-        // BT-44
+        // BT-44 Buyer name
         final PartyType aUBLParty = _convertParty (aBuyerParty, false, true);
 
+        // BT-48 Buyer VAT identifier
         for (final TaxRegistrationType aTaxRegistration : aBuyerParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
@@ -1791,8 +1866,10 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
 
+        // BT-45/BT-47/BT-47-1 Buyer legal entity
         _convertPartyLegalEntity (aBuyerParty, aUBLParty);
 
+        // BG-9 BUYER CONTACT (BT-56/BT-57/BT-58)
         final ContactType aUBLContact = _convertContact (aBuyerParty);
         if (aUBLContact != null)
           aUBLParty.setContact (aUBLContact);
@@ -1801,12 +1878,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Payee Party
+    // BG-10 PAYEE
     {
       final TradePartyType aPayeeParty = aHeaderSettlement.getPayeeTradeParty ();
       if (aPayeeParty != null)
       {
-        // BT-59
+        // BT-59 Payee name
         final PartyType aUBLParty = _convertParty (aPayeeParty, false, false);
 
         for (final TaxRegistrationType aTaxRegistration : aPayeeParty.getSpecifiedTaxRegistration ())
@@ -1824,14 +1901,15 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Tax Representative Party
+    // BG-11 SELLER TAX REPRESENTATIVE PARTY
     {
       final TradePartyType aTaxRepresentativeParty = aHeaderAgreement.getSellerTaxRepresentativeTradeParty ();
       if (aTaxRepresentativeParty != null)
       {
-        // BT-62
+        // BT-62 Seller tax representative name
         final PartyType aUBLParty = _convertParty (aTaxRepresentativeParty, false, false);
 
+        // BT-63 Seller tax representative VAT identifier
         for (final TaxRegistrationType aTaxRegistration : aTaxRepresentativeParty.getSpecifiedTaxRegistration ())
         {
           final PartyTaxSchemeType aUBLPartyTaxScheme = _convertPartyTaxScheme (aTaxRegistration);
@@ -1847,11 +1925,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Delivery
+    // BG-13 DELIVERY INFORMATION
     {
       final DeliveryType aUBLDelivery = new DeliveryType ();
       boolean bUseDelivery = false;
 
+      // BT-72 Actual delivery date
       final SupplyChainEventType aSCE = aHeaderDelivery.getActualDeliverySupplyChainEvent ();
       if (aSCE != null)
       {
@@ -1869,6 +1948,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType aUBLDeliveryLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_22.LocationType ();
         boolean bUseLocation = false;
 
+        // BT-71/BT-71-1 Deliver to location identifier
         final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_22.IDType aUBLID = _extractFirstPartyID (aShipToParty);
         if (aUBLID != null)
         {
@@ -1876,6 +1956,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           bUseLocation = true;
         }
 
+        // BG-15 DELIVER TO ADDRESS (BT-75 to BT-80, BT-165)
         final TradeAddressType aPostalAddress = aShipToParty.getPostalTradeAddress ();
         if (aPostalAddress != null)
         {
@@ -1889,6 +1970,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           bUseDelivery = true;
         }
 
+        // BT-70 Deliver to party name
         final TextType aName = aShipToParty.getName ();
         if (aName != null && StringHelper.isNotEmpty (aName.getValue ()))
         {
@@ -1905,7 +1987,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCreditNote.addDelivery (aUBLDelivery);
     }
 
-    // Payment means
+    // BG-16 PAYMENT INSTRUCTIONS
     {
       for (final TradeSettlementPaymentMeansType aPaymentMeans : aHeaderSettlement.getSpecifiedTradeSettlementPaymentMeans ())
       {
@@ -1928,7 +2010,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Payment Terms
+    // BT-20 Payment terms
     {
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
       {
@@ -1942,7 +2024,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // Allowance Charge
+    // BG-20 DOCUMENT LEVEL ALLOWANCES / BG-21 DOCUMENT LEVEL CHARGES
     {
       for (final TradeAllowanceChargeType aAllowanceCharge : aHeaderSettlement.getSpecifiedTradeAllowanceCharge ())
       {
@@ -1967,12 +2049,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
     final TradeSettlementHeaderMonetarySummationType aSTSHMS = aHeaderSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
 
-    // TaxTotal
+    // BG-23 VAT BREAKDOWN + BT-110/BT-111 Tax totals
     {
       TaxTotalType aUBLTaxTotal = null;
       if (aSTSHMS != null && aSTSHMS.hasTaxTotalAmountEntries ())
       {
-        // For all currencies
+        // BT-110 Invoice total VAT amount / BT-111 Invoice total VAT amount in accounting currency
         for (final AmountType aTaxTotalAmount : aSTSHMS.getTaxTotalAmount ())
         {
           final TaxTotalType aUBLCurTaxTotal = new TaxTotalType ();
@@ -1998,10 +2080,12 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         aUBLCreditNote.addTaxTotal (aUBLTaxTotal);
       }
 
+      // BG-23 VAT BREAKDOWN subtotals
       for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
       {
         final TaxSubtotalType aUBLTaxSubtotal = new TaxSubtotalType ();
 
+        // BT-116 VAT category taxable amount
         if (aTradeTax.hasBasisAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxableAmount (copyAmount (aTradeTax.getBasisAmountAtIndex (0),
@@ -2009,6 +2093,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                                         sDefaultCurrencyCode));
         }
 
+        // BT-117 VAT category tax amount
         if (aTradeTax.hasCalculatedAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxAmount (copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
@@ -2017,11 +2102,15 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
+        // BT-118 VAT category code
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
+        // BT-119 VAT category rate
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+        // BT-121 VAT exemption reason code
         if (StringHelper.isNotEmpty (aTradeTax.getExemptionReasonCodeValue ()))
           aUBLTaxCategory.setTaxExemptionReasonCode (aTradeTax.getExemptionReasonCodeValue ());
+        // BT-120 VAT exemption reason text
         if (aTradeTax.getExemptionReason () != null)
         {
           final TaxExemptionReasonType aUBLTaxExemptionReason = new TaxExemptionReasonType ();
@@ -2039,35 +2128,42 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       }
     }
 
-    // LegalMonetaryTotal
+    // BG-22 DOCUMENT TOTALS
     {
       final MonetaryTotalType aUBLMonetaryTotal = new MonetaryTotalType ();
       if (aSTSHMS != null)
       {
+        // BT-106 Sum of Invoice line net amount
         if (aSTSHMS.hasLineTotalAmountEntries ())
           aUBLMonetaryTotal.setLineExtensionAmount (copyAmount (aSTSHMS.getLineTotalAmountAtIndex (0),
                                                                 new LineExtensionAmountType (),
                                                                 sDefaultCurrencyCode));
+        // BT-109 Invoice total amount without VAT
         if (aSTSHMS.hasTaxBasisTotalAmountEntries ())
           aUBLMonetaryTotal.setTaxExclusiveAmount (copyAmount (aSTSHMS.getTaxBasisTotalAmountAtIndex (0),
                                                                new TaxExclusiveAmountType (),
                                                                sDefaultCurrencyCode));
+        // BT-112 Invoice total amount with VAT
         if (aSTSHMS.hasGrandTotalAmountEntries ())
           aUBLMonetaryTotal.setTaxInclusiveAmount (copyAmount (aSTSHMS.getGrandTotalAmountAtIndex (0),
                                                                new TaxInclusiveAmountType (),
                                                                sDefaultCurrencyCode));
+        // BT-107 Sum of allowances on document level
         if (aSTSHMS.hasAllowanceTotalAmountEntries ())
           aUBLMonetaryTotal.setAllowanceTotalAmount (copyAmount (aSTSHMS.getAllowanceTotalAmountAtIndex (0),
                                                                  new AllowanceTotalAmountType (),
                                                                  sDefaultCurrencyCode));
+        // BT-108 Sum of charges on document level
         if (aSTSHMS.hasChargeTotalAmountEntries ())
           aUBLMonetaryTotal.setChargeTotalAmount (copyAmount (aSTSHMS.getChargeTotalAmountAtIndex (0),
                                                               new ChargeTotalAmountType (),
                                                               sDefaultCurrencyCode));
+        // BT-113 Paid amount
         if (aSTSHMS.hasTotalPrepaidAmountEntries ())
           aUBLMonetaryTotal.setPrepaidAmount (copyAmount (aSTSHMS.getTotalPrepaidAmountAtIndex (0),
                                                           new PrepaidAmountType (),
                                                           sDefaultCurrencyCode));
+        // BT-114 Rounding amount
         if (aSTSHMS.hasRoundingAmountEntries ())
         {
           // Work around
@@ -2079,6 +2175,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
                                                                     new PayableRoundingAmountType (),
                                                                     sDefaultCurrencyCode));
         }
+        // BT-115 Amount due for payment
         if (aSTSHMS.hasDuePayableAmountEntries ())
           aUBLMonetaryTotal.setPayableAmount (copyAmount (aSTSHMS.getDuePayableAmountAtIndex (0),
                                                           new PayableAmountType (),
@@ -2087,7 +2184,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       aUBLCreditNote.setLegalMonetaryTotal (aUBLMonetaryTotal);
     }
 
-    // All invoice lines
+    // BG-25 CREDIT NOTE LINE
     for (final SupplyChainTradeLineItemType aLineItem : aSCTT.getIncludedSupplyChainTradeLineItem ())
     {
       final CreditNoteLineType aUBLCreditNoteLine = new CreditNoteLineType ();
@@ -2138,6 +2235,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
       if (aLineBillingPeriod != null)
       {
         final PeriodType aUBLLinePeriod = new PeriodType ();
+
         final DateTimeType aStartDT = aLineBillingPeriod.getStartDateTime ();
         if (aStartDT != null)
           aUBLLinePeriod.setStartDate (parseDate (aStartDT.getDateTimeString (), aErrorList));
@@ -2150,7 +2248,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           aUBLCreditNoteLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
-      // Order line reference
+      // BT-132 Referenced purchase order line reference
       final LineTradeAgreementType aLineAgreement = aLineItem.getSpecifiedLineTradeAgreement ();
       if (aLineAgreement != null)
       {
@@ -2163,7 +2261,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
-      // Document reference
+      // BT-128/BT-128-1 Invoice line object identifier
       for (final ReferencedDocumentType aLineReferencedDocument : aLineSettlement.getAdditionalReferencedDocument ())
       {
         final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aLineReferencedDocument, aErrorList);
@@ -2171,7 +2269,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           aUBLCreditNoteLine.addDocumentReference (aUBLDocRef);
       }
 
-      // Allowance charge
+      // BG-27 INVOICE LINE ALLOWANCES / BG-28 INVOICE LINE CHARGES
       for (final TradeAllowanceChargeType aLineAllowanceCharge : aLineSettlement.getSpecifiedTradeAllowanceCharge ())
       {
         ETriState eIsCharge = ETriState.UNDEFINED;
@@ -2193,18 +2291,21 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
-      // Item
+      // BG-31 ITEM INFORMATION
       final ItemType aUBLItem = new ItemType ();
       final TradeProductType aLineProduct = aLineItem.getSpecifiedTradeProduct ();
       if (aLineProduct != null)
       {
+        // BT-154 Item description
         final TextType aDescription = aLineProduct.getDescription ();
         if (aDescription != null)
           ifNotNull (copyName (aDescription, new DescriptionType ()), aUBLItem::addDescription);
 
+        // BT-153 Item name
         if (aLineProduct.hasNameEntries ())
           aUBLItem.setName (copyName (aLineProduct.getNameAtIndex (0), new NameType ()));
 
+        // BT-156 Item Buyer's identifier
         final IDType aBuyerAssignedID = aLineProduct.getBuyerAssignedID ();
         if (aBuyerAssignedID != null)
         {
@@ -2214,6 +2315,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLItem.setBuyersItemIdentification (aUBLID);
         }
 
+        // BT-155 Item Seller's identifier
         final IDType aSellerAssignedID = aLineProduct.getSellerAssignedID ();
         if (aSellerAssignedID != null)
         {
@@ -2223,6 +2325,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLItem.setSellersItemIdentification (aUBLID);
         }
 
+        // BT-157/BT-157-1 Item standard identifier
         final IDType aGlobalID = aLineProduct.getGlobalID ();
         if (aGlobalID != null)
         {
@@ -2232,6 +2335,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
             aUBLItem.setStandardItemIdentification (aUBLID);
         }
 
+        // BT-159 Item country of origin
         final TradeCountryType aOriginCountry = aLineProduct.getOriginTradeCountry ();
         if (aOriginCountry != null)
         {
@@ -2242,7 +2346,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
           aUBLItem.setOriginCountry (aUBLCountry);
         }
 
-        // Commodity Classification
+        // BT-158/BT-158-1/BT-158-2 Item classification identifier
         for (final ProductClassificationType aLineProductClassification : aLineProduct.getDesignatedProductClassification ())
         {
           final CodeType aClassCode = aLineProductClassification.getClassCode ();
@@ -2257,6 +2361,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
       }
 
+      // BG-30 LINE VAT INFORMATION (BT-151/BT-152)
       for (final TradeTaxType aTradeTax : aLineSettlement.getApplicableTradeTax ())
       {
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -2271,6 +2376,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
 
       if (aLineProduct != null)
       {
+        // BG-32 ITEM ATTRIBUTES (BT-160/BT-161)
         for (final ProductCharacteristicType aAPC : aLineProduct.getApplicableProductCharacteristic ())
           if (aAPC.hasDescriptionEntries ())
           {
