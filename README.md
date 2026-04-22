@@ -92,7 +92,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-v3.1.7 - work in progress
+v3.1.7 - 2026-04-22
 * Fixed BT-150 (Item price base quantity unit of measure): now falls back to the net price unitCode when no gross price is present, instead of losing it
 * Fixed BT-61/BT-61-1 (Payee legal registration identifier): `_convertPartyLegalEntity` is now called for the Payee party, mapping `SpecifiedLegalOrganization/ID` to `PartyLegalEntity/CompanyID`
 * Fixed UBL-CR-275 compliance: `RegistrationName` fallback is no longer set on the Payee `PartyLegalEntity`, as the EN 16931 Schematron forbids it
