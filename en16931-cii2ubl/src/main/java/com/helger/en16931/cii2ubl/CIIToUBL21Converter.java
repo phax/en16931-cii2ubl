@@ -1815,21 +1815,23 @@ public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Co
       }
     }
 
-    // BT-11 Project reference (UBL 2.2+ only for CreditNote)
-    // {
-    // final ProcuringProjectType aSpecifiedProcuring =
-    // aHeaderAgreement.getSpecifiedProcuringProject ();
-    // if (aSpecifiedProcuring != null)
-    // {
-    // final String sID = aSpecifiedProcuring.getIDValue ();
-    // if (StringHelper.isNotEmpty (sID))
-    // {
-    // final ProjectReferenceType aUBLProjectRef = new ProjectReferenceType ();
-    // aUBLProjectRef.setID (sID);
-    // aUBLCreditNote.addProjectReference (aUBLProjectRef);
-    // }
-    // }
-    // }
+    // BT-11 Project reference
+    // UBL 2.1 CreditNote lacks ProjectReference, so map to
+    // AdditionalDocumentReference without a DocumentType discriminator.
+    // BT-18 uses DocumentType="ATS" in CreditNote, so no clash.
+    {
+      final ProcuringProjectType aSpecifiedProcuring = aHeaderAgreement.getSpecifiedProcuringProject ();
+      if (aSpecifiedProcuring != null)
+      {
+        final String sID = aSpecifiedProcuring.getIDValue ();
+        if (StringHelper.isNotEmpty (sID))
+        {
+          final DocumentReferenceType aUBLDocRef = new DocumentReferenceType ();
+          aUBLDocRef.setID (sID);
+          aUBLCreditNote.addAdditionalDocumentReference (aUBLDocRef);
+        }
+      }
+    }
 
     // BG-4 SELLER
     {
