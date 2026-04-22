@@ -49,39 +49,46 @@ Replace `x.y.z` with the effective version you want to use:
 Call it via `java -jar en16931-cii2ubl-cli-full.jar` followed by the options and parameters.
 
 ```
-[INFO] CII to UBL Converter v3.1.2 (build 2026-01-05T14:22:44Z)
-Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion] [--verbose]
+[INFO] CII to UBL Converter v3.1.7 (build 2026-04-22T11:56:27Z)
+Missing required parameter: 'source files'
+Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion]
+                         [--swap-price-sign] [--swap-quantity-sign] [--verbose]
                          [--mode mode] [--output-suffix filename part] [-t
                          directory] [--ubl version] [--ubl-cardaccountnetworkid
                          ID] [--ubl-customizationid ID]
                          [--ubl-defaultorderrefid ID] [--ubl-profileid ID]
                          [--ubl-vatscheme vat scheme] source files...
 CII to UBL Converter for EN 16931 invoices
-      source files...      One or more CII file(s)
+      source files...        One or more CII file(s)
       --disable-wildcard-expansion
-                           Disable wildcard expansion of filenames
-  -h, --help               Show this help message and exit.
-      --mode mode          Allowed values: AUTOMATIC, INVOICE, CREDIT_NOTE
-                             (default: 'AUTOMATIC')
+                             Disable wildcard expansion of filenames
+  -h, --help                 Show this help message and exit.
+      --mode mode            Allowed values: AUTOMATIC, INVOICE, CREDIT_NOTE
+                               (default: 'AUTOMATIC')
       --output-suffix filename part
-                           The suffix added to the output filename (default:
-                             '-ubl')
-  -t, --target directory   The target directory for result output (default: '.')
-      --ubl version        Version of the target UBL Format: '2.1', '2.2',
-                             '2.3' or '2.4' (default: '2.1')
+                             The suffix added to the output filename (default:
+                               '-ubl')
+      --swap-price-sign      Swap price sign if needed for credit notes
+                               (default: 'true')
+      --swap-quantity-sign   Swap quantity sign if needed for credit notes
+                               (default: 'true')
+  -t, --target directory     The target directory for result output (default:
+                               '.')
+      --ubl version          Version of the target UBL Format: '2.1', '2.2',
+                               '2.3' or '2.4' (default: '2.1')
       --ubl-cardaccountnetworkid ID
-                           The UBL CardAccount network ID to be used (default:
-                             'mapped-from-cii')
+                             The UBL CardAccount network ID to be used
+                               (default: 'mapped-from-cii')
       --ubl-customizationid ID
-                           The UBL customization ID to be used
+                             The UBL customization ID to be used
       --ubl-defaultorderrefid ID
-                           The UBL default order reference ID to be used
-                             (default: '')
-      --ubl-profileid ID   The UBL profile ID to be used
+                             The UBL default order reference ID to be used
+                               (default: '')
+      --ubl-profileid ID     The UBL profile ID to be used
       --ubl-vatscheme vat scheme
-                           The UBL VAT scheme to be used (default: 'VAT')
-  -V, --version            Print version information and exit.
-      --verbose            Enable debug logging (default: 'false')
+                             The UBL VAT scheme to be used (default: 'VAT')
+  -V, --version              Print version information and exit.
+      --verbose              Enable debug logging (default: 'false')
 ```
 
 # Open issues
