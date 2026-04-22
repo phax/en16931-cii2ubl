@@ -569,10 +569,7 @@ public class CIIToUBL22Converter extends AbstractCIIToUBLConverter <CIIToUBL22Co
         }
 
       // BT-90 Bank assigned creditor identifier
-      // CII has a dedicated CreditorReferenceID element.
-      // In UBL it is placed as a PartyIdentification/ID on the Payee (if
-      // present) or the Seller. The @schemeID="SEPA" is required by the
-      // EN 16931 Schematron to distinguish it from regular BT-29 identifiers.
+      // Only mapped for BG-19 direct debit — EN 16931 defines BT-90 as part of BG-19.
       final IDType aCreditorRefID = aHeaderSettlement.getCreditorReferenceID ();
       if (aCreditorRefID != null)
       {
