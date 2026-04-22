@@ -137,6 +137,9 @@
     <cac:PartyName>
       <cbc:Name>Dagobert Duck</cbc:Name>
     </cac:PartyName>
+    <cac:PartyLegalEntity>
+      <cbc:CompanyID>DK16356608</cbc:CompanyID>
+    </cac:PartyLegalEntity>
   </cac:PayeeParty>
   <cac:TaxRepresentativeParty>
     <cac:PartyName>

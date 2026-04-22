@@ -117,6 +117,9 @@
     <cac:PartyName>
       <cbc:Name>Ebeneser Scrooge AS</cbc:Name>
     </cac:PartyName>
+    <cac:PartyLegalEntity>
+      <cbc:CompanyID>989823401</cbc:CompanyID>
+    </cac:PartyLegalEntity>
   </cac:PayeeParty>
   <cac:TaxRepresentativeParty>
     <cac:PartyName>

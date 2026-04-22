@@ -150,6 +150,9 @@
     <cac:PartyName>
       <cbc:Name>[Payee name]</cbc:Name>
     </cac:PartyName>
+    <cac:PartyLegalEntity>
+      <cbc:CompanyID schemeID="0204">90000000-03083-72</cbc:CompanyID>
+    </cac:PartyLegalEntity>
   </cac:PayeeParty>
   <cac:TaxRepresentativeParty>
     <cac:PartyName>

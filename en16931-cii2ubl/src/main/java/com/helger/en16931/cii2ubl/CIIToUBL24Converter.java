@@ -330,14 +330,16 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
                                                 @NonNull final PartyType aUBLParty)
   {
     final PartyLegalEntityType aUBLPartyLegalEntity;
+    final boolean bExistingLegalEntity;
     if (aUBLParty.hasPartyLegalEntityEntries ())
     {
       aUBLPartyLegalEntity = aUBLParty.getPartyLegalEntityAtIndex (0);
+      bExistingLegalEntity = true;
     }
     else
     {
       aUBLPartyLegalEntity = new PartyLegalEntityType ();
-      aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
+      bExistingLegalEntity = false;
     }
 
     final LegalOrganizationType aSLO = aTradeParty.getSpecifiedLegalOrganization ();
@@ -362,10 +364,20 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
       if (StringHelper.isNotEmpty (aDesc.getValue ()))
         aUBLPartyLegalEntity.addCompanyLegalForm (new CompanyLegalFormType (aDesc.getValue ()));
 
-    if (aUBLPartyLegalEntity.getRegistrationName () == null)
+    if (aUBLPartyLegalEntity.getRegistrationName () == null && !aUBLParty.hasPartyNameEntries () && StringHelper.isNotEmpty (aTradeParty.getNameValue ()))
     {
-      // Mandatory field according to Schematron
+      // Mandatory field according to Schematron (for Seller/Buyer only)
+      // UBL-CR-275 forbids RegistrationName on PayeeParty
       aUBLPartyLegalEntity.setRegistrationName (aTradeParty.getNameValue ());
+    }
+
+    // Only add if it has content — avoid empty PartyLegalEntity on Payee
+    if (!bExistingLegalEntity)
+    {
+      if (aUBLPartyLegalEntity.getRegistrationName () != null ||
+          aUBLPartyLegalEntity.getCompanyID () != null ||
+          !aUBLPartyLegalEntity.getCompanyLegalForm ().isEmpty ())
+        aUBLParty.addPartyLegalEntity (aUBLPartyLegalEntity);
     }
   }
 
@@ -966,6 +978,9 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           if (aUBLPartyTaxScheme != null)
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
+
+        // BT-61/BT-61-1 Payee legal registration identifier
+        _convertPartyLegalEntity (aPayeeParty, aUBLParty);
 
         final ContactType aUBLContact = _convertContact (aPayeeParty);
         if (aUBLContact != null)
@@ -1907,6 +1922,9 @@ public class CIIToUBL24Converter extends AbstractCIIToUBLConverter <CIIToUBL24Co
           if (aUBLPartyTaxScheme != null)
             aUBLParty.addPartyTaxScheme (aUBLPartyTaxScheme);
         }
+
+        // BT-61/BT-61-1 Payee legal registration identifier
+        _convertPartyLegalEntity (aPayeeParty, aUBLParty);
 
         final ContactType aUBLContact = _convertContact (aPayeeParty);
         if (aUBLContact != null)
