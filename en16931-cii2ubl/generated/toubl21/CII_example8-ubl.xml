@@ -147,7 +147,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">0.0088</cbc:PriceAmount>
-      <cbc:BaseQuantity>0.0088</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="KWH">0.0088</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -182,7 +182,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">0.00101</cbc:PriceAmount>
-      <cbc:BaseQuantity>0.00101</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="KWH">0.00101</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -217,7 +217,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">15.24</cbc:PriceAmount>
-      <cbc:BaseQuantity>15.24</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="KWT">15.24</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -252,7 +252,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">1.53</cbc:PriceAmount>
-      <cbc:BaseQuantity>1.53</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="KWT">1.53</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -287,7 +287,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">441</cbc:PriceAmount>
-      <cbc:BaseQuantity>441</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="MON">441</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -322,7 +322,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">678</cbc:PriceAmount>
-      <cbc:BaseQuantity>678</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="MON">678</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -341,7 +341,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">83.34</cbc:PriceAmount>
-      <cbc:BaseQuantity>83.34</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="MON">83.34</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -360,7 +360,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">190.31</cbc:PriceAmount>
-      <cbc:BaseQuantity>190.31</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="MON">190.31</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -379,7 +379,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">64.21</cbc:PriceAmount>
-      <cbc:BaseQuantity>64.21</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="MON">64.21</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -398,7 +398,7 @@ facturen. Kijk voor informatie op www.enexis.nl/rentenota</cbc:Note>
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">64.46</cbc:PriceAmount>
-      <cbc:BaseQuantity>64.46</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="MON">64.46</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
 </Invoice>

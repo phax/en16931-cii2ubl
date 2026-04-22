@@ -124,7 +124,7 @@
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">386.52</cbc:PriceAmount>
-      <cbc:BaseQuantity>366</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="DAY">366</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -148,7 +148,7 @@
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">3.2916</cbc:PriceAmount>
-      <cbc:BaseQuantity>1</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="KWT">1</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
   <cac:InvoiceLine>
@@ -172,7 +172,7 @@
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="EUR">0.061232374</cbc:PriceAmount>
-      <cbc:BaseQuantity>1</cbc:BaseQuantity>
+      <cbc:BaseQuantity unitCode="KWH">1</cbc:BaseQuantity>
     </cac:Price>
   </cac:InvoiceLine>
 </Invoice>

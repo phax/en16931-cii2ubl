@@ -92,6 +92,9 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v3.1.7 - work in progress
+* Improved BT-150 mapping to include Base Quantity Unit Code
+
 v3.1.6 - 2026-04-22
 * Added CLI options `--swap-quantity-sign` and `--swap-price-sign` to expose the full converter API
 * Improved BT-90 mapping so that it is correctly set to the `PayeeParty` if present

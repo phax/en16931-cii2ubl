@@ -1546,9 +1546,15 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           {
             // BT-149 Item Price Base Quantity (optional)
             aUBLPrice.setBaseQuantity (copyQuantity (aBT149, new BaseQuantityType ()));
-            // BT-150 is from gross only
+            // BT-150 prefer gross unitCode, fall back to net unitCode
             if (aUBLPrice.getBaseQuantity () != null)
-              aUBLPrice.getBaseQuantity ().setUnitCode (sBT150);
+            {
+              if (sBT150 != null)
+                aUBLPrice.getBaseQuantity ().setUnitCode (sBT150);
+              else
+                if (aNPPTP.getBasisQuantity () != null)
+                  aUBLPrice.getBaseQuantity ().setUnitCode (aNPPTP.getBasisQuantity ().getUnitCode ());
+            }
           }
         }
       }
@@ -2485,9 +2491,15 @@ public class CIIToUBL23Converter extends AbstractCIIToUBLConverter <CIIToUBL23Co
           {
             // BT-149 Item Price Base Quantity (optional)
             aUBLPrice.setBaseQuantity (copyQuantity (aBT149, new BaseQuantityType ()));
-            // BT-150 is from gross only
+            // BT-150 prefer gross unitCode, fall back to net unitCode
             if (aUBLPrice.getBaseQuantity () != null)
-              aUBLPrice.getBaseQuantity ().setUnitCode (sBT150);
+            {
+              if (sBT150 != null)
+                aUBLPrice.getBaseQuantity ().setUnitCode (sBT150);
+              else
+                if (aNPPTP.getBasisQuantity () != null)
+                  aUBLPrice.getBaseQuantity ().setUnitCode (aNPPTP.getBasisQuantity ().getUnitCode ());
+            }
           }
         }
       }
