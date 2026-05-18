@@ -53,7 +53,8 @@ final class MockSettings
                                                        "issue23.xml",
                                                        "issue28.xml",
                                                        "issue34.xml",
-                                                       "issue47.xml" };
+                                                       "issue47.xml",
+                                                       "issue1121.xml" };
   private static final String [] TEST_FILES_XRECHNUNG = { "01.01_comprehensive_test_uncefact.xml" };
   private static final String [] TEST_FILES_XRECHNUNG_122 = { "01.01a-INVOICE_uncefact.xml",
                                                               "01.02a-INVOICE_uncefact.xml",
@@ -136,8 +137,8 @@ final class MockSettings
                                                                     "01.05_minimal_test_uncefact.xml",
                                                                     "01.06_minimal_test_uncefact.xml" };
 
-  static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1315.getWithVersionLatestRelease ();
-  static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1315.getWithVersionLatestRelease ();
+  static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1316.getWithVersionLatestRelease ();
+  static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1316.getWithVersionLatestRelease ();
 
   static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
   static
