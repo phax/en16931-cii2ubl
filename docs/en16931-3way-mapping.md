@@ -64,7 +64,7 @@ Source: FprCEN/TS 16931-3-2:2019 (UBL) and FprCEN/TS 16931-3-3:2019 (CII)
 
 | ID | Name | Card. | UBL Invoice | UBL Credit Note | CII D16B | Notes |
 |----|------|-------|-------------|-----------------|----------|-------|
-| BT-25 | Preceding Invoice number | 1..1 | `cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID` | (same) | `rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:InvoiceReferencedDocument/ram:IssuerAssignedID` | |
+| BT-25 | Preceding Invoice reference | 1..1 | `cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID` | (same) | `rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:InvoiceReferencedDocument/ram:IssuerAssignedID` | |
 | BT-26 | Preceding Invoice issue date | 0..1 | `cac:BillingReference/cac:InvoiceDocumentReference/cbc:IssueDate` | (same) | `rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:InvoiceReferencedDocument/ram:FormattedIssueDateTime/qdt:DateTimeString` | CII: @format="102" |
 
 ## BG-4 SELLER (1..1)
@@ -117,7 +117,7 @@ Base path — UBL: `cac:AccountingCustomerParty/cac:Party` | CII: `rsm:SupplyCha
 |----|------|-------|-------------|-----------------|----------|-------|
 | BT-44 | Buyer name | 1..1 | `cac:PartyLegalEntity/cbc:RegistrationName` | (same) | `ram:Name` | |
 | BT-45 | Buyer trading name | 0..1 | `cac:PartyName/cbc:Name` | (same) | `ram:SpecifiedLegalOrganization/ram:TradingBusinessName` | |
-| BT-46 | Buyer identifier | 0..n | `cac:PartyIdentification/cbc:ID` | (same) | `ram:ID` or `ram:GlobalID` | |
+| BT-46 | Buyer identifier | 0..1 | `cac:PartyIdentification/cbc:ID` | (same) | `ram:ID` or `ram:GlobalID` | |
 | BT-46-1 | Buyer identifier scheme ID | 0..1 | `cac:PartyIdentification/cbc:ID/@schemeID` | (same) | `ram:GlobalID/@schemeID` | |
 | BT-47 | Buyer legal registration ID | 0..1 | `cac:PartyLegalEntity/cbc:CompanyID` | (same) | `ram:SpecifiedLegalOrganization/ram:ID` | |
 | BT-47-1 | Buyer legal registration ID scheme ID | 0..1 | `cac:PartyLegalEntity/cbc:CompanyID/@schemeID` | (same) | `ram:SpecifiedLegalOrganization/ram:ID/@schemeID` | |
@@ -195,7 +195,7 @@ Base path — UBL: `cac:Delivery` | CII: `rsm:SupplyChainTradeTransaction/ram:Ap
 | BT-71-1 | Deliver to location ID scheme ID | 0..1 | `cac:DeliveryLocation/cbc:ID/@schemeID` | (same) | `ram:ShipToTradeParty/ram:GlobalID/@schemeID` | |
 | BT-72 | Actual delivery date | 0..1 | `cbc:ActualDeliveryDate` | (same) | `ram:ActualDeliverySupplyChainEvent/ram:OccurrenceDateTime/udt:DateTimeString` | CII: @format="102" |
 
-## BG-14 DELIVERY OR INVOICE PERIOD (0..1)
+## BG-14 INVOICING PERIOD (0..1)
 
 | ID | Name | Card. | UBL Invoice | UBL Credit Note | CII D16B | Notes |
 |----|------|-------|-------------|-----------------|----------|-------|
@@ -335,7 +335,7 @@ Base path — UBL Invoice: `cac:InvoiceLine` | UBL Credit Note: `cac:CreditNoteL
 | BT-128 | Invoice line object identifier | 0..1 | `cac:DocumentReference/cbc:ID` | `cac:DocumentReference/cbc:ID` | `ram:SpecifiedLineTradeSettlement/ram:AdditionalReferencedDocument/ram:IssuerAssignedID` | UBL: DocumentTypeCode=130; CII: TypeCode="130" |
 | BT-128-1 | Invoice line object identifier scheme ID | 0..1 | `cac:DocumentReference/cbc:ID/@schemeID` | `cac:DocumentReference/cbc:ID/@schemeID` | `ram:SpecifiedLineTradeSettlement/ram:AdditionalReferencedDocument/ram:ReferenceTypeCode` | |
 | BT-129 | Invoiced quantity | 1..1 | `cbc:InvoicedQuantity` | `cbc:CreditedQuantity` | `ram:SpecifiedLineTradeDelivery/ram:BilledQuantity` | Different element in CN |
-| BT-130 | Invoiced quantity unit of measure | 1..1 | `cbc:InvoicedQuantity/@unitCode` | `cbc:CreditedQuantity/@unitCode` | `ram:SpecifiedLineTradeDelivery/ram:BilledQuantity/@unitCode` | |
+| BT-130 | Invoiced quantity unit of measure code | 1..1 | `cbc:InvoicedQuantity/@unitCode` | `cbc:CreditedQuantity/@unitCode` | `ram:SpecifiedLineTradeDelivery/ram:BilledQuantity/@unitCode` | |
 | BT-131 | Invoice line net amount | 1..1 | `cbc:LineExtensionAmount` | `cbc:LineExtensionAmount` | `ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount` | |
 | BT-132 | Referenced purchase order line reference | 0..1 | `cac:OrderLineReference/cbc:LineID` | `cac:OrderLineReference/cbc:LineID` | `ram:SpecifiedLineTradeAgreement/ram:BuyerOrderReferencedDocument/ram:LineID` | |
 | BT-133 | Invoice line Buyer accounting reference | 0..1 | `cbc:AccountingCost` | `cbc:AccountingCost` | `ram:SpecifiedLineTradeSettlement/ram:ReceivableSpecifiedTradeAccountingAccount/ram:ID` | |
