@@ -23,7 +23,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>3.0.3</version>
+    <version>3.0.5</version>
   </parent>
   <artifactId>en16931-cii2ubl-parent-pom</artifactId>
   <version>3.1.8-SNAPSHOT</version>
@@ -57,7 +57,7 @@
   </developers>
   
   <properties>
-    <phive-rules.version>4.3.2</phive-rules.version>
+    <phive-rules.version>4.3.6</phive-rules.version>
     <picocli.version>4.7.7</picocli.version>
   </properties>
 
