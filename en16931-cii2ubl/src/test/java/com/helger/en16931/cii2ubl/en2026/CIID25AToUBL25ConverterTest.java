@@ -17,117 +17,78 @@
  */
 package com.helger.en16931.cii2ubl.en2026;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static com.helger.en16931.cii2ubl.en2026.MockD25ASettings.assertXPath;
+import static com.helger.en16931.cii2ubl.en2026.MockD25ASettings.assertXPathCount;
+import static com.helger.en16931.cii2ubl.en2026.MockD25ASettings.convertAndValidate;
 
-import java.io.File;
-import java.io.Serializable;
-import java.time.Month;
-
-import org.jspecify.annotations.NonNull;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.helger.base.state.ESuccess;
-import com.helger.datetime.helper.PDTFactory;
-import com.helger.diagnostics.error.list.ErrorList;
-import com.helger.io.file.FilenameHelper;
-import com.helger.ubl25.UBL25Marshaller;
-
-import oasis.names.specification.ubl.schema.xsd.creditnote_25.CreditNoteType;
-import oasis.names.specification.ubl.schema.xsd.invoice_25.InvoiceType;
+import org.w3c.dom.Element;
 
 /**
- * Test class for class {@link CIID25AToUBL25Converter}.
+ * Test class for class {@link CIID25AToUBL25Converter}.<br>
+ * All XPath expressions are taken from <code>docs/en16931-2026-syntax.md</code> and are relative to
+ * the document element.
  *
  * @author Philip Helger
  */
 public final class CIID25AToUBL25ConverterTest
 {
-  private static final String BASE_TEST_DIR = "src/test/resources/external/cii-d25a/";
-  private static final String BASE_DEST_DIR = "generated/toubl25/";
-
-  private static final Logger LOGGER = LoggerFactory.getLogger (CIID25AToUBL25ConverterTest.class);
-
-  @NonNull
-  private static Serializable _convert (@NonNull final String sFilename, @NonNull final ErrorList aErrorList)
-  {
-    final File aFile = new File (BASE_TEST_DIR, sFilename);
-    assertTrue ("Not existing: " + aFile.getAbsolutePath (), aFile.exists ());
-
-    LOGGER.info ("Converting " + aFile.toString () + " to UBL 2.5");
-    final Serializable aUBL = new CIID25AToUBL25Converter ().convertCIItoUBL (aFile, aErrorList);
-    assertTrue ("Errors: " + aErrorList.toString (), aErrorList.containsNoError ());
-    assertNotNull (aUBL);
-    return aUBL;
-  }
-
-  @NonNull
-  private static File _getDestFile (@NonNull final String sFilename)
-  {
-    return new File (BASE_DEST_DIR, FilenameHelper.getBaseName (sFilename) + "-ubl.xml");
-  }
-
   @Test
   public void testConvertMinimalInvoice ()
   {
-    final String sFilename = "d25a-minimal-invoice.xml";
-    final ErrorList aErrorList = new ErrorList ();
-    final Serializable aUBL = _convert (sFilename, aErrorList);
-    assertTrue ("Expected an Invoice but got " + aUBL.getClass ().getName (), aUBL instanceof InvoiceType);
+    final Element aInv = convertAndValidate ("d25a-minimal-invoice.xml", true);
 
-    final InvoiceType aUBLInvoice = (InvoiceType) aUBL;
+    // Header level
+    assertXPath (aInv, "cbc:CustomizationID", "urn:cen.eu:en16931:2026");
+    assertXPath (aInv, "cbc:ProfileID", "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0");
+    assertXPath (aInv, "cbc:ID", "D25A-MIN-INV-1");
+    assertXPath (aInv, "cbc:IssueDate", "2026-01-15");
+    assertXPath (aInv, "cbc:InvoiceTypeCode", "380");
+    assertXPath (aInv, "cbc:DocumentCurrencyCode", "EUR");
 
-    // BT-24
-    assertEquals ("urn:cen.eu:en16931:2026", aUBLInvoice.getCustomizationIDValue ());
-    // BT-1
-    assertEquals ("D25A-MIN-INV-1", aUBLInvoice.getIDValue ());
-    // BT-2
-    assertEquals (PDTFactory.createLocalDate (2026, Month.JANUARY, 15),
-                  aUBLInvoice.getIssueDateValue ().toLocalDate ());
-    // BT-3
-    assertEquals ("380", aUBLInvoice.getInvoiceTypeCodeValue ());
-    // BT-5
-    assertEquals ("EUR", aUBLInvoice.getDocumentCurrencyCodeValue ());
-    // BG-25
-    assertEquals (1, aUBLInvoice.getInvoiceLineCount ());
-    // BT-126
-    assertEquals ("1", aUBLInvoice.getInvoiceLineAtIndex (0).getIDValue ());
+    // BG-4 SELLER
+    assertXPath (aInv, "cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name", "Seller Ltd");
+    // BG-7 BUYER
+    assertXPath (aInv, "cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name", "Buyer Ltd");
 
-    // Ensure the result is UBL 2.5 XSD valid
-    final ESuccess eSuccess = UBL25Marshaller.invoice ()
-                                             .setFormattedOutput (true)
-                                             .write (aUBLInvoice, _getDestFile (sFilename));
-    assertTrue ("The created UBL 2.5 Invoice is not XSD valid", eSuccess.isSuccess ());
+    // BG-22 DOCUMENT TOTALS
+    assertXPath (aInv, "cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount", "120");
+    assertXPath (aInv, "cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount/@currencyID", "EUR");
+    assertXPath (aInv, "cac:LegalMonetaryTotal/cbc:PayableAmount", "120");
+
+    // BG-25 INVOICE LINE
+    assertXPathCount (aInv, "cac:InvoiceLine", 1);
+    assertXPath (aInv, "cac:InvoiceLine/cbc:ID", "1");
+    assertXPath (aInv, "cac:InvoiceLine/cbc:InvoicedQuantity", "4");
+    assertXPath (aInv, "cac:InvoiceLine/cbc:InvoicedQuantity/@unitCode", "C62");
+    assertXPath (aInv, "cac:InvoiceLine/cbc:LineExtensionAmount", "100");
+    assertXPath (aInv, "cac:InvoiceLine/cac:Item/cbc:Name", "Test item");
+    assertXPath (aInv, "cac:InvoiceLine/cac:Price/cbc:PriceAmount", "25");
   }
 
   @Test
   public void testConvertMinimalCreditNote ()
   {
-    final String sFilename = "d25a-minimal-creditnote.xml";
-    final ErrorList aErrorList = new ErrorList ();
-    final Serializable aUBL = _convert (sFilename, aErrorList);
-    assertTrue ("Expected a CreditNote but got " + aUBL.getClass ().getName (), aUBL instanceof CreditNoteType);
+    final Element aCN = convertAndValidate ("d25a-minimal-creditnote.xml", false);
 
-    final CreditNoteType aUBLCreditNote = (CreditNoteType) aUBL;
+    // Header level
+    assertXPath (aCN, "cbc:CustomizationID", "urn:cen.eu:en16931:2026");
+    assertXPath (aCN, "cbc:ID", "D25A-MIN-CN-1");
+    assertXPath (aCN, "cbc:IssueDate", "2026-01-15");
+    assertXPath (aCN, "cbc:CreditNoteTypeCode", "381");
+    assertXPath (aCN, "cbc:DocumentCurrencyCode", "EUR");
 
-    // BT-24
-    assertEquals ("urn:cen.eu:en16931:2026", aUBLCreditNote.getCustomizationIDValue ());
-    // BT-1
-    assertEquals ("D25A-MIN-CN-1", aUBLCreditNote.getIDValue ());
-    // BT-3
-    assertEquals ("381", aUBLCreditNote.getCreditNoteTypeCodeValue ());
-    // BT-5
-    assertEquals ("EUR", aUBLCreditNote.getDocumentCurrencyCodeValue ());
-    // BG-25
-    assertEquals (1, aUBLCreditNote.getCreditNoteLineCount ());
+    // BG-4 SELLER
+    assertXPath (aCN, "cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name", "Seller Ltd");
 
-    // Ensure the result is UBL 2.5 XSD valid
-    final ESuccess eSuccess = UBL25Marshaller.creditNote ()
-                                             .setFormattedOutput (true)
-                                             .write (aUBLCreditNote, _getDestFile (sFilename));
-    assertTrue ("The created UBL 2.5 CreditNote is not XSD valid", eSuccess.isSuccess ());
+    // BG-22 DOCUMENT TOTALS
+    assertXPath (aCN, "cac:LegalMonetaryTotal/cbc:PayableAmount", "120");
+
+    // BG-25 INVOICE LINE - renamed to CreditNoteLine, InvoicedQuantity to CreditedQuantity
+    assertXPathCount (aCN, "cac:CreditNoteLine", 1);
+    assertXPath (aCN, "cac:CreditNoteLine/cbc:ID", "1");
+    assertXPath (aCN, "cac:CreditNoteLine/cbc:CreditedQuantity", "4");
+    assertXPath (aCN, "cac:CreditNoteLine/cbc:LineExtensionAmount", "100");
+    assertXPath (aCN, "cac:CreditNoteLine/cac:Item/cbc:Name", "Test item");
   }
 }

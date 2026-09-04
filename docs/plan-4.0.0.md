@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A3 done, next up A4** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A4 done, next up A5** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -194,7 +194,7 @@ Deleted: `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
     enough for a schema-valid skeleton.
   - **Done when:** compiles; a hand-written minimal D25A file yields an XSD-valid UBL 2.5 Invoice.
 
-- [ ] **A4 — Test harness + the first two D25A files** · ~4 h
+- [x] **A4 — Test harness + the first two D25A files** · ~4 h
   - `src/test/resources/external/cii-d25a/d25a-minimal-invoice.xml` and
     `d25a-minimal-creditnote.xml` (BT-24 = `urn:cen.eu:en16931:2026`).
   - `AbstractCIID25AToUBL25ConverterTest` doing: input XSD-validate against the D25A XSD →
@@ -352,7 +352,7 @@ Several 2017 paths **changed** in 2026 — do not copy the 2017 converter blindl
 | A1 | 2026-09-04 | `[4.0.0 A1]` fb6bcba | 315 files changed, -8209 lines. `generated/toubl21/` unchanged. |
 | A2 | 2026-09-04 | `[4.0.0 A2]` | Split verified: 44 members in, 44 out, none lost or duplicated. 102 conversions, `generated/toubl21/` unchanged. |
 | A3 | 2026-09-04 | `[4.0.0 A3]` | Base port is a pure import swap - every D25A accessor matches D16B by name. Skeleton also emits the UBL-mandatory containers, so both files convert to XSD-valid UBL 2.5. |
-| A4 | | | |
+| A4 | 2026-09-04 | `[4.0.0 A4]` | `MockD25ASettings` with `assertXPath` / `assertNoXPath` / `assertXPathCount`. XPaths are relative to the document element, matching the mapping table. Negative-probed: wrong value and wrong count both fail. |
 | A5 | | | |
 | A6 | | | |
 | A7 | | | |
