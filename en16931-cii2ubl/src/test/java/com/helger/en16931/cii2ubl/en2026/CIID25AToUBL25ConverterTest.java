@@ -198,4 +198,200 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aCN, "cac:Annotation[1]/cbc:SubjectCode", "AAI");
     assertXPath (aCN, "cac:BuyerAssignedReference/cbc:BuyerReference", "BUYER-REF-4711");
   }
+
+  @Test
+  public void testConvertFullInvoice ()
+  {
+    final Element aInv = convertAndValidate ("d25a-full-invoice.xml", true);
+
+    // Header level
+    assertXPath (aInv, "cbc:ID", "D25A-FULL-INV-1");
+    assertXPath (aInv, "cbc:IssueDate", "2026-01-15");
+    assertXPath (aInv, "cbc:InvoiceTypeCode", "380");
+    assertXPath (aInv, "cbc:DocumentCurrencyCode", "EUR");
+    // BT-6 VAT accounting currency code
+    assertXPath (aInv, "cbc:TaxCurrencyCode", "USD");
+    // BT-7 Value added tax point date
+    assertXPath (aInv, "cbc:TaxPointDate", "2026-01-10");
+    // BT-9 Payment due date
+    assertXPath (aInv, "cbc:DueDate", "2026-02-14");
+    // BT-19 Buyer accounting reference
+    assertXPath (aInv, "cbc:AccountingCost", "COST-CENTRE-1");
+    // BT-13 Purchase order reference + BT-14 Sales order reference
+    assertXPath (aInv, "cac:OrderReference/cbc:ID", "PO-2026-0001");
+    assertXPath (aInv, "cac:OrderReference/cbc:SalesOrderID", "SO-2026-9");
+    // BT-12 Contract reference
+    assertXPath (aInv, "cac:ContractDocumentReference/cbc:ID", "CONTRACT-42");
+    // BT-15 Receiving advice + BT-16 Despatch advice
+    assertXPath (aInv, "cac:ReceiptDocumentReference/cbc:ID", "RECEIPT-4");
+    assertXPath (aInv, "cac:DespatchDocumentReference/cbc:ID", "DESPATCH-3");
+    // BT-17 Tender or lot reference
+    assertXPath (aInv, "cac:OriginatorDocumentReference/cbc:ID", "TENDER-5");
+
+    // BG-3 PRECEDING INVOICE REFERENCE - 0..n since CII D25A
+    assertXPathCount (aInv, "cac:BillingReference", 2);
+    assertXPath (aInv, "cac:BillingReference[1]/cac:InvoiceDocumentReference/cbc:ID", "PREV-INV-1");
+    assertXPath (aInv, "cac:BillingReference[1]/cac:InvoiceDocumentReference/cbc:IssueDate", "2025-12-15");
+    assertXPath (aInv, "cac:BillingReference[2]/cac:InvoiceDocumentReference/cbc:ID", "PREV-INV-2");
+
+    // BT-18 Invoiced object identifier - DocumentTypeCode 130
+    assertXPath (aInv, "cac:AdditionalDocumentReference[cbc:DocumentTypeCode='130']/cbc:ID", "METER-9");
+    assertXPath (aInv, "cac:AdditionalDocumentReference[cbc:DocumentTypeCode='130']/cbc:ID/@schemeID", "AVE");
+    // BG-24 ADDITIONAL SUPPORTING DOCUMENTS
+    assertXPath (aInv, "cac:AdditionalDocumentReference[cbc:ID='DOC-916']/cbc:DocumentDescription", "Supporting document");
+    assertXPath (aInv,
+                 "cac:AdditionalDocumentReference[cbc:ID='DOC-916']/cac:Attachment/cac:ExternalReference/cbc:URI",
+                 "https://example.org/doc");
+
+    // BG-10 PAYEE
+    assertXPath (aInv, "cac:PayeeParty/cac:PartyName/cbc:Name", "Payee Ltd");
+    assertXPath (aInv, "cac:PayeeParty/cac:PartyIdentification/cbc:ID", "4035822222222");
+    assertXPath (aInv, "cac:PayeeParty/cac:PartyLegalEntity/cbc:CompanyID", "FN999999z");
+
+    // BG-11 SELLER TAX REPRESENTATIVE PARTY + BG-12 its address
+    assertXPath (aInv, "cac:TaxRepresentativeParty/cac:PartyName/cbc:Name", "Tax Rep GmbH");
+    assertXPath (aInv, "cac:TaxRepresentativeParty/cac:PartyTaxScheme/cbc:CompanyID", "ATU11111111");
+    assertXPath (aInv, "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:CityName", "Vienna");
+
+    // BG-13 DELIVERY INFORMATION + BG-15 DELIVER TO ADDRESS
+    assertXPath (aInv, "cac:Delivery/cbc:ActualDeliveryDate", "2026-01-12");
+    assertXPath (aInv, "cac:Delivery/cac:DeliveryLocation/cbc:ID", "4035811111111");
+    assertXPath (aInv, "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:CityName", "Linz");
+    assertXPath (aInv, "cac:Delivery/cac:DeliveryParty/cac:PartyName/cbc:Name", "Delivery Site");
+
+    // BG-16 PAYMENT INSTRUCTIONS + BG-17 CREDIT TRANSFER
+    assertXPath (aInv, "cac:PaymentMeans/cbc:PaymentMeansCode", "58");
+    // BT-82 uses the lower case @name attribute
+    assertXPath (aInv, "cac:PaymentMeans/cbc:PaymentMeansCode/@name", "SEPA credit transfer");
+    // BT-83 Remittance information
+    assertXPath (aInv, "cac:PaymentMeans/cbc:PaymentID", "REMIT-1");
+    assertXPath (aInv, "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:ID", "AT611904300234573201");
+    assertXPath (aInv, "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:Name", "Seller Account");
+    assertXPath (aInv,
+                 "cac:PaymentMeans/cac:PayeeFinancialAccount/cac:FinancialInstitutionBranch/cbc:ID",
+                 "GIBAATWWXXX");
+
+    // BT-20 Payment terms
+    assertXPath (aInv, "cac:PaymentTerms/cbc:Note", "Net 30 days");
+
+    // BG-20 DOCUMENT LEVEL ALLOWANCES - ChargeIndicator false
+    final String sAllow = "cac:AllowanceCharge[cbc:ChargeIndicator='false']/";
+    assertXPath (aInv, sAllow + "cbc:Amount", "5");
+    assertXPath (aInv, sAllow + "cbc:BaseAmount", "100");
+    assertXPath (aInv, sAllow + "cbc:MultiplierFactorNumeric", "5.00");
+    assertXPath (aInv, sAllow + "cbc:AllowanceChargeReason", "Volume discount");
+    assertXPath (aInv, sAllow + "cbc:AllowanceChargeReasonCode", "95");
+    assertXPath (aInv, sAllow + "cac:TaxCategory/cbc:ID", "S");
+    // BG-21 DOCUMENT LEVEL CHARGES - ChargeIndicator true
+    final String sCharge = "cac:AllowanceCharge[cbc:ChargeIndicator='true']/";
+    assertXPath (aInv, sCharge + "cbc:Amount", "15");
+    assertXPath (aInv, sCharge + "cbc:AllowanceChargeReason", "Freight");
+    assertXPath (aInv, sCharge + "cbc:AllowanceChargeReasonCode", "FC");
+
+    // BG-23 VAT BREAKDOWN - two categories, and BT-110/BT-111 as two TaxTotals
+    assertXPathCount (aInv, "cac:TaxTotal", 2);
+    // BT-110 in the invoice currency
+    assertXPath (aInv, "cac:TaxTotal[cbc:TaxAmount/@currencyID='EUR']/cbc:TaxAmount", "22");
+    // BT-111 in the VAT accounting currency
+    assertXPath (aInv, "cac:TaxTotal[cbc:TaxAmount/@currencyID='USD']/cbc:TaxAmount", "24.2");
+    assertXPathCount (aInv, "cac:TaxTotal/cac:TaxSubtotal", 2);
+    final String sVat1 = "cac:TaxTotal/cac:TaxSubtotal[cac:TaxCategory/cbc:ID='S']/";
+    assertXPath (aInv, sVat1 + "cbc:TaxableAmount", "100");
+    assertXPath (aInv, sVat1 + "cbc:TaxAmount", "20");
+    assertXPath (aInv, sVat1 + "cac:TaxCategory/cbc:Percent", "20");
+    final String sVat2 = "cac:TaxTotal/cac:TaxSubtotal[cac:TaxCategory/cbc:ID='AE']/";
+    assertXPath (aInv, sVat2 + "cbc:TaxableAmount", "50");
+    assertXPath (aInv, sVat2 + "cac:TaxCategory/cbc:TaxExemptionReason", "Reverse charge");
+    assertXPath (aInv, sVat2 + "cac:TaxCategory/cbc:TaxExemptionReasonCode", "VATEX-EU-AE");
+
+    // BG-22 DOCUMENT TOTALS
+    final String sTot = "cac:LegalMonetaryTotal/";
+    assertXPath (aInv, sTot + "cbc:LineExtensionAmount", "100");
+    assertXPath (aInv, sTot + "cbc:AllowanceTotalAmount", "5");
+    assertXPath (aInv, sTot + "cbc:ChargeTotalAmount", "15");
+    assertXPath (aInv, sTot + "cbc:TaxExclusiveAmount", "110");
+    assertXPath (aInv, sTot + "cbc:TaxInclusiveAmount", "132");
+    assertXPath (aInv, sTot + "cbc:PrepaidAmount", "32");
+    assertXPath (aInv, sTot + "cbc:PayableAmount", "100");
+
+    // BG-25 INVOICE LINE
+    final String sLine = "cac:InvoiceLine/";
+    assertXPath (aInv, sLine + "cbc:ID", "1");
+    assertXPath (aInv, sLine + "cbc:Note", "Line one note");
+    assertXPath (aInv, sLine + "cbc:InvoicedQuantity", "4");
+    assertXPath (aInv, sLine + "cbc:InvoicedQuantity/@unitCode", "C62");
+    assertXPath (aInv, sLine + "cbc:LineExtensionAmount", "100");
+    assertXPath (aInv, sLine + "cbc:AccountingCost", "LINE-COST-CENTRE");
+    assertXPath (aInv, sLine + "cac:DocumentReference/cbc:ID", "OBJ-1");
+    // BG-26 INVOICE LINE PERIOD
+    assertXPath (aInv, sLine + "cac:InvoicePeriod/cbc:StartDate", "2026-01-01");
+    assertXPath (aInv, sLine + "cac:InvoicePeriod/cbc:EndDate", "2026-01-31");
+    // BG-27 INVOICE LINE ALLOWANCES + BG-28 INVOICE LINE CHARGES
+    assertXPath (aInv, sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:Amount", "10");
+    assertXPath (aInv, sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:AllowanceChargeReason", "Line discount");
+    assertXPath (aInv, sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='true']/cbc:AllowanceChargeReason", "Line freight");
+    // BG-31 ITEM INFORMATION
+    final String sItem = sLine + "cac:Item/";
+    assertXPath (aInv, sItem + "cbc:Name", "Widget");
+    assertXPath (aInv, sItem + "cbc:Description", "A round widget");
+    assertXPath (aInv, sItem + "cac:SellersItemIdentification/cbc:ID", "SELLER-ART-1");
+    assertXPath (aInv, sItem + "cac:BuyersItemIdentification/cbc:ID", "BUYER-ART-1");
+    assertXPath (aInv, sItem + "cac:StandardItemIdentification/cbc:ID", "1234567890128");
+    assertXPath (aInv, sItem + "cac:StandardItemIdentification/cbc:ID/@schemeID", "0160");
+    assertXPath (aInv, sItem + "cac:OriginCountry/cbc:IdentificationCode", "AT");
+    // BT-158 + BT-158-1 + BT-158-2
+    assertXPath (aInv, sItem + "cac:CommodityClassification/cbc:ItemClassificationCode", "CLASS-1");
+    assertXPath (aInv, sItem + "cac:CommodityClassification/cbc:ItemClassificationCode/@listID", "TST");
+    assertXPath (aInv, sItem + "cac:CommodityClassification/cbc:ItemClassificationCode/@listVersionID", "1.0");
+    // BG-30 LINE VAT INFORMATION
+    assertXPath (aInv, sItem + "cac:ClassifiedTaxCategory/cbc:ID", "S");
+    assertXPath (aInv, sItem + "cac:ClassifiedTaxCategory/cbc:Percent", "20");
+    // BG-32 ITEM ATTRIBUTE
+    assertXPathCount (aInv, sItem + "cac:AdditionalItemProperty", 2);
+    assertXPath (aInv, sItem + "cac:AdditionalItemProperty[1]/cbc:Name", "Colour");
+    assertXPath (aInv, sItem + "cac:AdditionalItemProperty[1]/cbc:Value", "Blue");
+    // BG-29 PRICE DETAILS - BT-146 net price, BT-147 discount, BT-148 gross price, BT-149/BT-150
+    final String sPrice = sLine + "cac:Price/";
+    assertXPath (aInv, sPrice + "cbc:PriceAmount", "25");
+    assertXPath (aInv, sPrice + "cbc:BaseQuantity", "1");
+    assertXPath (aInv, sPrice + "cbc:BaseQuantity/@unitCode", "C62");
+    assertXPath (aInv, sPrice + "cac:AllowanceCharge/cbc:ChargeIndicator", "false");
+    assertXPath (aInv, sPrice + "cac:AllowanceCharge/cbc:Amount", "5");
+    assertXPath (aInv, sPrice + "cac:AllowanceCharge/cbc:BaseAmount", "30");
+  }
+
+  @Test
+  public void testConvertFullCreditNote ()
+  {
+    final Element aCN = convertAndValidate ("d25a-full-creditnote.xml", false);
+
+    // The 2026 credit note binding is a mechanical rename of the invoice binding
+    assertXPath (aCN, "cbc:ID", "D25A-FULL-CN-1");
+    assertXPath (aCN, "cbc:CreditNoteTypeCode", "381");
+    assertNoXPath (aCN, "cbc:InvoiceTypeCode");
+
+    // cac:InvoiceLine -> cac:CreditNoteLine, cbc:InvoicedQuantity -> cbc:CreditedQuantity
+    assertXPathCount (aCN, "cac:CreditNoteLine", 1);
+    assertNoXPath (aCN, "cac:InvoiceLine");
+    assertXPath (aCN, "cac:CreditNoteLine/cbc:CreditedQuantity", "4");
+    assertXPath (aCN, "cac:CreditNoteLine/cbc:CreditedQuantity/@unitCode", "C62");
+    assertNoXPath (aCN, "cac:CreditNoteLine/cbc:InvoicedQuantity");
+
+    // Everything else is identical to the invoice
+    assertXPath (aCN, "cbc:DueDate", "2026-02-14");
+    assertXPath (aCN, "cbc:TaxCurrencyCode", "USD");
+    assertXPath (aCN, "cac:ProjectReference/cbc:ID", "PROJECT-7");
+    assertXPath (aCN, "cac:OrderReference/cbc:SalesOrderID", "SO-2026-9");
+    assertXPathCount (aCN, "cac:BillingReference", 2);
+    assertXPath (aCN, "cac:PayeeParty/cac:PartyName/cbc:Name", "Payee Ltd");
+    assertXPath (aCN, "cac:TaxRepresentativeParty/cac:PartyName/cbc:Name", "Tax Rep GmbH");
+    assertXPath (aCN, "cac:Delivery/cbc:ActualDeliveryDate", "2026-01-12");
+    assertXPath (aCN, "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:ID", "AT611904300234573201");
+    assertXPathCount (aCN, "cac:TaxTotal", 2);
+    assertXPathCount (aCN, "cac:TaxTotal/cac:TaxSubtotal", 2);
+    assertXPath (aCN, "cac:LegalMonetaryTotal/cbc:PayableAmount", "100");
+    assertXPath (aCN, "cac:CreditNoteLine/cac:Item/cbc:Name", "Widget");
+    assertXPath (aCN, "cac:CreditNoteLine/cac:Price/cbc:PriceAmount", "25");
+    assertXPath (aCN, "cac:CreditNoteLine/cac:Item/cac:AdditionalItemProperty[1]/cbc:Value", "Blue");
+  }
 }

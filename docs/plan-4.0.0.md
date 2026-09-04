@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A6 done, next up A7** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A7 done, next up A8** — Phase 3 (all 214 carried-over rows) complete · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -253,7 +253,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | BT-32-2 | `cac:TaxScheme/cbc:ID` = anything except `VAT` | fixed value `LOC` (CII `@schemeID='FC'`) |
 | BT-127 | `cbc:Note` | unchanged — but it must **not** follow BG-1 into `cac:Annotation`; it has no subject-code counterpart |
 
-- [ ] **A7 — Comprehensive carried-over test file + XPath assertions** · ~1 session · 214 rows
+- [x] **A7 — Comprehensive carried-over test file + XPath assertions** · done · 214 rows
   - BG-25 (10): BT-126 127 128 128-1 128-2 129 130 131 132 133
   - BG-26 (4): BT-134 134-1 135 135-1 · BG-27 (5): BT-136 … 140 · BG-28 (5): BT-141 … 145
   - BG-29 (7): BT-146 147 147-1 148 148-1 149 150 · BG-30 (3): BT-151 151-1 152
@@ -374,7 +374,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A4 | 2026-09-04 | `[4.0.0 A4]` | `MockD25ASettings` with `assertXPath` / `assertNoXPath` / `assertXPathCount`. XPaths are relative to the document element, matching the mapping table. Negative-probed: wrong value and wrong count both fail. |
 | A5 | 2026-09-04 | `[4.0.0 A5]` d9c9af4 | Bulk port instead of hand-porting. 17 compile errors, all cardinality widenings (4.4b). Also corrected the A3 skeleton's wrong BT-27 mapping. |
 | A6 | 2026-09-04 | `[4.0.0 A6]` | All 180 shared rows diffed programmatically between the two mapping docs; 58 differed, of which 6 were real changes (the rest were base-path notation). Verified with two new header test files. |
-| A7 | | | |
+| A7 | 2026-09-05 | `[4.0.0 A7]` | `d25a-full-invoice.xml` + `d25a-full-creditnote.xml` cover BG-3 … BG-32 with ~150 XPath assertions. 6 test files, 10 tests, all green. |
 | A8 | | | |
 | A9 | | | |
 | A10 | | | |
