@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A16 done, next up A17 (documentation, the last item)** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A17 done — all 18 action items complete.** One open question remains: the wording of `docs/00readme.txt` (see A17). · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -407,12 +407,15 @@ now spelled out). **Six are real**, and all six are implemented in A6:
     `ram:ProprietaryID`; BT-90 with and without a Payee.
   - **Done when:** every one of the 284 mapping rows is asserted by at least one test.
 
-- [ ] **A17 — Documentation** · ~half session
+- [x] **A17 — Documentation** · done, except the `docs/00readme.txt` citation
   - `README.md`: drop UBL 2.2/2.3/2.4, document the two bindings, the new package names, the CLI.
   - `CLAUDE.md`: update the converter hierarchy section; note that
     `docs/mapping-cii-ubl.xlsx` is **2017-only** and `docs/en16931-2026-syntax.md` is the 2026 source.
-  - `docs/00readme.txt`: it currently describes the 2026 sources as "Draft versions for Formal
-    Vote" — correct this to the published status.
+  - `docs/00readme.txt`: **still open.** It describes the 2026 sources as "Draft versions for Formal
+    Vote, CEN/TC 434 documents N0463 and N0465", which the maintainer has confirmed is wrong — the
+    data is from the published version. The correct citation is unknown (do the published documents
+    still carry the N-numbers, or should they be cited as CEN/TS 16931-3-2:2026 and
+    CEN/TS 16931-3-3:2026 directly?), so the wording was left untouched rather than invented.
   - `README.md` News and noteworthy: `v4.0.0 - work in progress`.
 
 ## 7. Estimate
@@ -465,4 +468,4 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A14 | 2026-09-05 | `[4.0.0 A14]` | Detection verified against all 103 existing files: 101 detect as 2017, 2 legacy ZUGFeRD files are undeterminable — real-world evidence for the override (see 4.4e). |
 | A15 | 2026-09-05 | `[4.0.0 A15]` | `--ubl` kept as a deprecated alias (2.1/2.5), cross-checked against `--en-version`. **Fixed a pre-existing CLI NPE** — see 4.4f. |
 | A16 | 2026-09-05 | `[4.0.0 A16]` | Coverage guard added; it immediately found **BT-122-1/BT-122-1-1 unimplemented** and BT-91's missing ProprietaryID fallback — see 4.4g. |
-| A17 | | | |
+| A17 | 2026-09-05 | `[4.0.0 A17]` | README, CLAUDE.md and the News entry updated. `docs/00readme.txt` left untouched pending the correct citation. |
