@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A13 done, next up A14** — Phases 3 and 4 complete: all 284 mapping rows implemented · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A14 done, next up A15** — all 284 mapping rows implemented; detection and dispatcher in place · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -163,6 +163,22 @@ written to it — the result would fail UBL 2.5 XSD validation. The converter th
 
 **This is the one place where the implementation knowingly deviates from the table.** Worth checking
 against the published CEN/TS text and reporting upstream if it is wrong there too.
+
+### 4.4e BT-24 detection measured against the real corpus
+
+`EEN16931Edition.detect` was run over all 103 existing CII test files:
+
+| Result | Count | Detail |
+|--------|-------|--------|
+| Detected as EN 16931:2017 | 101 | includes 82 with an XRechnung `#compliant#…` suffix, which prefix matching handles |
+| Undeterminable | 2 | `CII_business_example_01.xml` and `CII_business_example_02.xml` carry the legacy ZUGFeRD identifier `urn:ferd:CrossIndustryDocument:invoice:1p0:comfort` |
+
+So ~2% of a real corpus cannot be auto-detected. This is concrete justification for D4's
+`--en-version` override rather than a theoretical edge case, and the dispatcher converts these files
+correctly once the edition is forced.
+
+`DOMReader.readXMLDOM (File)` throws on a non-existent file, so `detect` guards with
+`aFile.isFile ()` first.
 
 ### 4.5 The D25A JAXB model is a separate Java package
 
@@ -329,7 +345,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 
 ### Phase 5 — Detection, CLI, comprehensive tests, docs
 
-- [ ] **A14 — `EEN16931Edition` + `CIIToUBLDispatcher`** · ~half session
+- [x] **A14 — `EEN16931Edition` + `CIIToUBLDispatcher`** · done
   - `EEN16931Edition.detect (File | Node | Document)` reading BT-24 via a DOM/StAX peek — **must
     not** JAXB-parse the whole document, since the correct model is not yet known. Returns `null`
     when BT-24 is absent or matches neither edition prefix.
@@ -409,7 +425,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A11 | 2026-09-05 | `[4.0.0 A11]` | **Trap found:** the CII schema declares `default="4465_AllowanceChargeReasonCode"` on `@listID`, so JAXB always reports one. Only the fixed `5153` of BT-177-1 may be propagated — see 4.4c. |
 | A12 | 2026-09-05 | `[4.0.0 A12]` | **Source defect found on BT-218** — see 4.4d. |
 | A13 | 2026-09-05 | `[4.0.0 A13]` | BT-193/BT-193-1 came for free from the A11 `@listID` handling, since header and line allowances share `_copyAllowanceCharge`. **All 284 rows now implemented.** |
-| A14 | | | |
+| A14 | 2026-09-05 | `[4.0.0 A14]` | Detection verified against all 103 existing files: 101 detect as 2017, 2 legacy ZUGFeRD files are undeterminable — real-world evidence for the override (see 4.4e). |
 | A15 | | | |
 | A16 | | | |
 | A17 | | | |
