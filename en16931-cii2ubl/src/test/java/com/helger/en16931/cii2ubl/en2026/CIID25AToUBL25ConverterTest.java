@@ -469,4 +469,31 @@ public final class CIID25AToUBL25ConverterTest
     assertNoXPath (aInv, "cac:PaymentTerms[cbc:Note and cbc:SettlementDiscountPercent]");
     assertNoXPath (aInv, "cac:PaymentTerms[cbc:SettlementDiscountPercent and cbc:PenaltyAmount]");
   }
+
+  @Test
+  public void testConvertNewBG34 ()
+  {
+    // BG-34 CHARGES ON BEHALF OF A THIRD PARTY
+    final Element aInv = convertAndValidate ("d25a-new-bg34-invoice.xml", true);
+
+    assertXPathCount (aInv, "cac:CollectionInvoiceLine", 2);
+    // BT-179-1 Line identifier - synthesised, since CII has no counterpart
+    assertXPath (aInv, "cac:CollectionInvoiceLine[1]/cbc:ID", "1");
+    // BT-179 Charge amount collected on behalf of a third party
+    assertXPath (aInv, "cac:CollectionInvoiceLine[1]/cbc:TaxInclusiveLineExtensionAmount", "3.2");
+    assertXPath (aInv, "cac:CollectionInvoiceLine[1]/cbc:TaxInclusiveLineExtensionAmount/@currencyID", "EUR");
+    // BT-180 Charges specification
+    assertXPath (aInv, "cac:CollectionInvoiceLine[1]/cac:Item/cbc:Description", "Copyright levy");
+
+    assertXPath (aInv, "cac:CollectionInvoiceLine[2]/cbc:ID", "2");
+    assertXPath (aInv, "cac:CollectionInvoiceLine[2]/cbc:TaxInclusiveLineExtensionAmount", "1.75");
+    assertXPath (aInv, "cac:CollectionInvoiceLine[2]/cac:Item/cbc:Description", "Recycling fee");
+
+    // The credit note uses cac:CollectionCreditNoteLine
+    final Element aCN = convertAndValidate ("d25a-new-bg34-creditnote.xml", false);
+    assertXPathCount (aCN, "cac:CollectionCreditNoteLine", 2);
+    assertNoXPath (aCN, "cac:CollectionInvoiceLine");
+    assertXPath (aCN, "cac:CollectionCreditNoteLine[1]/cbc:TaxInclusiveLineExtensionAmount", "3.2");
+    assertXPath (aCN, "cac:CollectionCreditNoteLine[2]/cac:Item/cbc:Description", "Recycling fee");
+  }
 }

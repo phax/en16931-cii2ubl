@@ -1279,6 +1279,37 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       }
     }
 
+    // BG-34 CHARGES ON BEHALF OF A THIRD PARTY (BT-179/BT-179-1/BT-180) - new in EN 16931:2026
+    // CII holds these in ram:SpecifiedFinancialAdjustment, UBL in cac:CollectionInvoiceLine
+    {
+      int nAdjustmentIndex = 0;
+      for (final FinancialAdjustmentType aAdjustment : aHeaderSettlement.getSpecifiedFinancialAdjustment ())
+      {
+        nAdjustmentIndex++;
+        final InvoiceLineType aUBLCollectionLine = new InvoiceLineType ();
+
+        // BT-179-1 Line identifier. Mandatory in UBL but CII has no counterpart, so a 1 based
+        // sequence number is used.
+        aUBLCollectionLine.setID (Integer.toString (nAdjustmentIndex));
+
+        // BT-179 Charge amount collected on behalf of a third party
+        // CII D25A: ActualAmount is a 0..n element
+        if (aAdjustment.hasActualAmountEntries ())
+          ifNotNull (copyAmount (aAdjustment.getActualAmountAtIndex (0),
+                                 new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.TaxInclusiveLineExtensionAmountType (),
+                                 sDefaultCurrencyCode),
+                     aUBLCollectionLine::setTaxInclusiveLineExtensionAmount);
+
+        // BT-180 Charges specification. cac:Item is mandatory in UBL.
+        final ItemType aUBLItem = new ItemType ();
+        for (final TextType aReason : aAdjustment.getReason ())
+          ifNotNull (copyName (aReason, new DescriptionType ()), aUBLItem::addDescription);
+        aUBLCollectionLine.setItem (aUBLItem);
+
+        aUBLInvoice.addCollectionInvoiceLine (aUBLCollectionLine);
+      }
+    }
+
     // BG-33 PAYMENT TERMS (BT-20) + BG-35 EARLY PAYMENT DISCOUNT + BG-36 LATE PAYMENT PENALTY
     // All three groups share cac:PaymentTerms in UBL, but CII keeps them in separate containers.
     // One cac:PaymentTerms is emitted per CII container so that they stay distinguishable.
@@ -2291,6 +2322,37 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           // Since v1.2.0 only one is allowed
           if (true)
             break;
+      }
+    }
+
+    // BG-34 CHARGES ON BEHALF OF A THIRD PARTY (BT-179/BT-179-1/BT-180) - new in EN 16931:2026
+    // CII holds these in ram:SpecifiedFinancialAdjustment, UBL in cac:CollectionCreditNoteLine
+    {
+      int nAdjustmentIndex = 0;
+      for (final FinancialAdjustmentType aAdjustment : aHeaderSettlement.getSpecifiedFinancialAdjustment ())
+      {
+        nAdjustmentIndex++;
+        final CreditNoteLineType aUBLCollectionLine = new CreditNoteLineType ();
+
+        // BT-179-1 Line identifier. Mandatory in UBL but CII has no counterpart, so a 1 based
+        // sequence number is used.
+        aUBLCollectionLine.setID (Integer.toString (nAdjustmentIndex));
+
+        // BT-179 Charge amount collected on behalf of a third party
+        // CII D25A: ActualAmount is a 0..n element
+        if (aAdjustment.hasActualAmountEntries ())
+          ifNotNull (copyAmount (aAdjustment.getActualAmountAtIndex (0),
+                                 new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.TaxInclusiveLineExtensionAmountType (),
+                                 sDefaultCurrencyCode),
+                     aUBLCollectionLine::setTaxInclusiveLineExtensionAmount);
+
+        // BT-180 Charges specification. cac:Item is mandatory in UBL.
+        final ItemType aUBLItem = new ItemType ();
+        for (final TextType aReason : aAdjustment.getReason ())
+          ifNotNull (copyName (aReason, new DescriptionType ()), aUBLItem::addDescription);
+        aUBLCollectionLine.setItem (aUBLItem);
+
+        aUBLCreditNote.addCollectionCreditNoteLine (aUBLCollectionLine);
       }
     }
 

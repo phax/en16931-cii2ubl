@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A9 done, next up A10** — Phase 3 complete; Phase 4 in progress (17 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A10 done, next up A11** — Phase 3 complete; Phase 4 in progress (20 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -276,7 +276,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
     `ram:ApplicableTradePaymentPenaltyTerms`); UBL does not, so emit **one `cac:PaymentTerms`
     per CII container** rather than merging.
 
-- [ ] **A10 — BG-34 charges on behalf of a third party** · ~half session · 3 rows
+- [x] **A10 — BG-34 charges on behalf of a third party** · done · 3 rows
   - BT-179 (`cbc:TaxInclusiveLineExtensionAmount`), BT-179-1 (`cbc:ID`, UBL-only — CII has no
     counterpart, so synthesise a 1-based sequence), BT-180 (`cac:Item/cbc:Description`).
   - CII source `ram:SpecifiedFinancialAdjustment` → UBL `/Invoice/cac:CollectionInvoiceLine`
@@ -377,7 +377,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A7 | 2026-09-05 | `[4.0.0 A7]` | `d25a-full-invoice.xml` + `d25a-full-creditnote.xml` cover BG-3 … BG-32 with ~150 XPath assertions. 6 test files, 10 tests, all green. |
 | A8 | 2026-09-05 | `[4.0.0 A8]` | Also added `parseDateTime` to the shared base for UNTDID 2379 format "208", which is what makes BT-166 possible at all. |
 | A9 | 2026-09-05 | `[4.0.0 A9]` | One `cac:PaymentTerms` per CII container, so the three groups stay distinguishable; asserted by two `assertNoXPath` checks that they are never merged. |
-| A10 | | | |
+| A10 | 2026-09-05 | `[4.0.0 A10]` | BT-179-1 has no CII counterpart, so a 1-based sequence number is synthesised. Note BT-215/216 were already done in A8. |
 | A11 | | | |
 | A12 | | | |
 | A13 | | | |
