@@ -572,4 +572,60 @@ public final class CIID25AToUBL25ConverterTest
     // BT-220 Line-level preceding invoice line reference
     assertXPath (aInv, sBillRef + "cac:BillingReferenceLine/cbc:ID", "PREV-LINE-7");
   }
+
+  @Test
+  public void testConvertNewLineDeliveryAndItemTerms ()
+  {
+    final Element aInv = convertAndValidate ("d25a-new-linedelivery-invoice.xml", true);
+    final String sLine = "cac:InvoiceLine/";
+
+    // BG-37 INVOICE LINE DELIVERY INFORMATION
+    final String sDel = sLine + "cac:Delivery/";
+    // BT-185 Invoice line deliver to party name
+    assertXPath (aInv, sDel + "cac:DeliveryParty/cac:PartyName/cbc:Name", "Line Delivery Site");
+    // BT-186 + BT-186-1 Invoice line deliver to location identifier
+    assertXPath (aInv, sDel + "cac:DeliveryLocation/cbc:ID", "4035813333333");
+    assertXPath (aInv, sDel + "cac:DeliveryLocation/cbc:ID/@schemeID", "0088");
+    // BT-187 Invoice line actual delivery date
+    assertXPath (aInv, sDel + "cbc:ActualDeliveryDate", "2026-01-13");
+
+    // BG-38 INVOICE LINE DELIVER TO ADDRESS
+    final String sAddr = sDel + "cac:DeliveryLocation/cac:Address/";
+    assertXPath (aInv, sAddr + "cbc:StreetName", "Line Delivery Road 1");
+    assertXPath (aInv, sAddr + "cbc:AdditionalStreetName", "Gate 5");
+    assertXPath (aInv, sAddr + "cac:AddressLine/cbc:Line", "Dock C");
+    assertXPath (aInv, sAddr + "cbc:CityName", "Innsbruck");
+    assertXPath (aInv, sAddr + "cbc:PostalZone", "6020");
+    assertXPath (aInv, sAddr + "cbc:CountrySubentity", "Tirol");
+    assertXPath (aInv, sAddr + "cac:Country/cbc:IdentificationCode", "AT");
+
+    // BG-30 LINE VAT INFORMATION - new terms
+    final String sTaxCat = sLine + "cac:Item/cac:ClassifiedTaxCategory/";
+    // BT-194 Invoiced item exemption reason text
+    assertXPath (aInv, sTaxCat + "cbc:TaxExemptionReason", "Item exempt");
+    // BT-195 Invoiced item VAT exemption reason and specification code
+    assertXPath (aInv, sTaxCat + "cbc:TaxExemptionReasonCode", "VATEX-EU-G");
+    // BT-196 Goods/services code
+    assertXPath (aInv, sTaxCat + "cbc:SupplyTypeCode", "SUPPLY-L");
+
+    // BT-193 + BT-193-1 Invoice line-level non-VAT tax type code
+    final String sLineCharge = sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='true']/";
+    assertXPath (aInv, sLineCharge + "cbc:AllowanceChargeReasonCode", "ENV");
+    assertXPath (aInv, sLineCharge + "cbc:AllowanceChargeReasonCode/@listID", "5153");
+    // BT-145 keeps no list identifier
+    assertNoXPath (aInv, sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:AllowanceChargeReasonCode/@listID");
+
+    // BG-32 ITEM ATTRIBUTE
+    final String sProp = sLine + "cac:Item/cac:AdditionalItemProperty";
+    assertXPathCount (aInv, sProp, 2);
+    // BT-161a value as text
+    assertXPath (aInv, sProp + "[cbc:Name='Colour']/cbc:Value", "Blue");
+    assertNoXPath (aInv, sProp + "[cbc:Name='Colour']/cbc:ValueQuantity");
+    // BT-211 Item attribute code
+    assertXPath (aInv, sProp + "[cbc:Name='Humidity']/cbc:NameCode", "AAO");
+    // BT-161b value as a measure + BT-212 its unit of measure
+    assertXPath (aInv, sProp + "[cbc:Name='Humidity']/cbc:ValueQuantity", "65");
+    assertXPath (aInv, sProp + "[cbc:Name='Humidity']/cbc:ValueQuantity/@unitCode", "P1");
+    assertNoXPath (aInv, sProp + "[cbc:Name='Humidity']/cbc:Value");
+  }
 }

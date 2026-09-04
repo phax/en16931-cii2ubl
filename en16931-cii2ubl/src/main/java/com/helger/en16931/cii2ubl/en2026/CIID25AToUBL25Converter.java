@@ -1683,25 +1683,64 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           ifNotNull (_toLineReference (aRefLineDelivery.getReceivingAdviceReferencedDocument ()),
                      aUBLInvoiceLine::addReceiptLineReference);
 
-          // BT-198 + BT-199 - the delivery note reference lives inside cac:Delivery
+          // BG-37 INVOICE LINE DELIVERY INFORMATION + BG-38 INVOICE LINE DELIVER TO ADDRESS
+          // (new in EN 16931:2026), plus BT-198/BT-199 which UBL nests in the same cac:Delivery
+          final DeliveryType aUBLDelivery = new DeliveryType ();
+
+          // BT-198 Invoice line delivery note reference
           final ReferencedDocumentType aDeliveryNote = aRefLineDelivery.getDeliveryNoteReferencedDocument ();
           if (aDeliveryNote != null)
           {
-            final DeliveryType aUBLDelivery = new DeliveryType ();
-            // BT-198
             ifNotNull (_toDocumentReference (aDeliveryNote.getIssuerAssignedIDValue ()),
                        aUBLDelivery::addDeliveryNoteDocumentReference);
-            // BT-199
+            // BT-199 Invoice line delivery note line reference
             if (StringHelper.isNotEmpty (aDeliveryNote.getLineIDValue ()))
             {
               final LineReferenceType aUBLLineRef = new LineReferenceType ();
               aUBLLineRef.setLineID (aDeliveryNote.getLineIDValue ());
               aUBLDelivery.addDeliveryNoteLineReference (aUBLLineRef);
             }
-            if (aUBLDelivery.hasDeliveryNoteDocumentReferenceEntries () ||
-                aUBLDelivery.hasDeliveryNoteLineReferenceEntries ())
-              aUBLInvoiceLine.addDelivery (aUBLDelivery);
           }
+
+          // BT-187 Invoice line actual delivery date
+          if (aRefLineDelivery.getActualDeliverySupplyChainEvent () != null &&
+              aRefLineDelivery.getActualDeliverySupplyChainEvent ().getOccurrenceDateTime () != null)
+            ifNotNull (parseDate (aRefLineDelivery.getActualDeliverySupplyChainEvent ()
+                                                  .getOccurrenceDateTime ()
+                                                  .getDateTimeString (),
+                                  aErrorList),
+                       aUBLDelivery::setActualDeliveryDate);
+
+          final TradePartyType aLineShipTo = aRefLineDelivery.getShipToTradeParty ();
+          if (aLineShipTo != null)
+          {
+            // BT-185 Invoice line deliver to party name
+            if (StringHelper.isNotEmpty (aLineShipTo.getNameValue ()))
+            {
+              final PartyType aUBLDeliveryParty = new PartyType ();
+              final PartyNameType aUBLPartyName = new PartyNameType ();
+              aUBLPartyName.setName (aLineShipTo.getNameValue ());
+              aUBLDeliveryParty.addPartyName (aUBLPartyName);
+              aUBLDelivery.setDeliveryParty (aUBLDeliveryParty);
+            }
+
+            final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_25.LocationType aUBLLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_25.LocationType ();
+            // BT-186 + BT-186-1 Invoice line deliver to location identifier
+            ifNotNull (_extractFirstPartyID (aLineShipTo), aUBLLocation::setID);
+            // BG-38 INVOICE LINE DELIVER TO ADDRESS (BT-203 to BT-209)
+            if (aLineShipTo.getPostalTradeAddress () != null)
+              aUBLLocation.setAddress (_convertPostalAddress (aLineShipTo.getPostalTradeAddress ()));
+
+            if (aUBLLocation.getID () != null || aUBLLocation.getAddress () != null)
+              aUBLDelivery.setDeliveryLocation (aUBLLocation);
+          }
+
+          if (aUBLDelivery.hasDeliveryNoteDocumentReferenceEntries () ||
+              aUBLDelivery.hasDeliveryNoteLineReferenceEntries () ||
+              aUBLDelivery.getActualDeliveryDate () != null ||
+              aUBLDelivery.getDeliveryParty () != null ||
+              aUBLDelivery.getDeliveryLocation () != null)
+            aUBLInvoiceLine.addDelivery (aUBLDelivery);
         }
       }
 
@@ -1850,6 +1889,15 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+
+        // BT-194 Invoiced item exemption reason text - new in EN 16931:2026
+        ifNotEmpty (aTradeTax.getExemptionReasonValue (),
+                    x -> aUBLTaxCategory.addTaxExemptionReason (new TaxExemptionReasonType (x)));
+        // BT-195 Invoiced item VAT exemption reason and specification code - new in EN 16931:2026
+        ifNotEmpty (aTradeTax.getExemptionReasonCodeValue (), aUBLTaxCategory::setTaxExemptionReasonCode);
+        // BT-196 Goods/services code - new in EN 16931:2026
+        ifNotEmpty (aTradeTax.getSupplyTypeCodeValue (), aUBLTaxCategory::setSupplyTypeCode);
+
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -1863,9 +1911,24 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           if (aAPC.hasDescriptionEntries ())
           {
             final ItemPropertyType aUBLAdditionalItem = new ItemPropertyType ();
+            // BT-160 Item attribute name
             aUBLAdditionalItem.setName (copyName (aAPC.getDescriptionAtIndex (0), new NameType ()));
+            // BT-211 Item attribute code - new in EN 16931:2026
+            ifNotEmpty (aAPC.getTypeCodeValue (), aUBLAdditionalItem::setNameCode);
+            // BT-161a Item attribute value as text
             if (aAPC.hasValueEntries ())
               aUBLAdditionalItem.setValue (aAPC.getValueAtIndex (0).getValue ());
+            else
+              // BT-161b Item attribute value as a measure, with BT-212 as its unit of measure.
+              // Rule CII-SR-504 allows exactly one of the two.
+              if (aAPC.getValueMeasure () != null && aAPC.getValueMeasure ().getValue () != null)
+              {
+                final ValueQuantityType aUBLValueQuantity = new ValueQuantityType ();
+                aUBLValueQuantity.setValue (aAPC.getValueMeasure ().getValue ());
+                // BT-212
+                aUBLValueQuantity.setUnitCode (aAPC.getValueMeasure ().getUnitCode ());
+                aUBLAdditionalItem.setValueQuantity (aUBLValueQuantity);
+              }
             if (aUBLAdditionalItem.getName () != null)
               aUBLItem.addAdditionalItemProperty (aUBLAdditionalItem);
           }
@@ -2831,25 +2894,64 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           ifNotNull (_toLineReference (aRefLineDelivery.getReceivingAdviceReferencedDocument ()),
                      aUBLCreditNoteLine::addReceiptLineReference);
 
-          // BT-198 + BT-199 - the delivery note reference lives inside cac:Delivery
+          // BG-37 INVOICE LINE DELIVERY INFORMATION + BG-38 INVOICE LINE DELIVER TO ADDRESS
+          // (new in EN 16931:2026), plus BT-198/BT-199 which UBL nests in the same cac:Delivery
+          final DeliveryType aUBLDelivery = new DeliveryType ();
+
+          // BT-198 Invoice line delivery note reference
           final ReferencedDocumentType aDeliveryNote = aRefLineDelivery.getDeliveryNoteReferencedDocument ();
           if (aDeliveryNote != null)
           {
-            final DeliveryType aUBLDelivery = new DeliveryType ();
-            // BT-198
             ifNotNull (_toDocumentReference (aDeliveryNote.getIssuerAssignedIDValue ()),
                        aUBLDelivery::addDeliveryNoteDocumentReference);
-            // BT-199
+            // BT-199 Invoice line delivery note line reference
             if (StringHelper.isNotEmpty (aDeliveryNote.getLineIDValue ()))
             {
               final LineReferenceType aUBLLineRef = new LineReferenceType ();
               aUBLLineRef.setLineID (aDeliveryNote.getLineIDValue ());
               aUBLDelivery.addDeliveryNoteLineReference (aUBLLineRef);
             }
-            if (aUBLDelivery.hasDeliveryNoteDocumentReferenceEntries () ||
-                aUBLDelivery.hasDeliveryNoteLineReferenceEntries ())
-              aUBLCreditNoteLine.addDelivery (aUBLDelivery);
           }
+
+          // BT-187 Invoice line actual delivery date
+          if (aRefLineDelivery.getActualDeliverySupplyChainEvent () != null &&
+              aRefLineDelivery.getActualDeliverySupplyChainEvent ().getOccurrenceDateTime () != null)
+            ifNotNull (parseDate (aRefLineDelivery.getActualDeliverySupplyChainEvent ()
+                                                  .getOccurrenceDateTime ()
+                                                  .getDateTimeString (),
+                                  aErrorList),
+                       aUBLDelivery::setActualDeliveryDate);
+
+          final TradePartyType aLineShipTo = aRefLineDelivery.getShipToTradeParty ();
+          if (aLineShipTo != null)
+          {
+            // BT-185 Invoice line deliver to party name
+            if (StringHelper.isNotEmpty (aLineShipTo.getNameValue ()))
+            {
+              final PartyType aUBLDeliveryParty = new PartyType ();
+              final PartyNameType aUBLPartyName = new PartyNameType ();
+              aUBLPartyName.setName (aLineShipTo.getNameValue ());
+              aUBLDeliveryParty.addPartyName (aUBLPartyName);
+              aUBLDelivery.setDeliveryParty (aUBLDeliveryParty);
+            }
+
+            final oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_25.LocationType aUBLLocation = new oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_25.LocationType ();
+            // BT-186 + BT-186-1 Invoice line deliver to location identifier
+            ifNotNull (_extractFirstPartyID (aLineShipTo), aUBLLocation::setID);
+            // BG-38 INVOICE LINE DELIVER TO ADDRESS (BT-203 to BT-209)
+            if (aLineShipTo.getPostalTradeAddress () != null)
+              aUBLLocation.setAddress (_convertPostalAddress (aLineShipTo.getPostalTradeAddress ()));
+
+            if (aUBLLocation.getID () != null || aUBLLocation.getAddress () != null)
+              aUBLDelivery.setDeliveryLocation (aUBLLocation);
+          }
+
+          if (aUBLDelivery.hasDeliveryNoteDocumentReferenceEntries () ||
+              aUBLDelivery.hasDeliveryNoteLineReferenceEntries () ||
+              aUBLDelivery.getActualDeliveryDate () != null ||
+              aUBLDelivery.getDeliveryParty () != null ||
+              aUBLDelivery.getDeliveryLocation () != null)
+            aUBLCreditNoteLine.addDelivery (aUBLDelivery);
         }
       }
 
@@ -2998,6 +3100,15 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         if (aTradeTax.getRateApplicablePercentValue () != null)
           aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+
+        // BT-194 Invoiced item exemption reason text - new in EN 16931:2026
+        ifNotEmpty (aTradeTax.getExemptionReasonValue (),
+                    x -> aUBLTaxCategory.addTaxExemptionReason (new TaxExemptionReasonType (x)));
+        // BT-195 Invoiced item VAT exemption reason and specification code - new in EN 16931:2026
+        ifNotEmpty (aTradeTax.getExemptionReasonCodeValue (), aUBLTaxCategory::setTaxExemptionReasonCode);
+        // BT-196 Goods/services code - new in EN 16931:2026
+        ifNotEmpty (aTradeTax.getSupplyTypeCodeValue (), aUBLTaxCategory::setSupplyTypeCode);
+
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -3011,9 +3122,24 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           if (aAPC.hasDescriptionEntries ())
           {
             final ItemPropertyType aUBLAdditionalItem = new ItemPropertyType ();
+            // BT-160 Item attribute name
             aUBLAdditionalItem.setName (copyName (aAPC.getDescriptionAtIndex (0), new NameType ()));
+            // BT-211 Item attribute code - new in EN 16931:2026
+            ifNotEmpty (aAPC.getTypeCodeValue (), aUBLAdditionalItem::setNameCode);
+            // BT-161a Item attribute value as text
             if (aAPC.hasValueEntries ())
               aUBLAdditionalItem.setValue (aAPC.getValueAtIndex (0).getValue ());
+            else
+              // BT-161b Item attribute value as a measure, with BT-212 as its unit of measure.
+              // Rule CII-SR-504 allows exactly one of the two.
+              if (aAPC.getValueMeasure () != null && aAPC.getValueMeasure ().getValue () != null)
+              {
+                final ValueQuantityType aUBLValueQuantity = new ValueQuantityType ();
+                aUBLValueQuantity.setValue (aAPC.getValueMeasure ().getValue ());
+                // BT-212
+                aUBLValueQuantity.setUnitCode (aAPC.getValueMeasure ().getUnitCode ());
+                aUBLAdditionalItem.setValueQuantity (aUBLValueQuantity);
+              }
             if (aUBLAdditionalItem.getName () != null)
               aUBLItem.addAdditionalItemProperty (aUBLAdditionalItem);
           }
