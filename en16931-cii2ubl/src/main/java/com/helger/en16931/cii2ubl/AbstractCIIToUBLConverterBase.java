@@ -26,10 +26,13 @@ import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.numeric.BigHelper;
+import com.helger.base.state.ETriState;
 import com.helger.base.string.StringHelper;
 import com.helger.base.string.StringImplode;
 import com.helger.base.trait.IGenericImplTrait;
@@ -71,6 +74,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
 
   // Source: EN 16931 validation artefacts
   // Last update: 2026-02-04 from 1.3.15
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverterBase.class);
+
   protected static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
                                                                                             "81 83 261 262 296 308 381 396 420 458 532");
   protected static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
@@ -394,6 +399,233 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
     if ("72".equals (s))
       return "432";
     return s;
+  }
+
+  /**
+   * Parse a CII indicator, which is a choice between a real boolean and a string.<br>
+   * The CII indicator types of the different CII releases are unrelated Java classes, so the
+   * callers pass the already extracted values instead of the indicator object itself.
+   *
+   * @param aBooleanValue
+   *        The boolean branch of the choice. May be <code>null</code>.
+   * @param bHasStringValue
+   *        <code>true</code> if the string branch of the choice is present at all.
+   * @param sStringValue
+   *        The value of the string branch. May be <code>null</code>.
+   * @param aSource
+   *        The source object, used for the error message only. May be <code>null</code>.
+   * @param aErrorList
+   *        The error list to be filled. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   * @since 4.0.0
+   */
+  @NonNull
+  protected static ETriState parseIndicator (@Nullable final Boolean aBooleanValue,
+                                             final boolean bHasStringValue,
+                                             @Nullable final String sStringValue,
+                                             @Nullable final Object aSource,
+                                             @NonNull final IErrorList aErrorList)
+  {
+    // Choice
+    if (aBooleanValue != null)
+      return ETriState.valueOf (aBooleanValue.booleanValue ());
+
+    if (bHasStringValue)
+    {
+      // Parse string
+      if (sStringValue == null)
+        return ETriState.UNDEFINED;
+      if ("true".equals (sStringValue))
+        return ETriState.TRUE;
+      if ("false".equals (sStringValue))
+        return ETriState.FALSE;
+
+      aErrorList.add (buildError (null, "Failed to parse the indicator value '" + aSource + "' to a boolean value."));
+      return ETriState.UNDEFINED;
+    }
+
+    throw new IllegalStateException ("Indicator has neither string nor boolean");
+  }
+
+  /**
+   * Copy a CII text to a CCTS text based UBL object. The CII text types of the different CII
+   * releases are unrelated Java classes, so the callers pass the already extracted values.
+   *
+   * @param <T>
+   *        The UBL target type
+   * @param sValue
+   *        The text value. May be <code>null</code>.
+   * @param sLanguageID
+   *        The language ID. May be <code>null</code>.
+   * @param sLanguageLocaleID
+   *        The language locale ID. May be <code>null</code>.
+   * @param ret
+   *        The UBL object to fill. May not be <code>null</code>.
+   * @return <code>null</code> if the value is empty, to avoid creating an empty element.
+   * @since 4.0.0
+   */
+  @Nullable
+  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.TextType> T copyName (@Nullable final String sValue,
+                                                                                          @Nullable final String sLanguageID,
+                                                                                          @Nullable final String sLanguageLocaleID,
+                                                                                          @NonNull final T ret)
+  {
+    // Avoid empty element
+    if (StringHelper.isEmpty (sValue))
+      return null;
+
+    ret.setValue (sValue);
+    ret.setLanguageID (sLanguageID);
+    ret.setLanguageLocaleID (sLanguageLocaleID);
+    return ret;
+  }
+
+  /**
+   * Copy a CII quantity to a CCTS quantity based UBL object.
+   *
+   * @param <T>
+   *        The UBL target type
+   * @param aValue
+   *        The quantity value. May be <code>null</code>.
+   * @param sUnitCode
+   *        The unit code. May be <code>null</code>.
+   * @param sUnitCodeListID
+   *        The unit code list ID. May be <code>null</code>.
+   * @param sUnitCodeListAgencyID
+   *        The unit code list agency ID. May be <code>null</code>.
+   * @param sUnitCodeListAgencyName
+   *        The unit code list agency name. May be <code>null</code>.
+   * @param ret
+   *        The UBL object to fill. May not be <code>null</code>.
+   * @return <code>null</code> if the value is <code>null</code>, to avoid creating an empty element.
+   * @since 4.0.0
+   */
+  @Nullable
+  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.QuantityType> T copyQuantity (@Nullable final BigDecimal aValue,
+                                                                                                  @Nullable final String sUnitCode,
+                                                                                                  @Nullable final String sUnitCodeListID,
+                                                                                                  @Nullable final String sUnitCodeListAgencyID,
+                                                                                                  @Nullable final String sUnitCodeListAgencyName,
+                                                                                                  @NonNull final T ret)
+  {
+    // Avoid empty element
+    if (aValue == null)
+      return null;
+
+    ret.setValue (BigHelper.getWithoutTrailingZeroes (aValue));
+    ret.setUnitCode (sUnitCode);
+    ret.setUnitCodeListID (sUnitCodeListID);
+    ret.setUnitCodeListAgencyID (sUnitCodeListAgencyID);
+    ret.setUnitCodeListAgencyName (sUnitCodeListAgencyName);
+    return ret;
+  }
+
+  /**
+   * Copy a CII amount to a CCTS amount based UBL object.
+   *
+   * @param <T>
+   *        The UBL target type
+   * @param aValue
+   *        The amount value. May be <code>null</code>.
+   * @param sCurrencyID
+   *        The currency ID. May be <code>null</code>, in which case the default currency code is
+   *        used.
+   * @param sCurrencyCodeListVersionID
+   *        The currency code list version ID. May be <code>null</code>.
+   * @param ret
+   *        The UBL object to fill. May not be <code>null</code>.
+   * @param sDefaultCurrencyCode
+   *        The fallback currency code. May be <code>null</code>.
+   * @return <code>null</code> if the value is <code>null</code>, to avoid creating an empty element.
+   * @since 4.0.0
+   */
+  @Nullable
+  protected static <T extends com.helger.xsds.ccts.cct.schemamodule.AmountType> T copyAmount (@Nullable final BigDecimal aValue,
+                                                                                              @Nullable final String sCurrencyID,
+                                                                                              @Nullable final String sCurrencyCodeListVersionID,
+                                                                                              @NonNull final T ret,
+                                                                                              @Nullable final String sDefaultCurrencyCode)
+  {
+    // Avoid empty element
+    if (aValue == null)
+      return null;
+
+    ret.setValue (BigHelper.getWithoutTrailingZeroes (aValue));
+    ret.setCurrencyID (sCurrencyID);
+    if (StringHelper.isEmpty (ret.getCurrencyID ()))
+      ret.setCurrencyID (sDefaultCurrencyCode);
+    ret.setCurrencyCodeListVersionID (sCurrencyCodeListVersionID);
+    return ret;
+  }
+
+  /**
+   * BT-29/BT-46/BT-60/BT-71: a CII GlobalID is only usable as a UBL party identification if it has
+   * both a value and a scheme identifier.
+   *
+   * @param sValue
+   *        The identifier value. May be <code>null</code>.
+   * @param sSchemeID
+   *        The scheme identifier. May be <code>null</code>.
+   * @return <code>true</code> if the identifier can be used.
+   * @since 4.0.0
+   */
+  protected static boolean isUsableGlobalID (@Nullable final String sValue, @Nullable final String sSchemeID)
+  {
+    return StringHelper.isNotEmpty (sValue) && StringHelper.isNotEmpty (sSchemeID);
+  }
+
+  /**
+   * Determine whether a CII document is an Invoice or a Credit Note. The decision is based on BT-3
+   * (Invoice type code) and falls back to the sign of BT-115 (Amount due for payment).
+   *
+   * @param sTypeCode
+   *        BT-3 Invoice type code. May be <code>null</code>.
+   * @param aDuePayableAmount
+   *        BT-115 Amount due for payment. May be <code>null</code>.
+   * @param aDuePayableSource
+   *        The source object of BT-115, used for the warning message only. May be
+   *        <code>null</code>.
+   * @param aErrorList
+   *        The error list to be filled. May not be <code>null</code>.
+   * @return {@link ETriState#TRUE} for an Invoice, {@link ETriState#FALSE} for a Credit Note and
+   *         {@link ETriState#UNDEFINED} if it cannot be determined.
+   * @since 4.0.0
+   */
+  @NonNull
+  protected static ETriState isInvoiceType (@Nullable final String sTypeCode,
+                                            @Nullable final BigDecimal aDuePayableAmount,
+                                            @Nullable final Object aDuePayableSource,
+                                            @NonNull final IErrorList aErrorList)
+  {
+    ETriState eIsInvoice = ETriState.UNDEFINED;
+
+    // First check TypeCode
+    final String sRealTypeCode = StringHelper.trim (sTypeCode);
+    if (INVOICE_TYPE_CODES.contains (sRealTypeCode))
+      eIsInvoice = ETriState.TRUE;
+    else
+      if (CREDIT_NOTE_TYPE_CODES.contains (sRealTypeCode))
+        eIsInvoice = ETriState.FALSE;
+
+    // Check total
+    if (eIsInvoice.isUndefined () && aDuePayableSource != null)
+      eIsInvoice = ETriState.valueOf (BigHelper.isGE0 (aDuePayableAmount));
+
+    if (eIsInvoice.isUndefined ())
+    {
+      aErrorList.add (buildWarn (null,
+                                 "Could not determine, if the provided CII document is an Invoice or a CreditNote. TypeCode is '" +
+                                       sRealTypeCode +
+                                       "'; DuePayable is " +
+                                       aDuePayableSource));
+    }
+    else
+    {
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Determined the provided CII document to be " +
+                      (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
+    }
+    return eIsInvoice;
   }
 
   protected static boolean isLT0Strict (@Nullable final BigDecimal aBD)

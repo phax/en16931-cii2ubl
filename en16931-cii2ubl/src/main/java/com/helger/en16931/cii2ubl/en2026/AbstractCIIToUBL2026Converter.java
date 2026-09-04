@@ -106,31 +106,21 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
     if (aIndicator == null)
       return ETriState.UNDEFINED;
 
-    // Choice
-    if (aIndicator.isIndicator () != null)
-      return ETriState.valueOf (aIndicator.isIndicator ().booleanValue ());
-
-    if (aIndicator.getIndicatorString () != null)
-    {
-      final String sIndicator = aIndicator.getIndicatorStringValue ();
-      // Parse string
-      if (sIndicator == null)
-        return ETriState.UNDEFINED;
-      if ("true".equals (sIndicator))
-        return ETriState.TRUE;
-      if ("false".equals (sIndicator))
-        return ETriState.FALSE;
-
-      aErrorList.add (buildError (null,
-                                  "Failed to parse the indicator value '" + aIndicator + "' to a boolean value."));
-      return ETriState.UNDEFINED;
-    }
-
-    throw new IllegalStateException ("Indicator has neither string nor boolean");
+    return parseIndicator (aIndicator.isIndicator (),
+                           aIndicator.getIndicatorString () != null,
+                           aIndicator.getIndicatorStringValue (),
+                           aIndicator,
+                           aErrorList);
   }
 
   /**
-   * Copy all ID parts from a CII ID to a CCTS/UBL ID.
+   * Copy all ID parts from a CII ID to a CCTS/UBL ID.<br>
+   * Unlike copyName, copyQuantity and copyAmount this is not delegated to
+   * AbstractCIIToUBLConverterBase. It copies eight attributes and contains no logic, so a shared
+   * variant would need eight consecutive String parameters - and six of them
+   * (schemeName, schemeAgencyID, schemeAgencyName, schemeVersionID, schemeDataURI, schemeURI) never
+   * occur in the test corpus, so a transposed argument would go unnoticed. The same applies to
+   * copyCode below. The duplication is cheaper than that risk.
    *
    * @param aCIIID
    *        CII ID
@@ -167,14 +157,7 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
     if (aName == null)
       return null;
 
-    // Avoid empty element
-    if (StringHelper.isEmpty (aName.getValue ()))
-      return null;
-
-    ret.setValue (aName.getValue ());
-    ret.setLanguageID (aName.getLanguageID ());
-    ret.setLanguageLocaleID (aName.getLanguageLocaleID ());
-    return ret;
+    return copyName (aName.getValue (), aName.getLanguageID (), aName.getLanguageLocaleID (), ret);
   }
 
   @Nullable
@@ -208,16 +191,12 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
     if (aQuantity == null)
       return null;
 
-    // Avoid empty element
-    if (aQuantity.getValue () == null)
-      return null;
-
-    ret.setValue (BigHelper.getWithoutTrailingZeroes (aQuantity.getValue ()));
-    ret.setUnitCode (aQuantity.getUnitCode ());
-    ret.setUnitCodeListID (aQuantity.getUnitCodeListID ());
-    ret.setUnitCodeListAgencyID (aQuantity.getUnitCodeListAgencyID ());
-    ret.setUnitCodeListAgencyName (aQuantity.getUnitCodeListAgencyName ());
-    return ret;
+    return copyQuantity (aQuantity.getValue (),
+                         aQuantity.getUnitCode (),
+                         aQuantity.getUnitCodeListID (),
+                         aQuantity.getUnitCodeListAgencyID (),
+                         aQuantity.getUnitCodeListAgencyName (),
+                         ret);
   }
 
   @Nullable
@@ -228,16 +207,11 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
     if (aAmount == null)
       return null;
 
-    // Avoid empty element
-    if (aAmount.getValue () == null)
-      return null;
-
-    ret.setValue (BigHelper.getWithoutTrailingZeroes (aAmount.getValue ()));
-    ret.setCurrencyID (aAmount.getCurrencyID ());
-    if (StringHelper.isEmpty (ret.getCurrencyID ()))
-      ret.setCurrencyID (sDefaultCurrencyCode);
-    ret.setCurrencyCodeListVersionID (aAmount.getCurrencyCodeListVersionID ());
-    return ret;
+    return copyAmount (aAmount.getValue (),
+                       aAmount.getCurrencyID (),
+                       aAmount.getCurrencyCodeListVersionID (),
+                       ret,
+                       sDefaultCurrencyCode);
   }
 
   protected static boolean canUseGlobalID (@NonNull final TradePartyType aParty)
@@ -246,7 +220,7 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
     // else
     if (aParty.hasGlobalIDEntries ())
       for (final IDType aID : aParty.getGlobalID ())
-        if (StringHelper.isNotEmpty (aID.getValue ()) && StringHelper.isNotEmpty (aID.getSchemeID ()))
+        if (isUsableGlobalID (aID.getValue (), aID.getSchemeID ()))
           return true;
     return false;
   }
@@ -255,32 +229,18 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
   protected static ICommonsList <IDType> getAllUsableGlobalIDs (@NonNull final TradePartyType aParty)
   {
     return CommonsArrayList.createFiltered (aParty.getGlobalID (),
-                                            x -> StringHelper.isNotEmpty (x.getValue ()) &&
-                                                 StringHelper.isNotEmpty (x.getSchemeID ()));
+                                            x -> isUsableGlobalID (x.getValue (), x.getSchemeID ()));
   }
 
   @NonNull
   protected static ETriState isInvoiceType (@NonNull final CrossIndustryInvoiceType aCIIInvoice,
                                             @NonNull final IErrorList aErrorList)
   {
-    ETriState eIsInvoice = ETriState.UNDEFINED;
-
-    // First check TypeCode
-    final String sTypeCode;
+    // BT-3 Invoice type code
     final ExchangedDocumentType aExchangedDoc = aCIIInvoice.getExchangedDocument ();
-    if (aExchangedDoc != null)
-    {
-      sTypeCode = StringHelper.trim (aExchangedDoc.getTypeCodeValue ());
-      if (INVOICE_TYPE_CODES.contains (sTypeCode))
-        eIsInvoice = ETriState.TRUE;
-      else
-        if (CREDIT_NOTE_TYPE_CODES.contains (sTypeCode))
-          eIsInvoice = ETriState.FALSE;
-    }
-    else
-      sTypeCode = null;
+    final String sTypeCode = aExchangedDoc == null ? null : aExchangedDoc.getTypeCodeValue ();
 
-    // Check total
+    // BT-115 Amount due for payment
     final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
     final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction
                                                                                             .getApplicableHeaderTradeSettlement ();
@@ -290,26 +250,7 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
                                                                                                            .getDuePayableAmount ()
                                                                                                            .get (0);
 
-    if (eIsInvoice.isUndefined () && aDuePayable != null)
-    {
-      eIsInvoice = ETriState.valueOf (BigHelper.isGE0 (aDuePayable.getValue ()));
-    }
-
-    if (eIsInvoice.isUndefined ())
-    {
-      aErrorList.add (buildWarn (null,
-                                 "Could not determine, if the provided CII document is an Invoice or a CreditNote. TypeCode is '" +
-                                       sTypeCode +
-                                       "'; DuePayable is " +
-                                       aDuePayable));
-    }
-    else
-    {
-      if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("Determined the provided CII document to be " +
-                      (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
-    }
-    return eIsInvoice;
+    return isInvoiceType (sTypeCode, aDuePayable == null ? null : aDuePayable.getValue (), aDuePayable, aErrorList);
   }
 
   /**

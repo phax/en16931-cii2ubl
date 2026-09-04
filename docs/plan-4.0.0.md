@@ -218,6 +218,41 @@ Lesson: the mapping document's own "new in 2026" table was **not** a complete di
 BT-122-1-1 have since been added to it, together with a note that "number above BT-165" is not a
 complete test for what is new. The coverage test enforces the full row set regardless.
 
+### 4.4h What can and cannot be shared between the two editions
+
+The two edition base classes were **100% identical modulo package names**, and the two concrete
+converters still share 175 verbatim lines. Nothing lifts for free: the CII `udt` types of D16B and
+D25A are unrelated Java classes — they implement only `Serializable` and `IExplicitlyCloneable`,
+with no common CCTS supertype — so a method taking a CII type cannot be shared.
+
+What *can* be shared is the **logic**, by passing the already extracted values (the `parseIndicator`
+pattern). Lifted into `AbstractCIIToUBLConverterBase`:
+
+| Method | Why it was worth lifting |
+|--------|--------------------------|
+| `parseIndicator` | branching over the boolean/string choice plus error reporting |
+| `isInvoiceType` | the BT-3 code sets and the BT-115 sign fallback — the actual business rule |
+| `copyAmount` | the default-currency fallback and trailing-zero normalisation |
+| `copyQuantity` | trailing-zero normalisation |
+| `copyName` | the "avoid empty element" guard |
+| `isUsableGlobalID` | the BT-29/46/60/71 usability rule |
+
+Each edition keeps a thin typed adapter. 352 → 287 lines per edition class.
+
+**`copyID` and `copyCode` were deliberately left duplicated.** They copy 8 and 10 attributes with
+no logic at all, so sharing them means 8–10 consecutive `String` parameters. Measured against the
+generated corpus, 6 of `copyID`'s attributes and 6 of `copyCode`'s **never appear in any output
+file**, so a transposed argument would be invisible to every existing test. The duplication is
+cheaper than that risk.
+
+For the same reason the lifted `copyQuantity` / `copyAmount` / `copyName` are now covered by
+explicit unit tests in `AbstractCIIToUBLConverterBaseTest` that give every attribute a distinct
+value — verified to fail on a deliberate transposition.
+
+The 175 identical lines in the concrete converters (`_convertParty`, `_convertContact`,
+`_createUBLOrderRef`, …) are typed to edition-specific CII **and** UBL classes on both sides, so
+sharing them would need generics over both models. Not attempted.
+
 ### 4.5 The D25A JAXB model is a separate Java package
 
 | Release | Package |
