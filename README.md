@@ -103,6 +103,7 @@ CII to UBL Converter for EN 16931 invoices
 
 v3.1.8 - work in progress
 * Added `docs/en16931-2026-syntax.md` with the three-way field mapping (UBL 2.5 invoice / UBL 2.5 credit note / CII D25A) of EN 16931:2026, extracted from the CEN/TS 16931-3-2:2026 and CEN/TS 16931-3-3:2026 Formal Vote drafts
+* Added `docs/plan-4.0.0.md` with the implementation plan for v4.0.0 (EN 16931:2026 syntax binding next to EN 16931:2017; drop UBL 2.2/2.3/2.4, add UBL 2.5)
 
 v3.1.7 - 2026-04-22
 * Fixed BT-150 (Item price base quantity unit of measure): now falls back to the net price unitCode when no gross price is present, instead of losing it
