@@ -40,7 +40,7 @@ artifacts and schemas.
 | D3 | Test strategy: XSD validity **+ XPath assertions per BT** | No Schematron exists for 2026; XSD alone would not catch a BT written into the wrong element |
 | D4 | CLI auto-detects the edition from BT-24; `--en-version 2017\|2026` overrides | Namespace-based detection is impossible (see 4.2); BT-24 is mandatory in every conformant instance |
 | D5 | Edition detection is **public library API**, not CLI-only | Embedders face mixed inbound traffic too |
-| D6 | The 2017 path stays behaviour-identical to 3.1.x | Enforced by the golden-file snapshot in A0 |
+| D6 | The 2017 path stays behaviour-identical to 3.1.x | Enforced by the git-tracked `generated/toubl21/` output (A0) |
 
 ## 4. Verified preconditions
 
@@ -145,12 +145,17 @@ Deleted: `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
 
 ### Phase 1 — Prepare and shrink
 
-- [ ] **A0 — Golden-file snapshot of the 2017 output** · ~2 h
-  - Add `MainCreateGolden2017Files` (a `main`, not a test) writing UBL 2.1 output for all 103 CII
-    files to `en16931-cii2ubl/src/test/resources/external/golden/2017/`.
-  - Add `Golden2017RegressionTest` comparing freshly converted output to those files.
-  - **Done when:** 103 golden files committed, regression test green.
-  - **Why first:** this is the only proof that A1/A2 do not change 2017 behaviour (D6).
+- [ ] **A0 — Establish the regression baseline** · ~15 min
+  - No new code needed. `CIIToUBL21ConverterTest.testConvertAndValidateAll` already writes all 102
+    converted documents to `en16931-cii2ubl/generated/toubl21/`, and that folder is **tracked in
+    git**. It is the golden baseline.
+  - Run `mvn clean test -pl en16931-cii2ubl -Dtest=CIIToUBL21ConverterTest` and confirm
+    `git status --short en16931-cii2ubl/generated/toubl21/` reports **nothing**.
+  - If it does report changes, the committed files are stale — commit them first, so the baseline
+    is real before A1/A2 touch anything.
+  - **Done when:** `generated/toubl21/` is clean after a full test run.
+  - **Why first:** `git diff` on that folder is the proof that A1/A2 do not change 2017 behaviour (D6).
+  - A1 additionally deletes `generated/toubl22/`, `toubl23/` and `toubl24/` (102 files each).
 
 - [ ] **A1 — Drop UBL 2.2 / 2.3 / 2.4** · ~2 h
   - Delete `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
@@ -325,7 +330,7 @@ Several 2017 paths **changed** in 2026 — do not copy the 2017 converter blindl
 | The 2026 binding has weaker test coverage than 2017 | A wrong mapping can ship undetected | XPath assertion per BT (D3); revisit once `phive-rules-en16931` publishes 2026 Schematron, then add a `testConvertAndValidateAll` equivalent |
 | BT-24 detection fails on non-conformant CII | Dispatcher cannot route | `--en-version` override (D4) and an explicit `ErrorList` entry, never a silent guess |
 | CEF code lists `VATEX` / `SUPPLY` may not be published yet | BT-174 176 195 210 213 214 cannot be validated | Pass values through unvalidated; document it |
-| A2 silently changes 2017 output | Regression for every existing user | A0 golden snapshot must stay byte-identical |
+| A2 silently changes 2017 output | Regression for every existing user | `git status` on `generated/toubl21/` must stay empty |
 | `docs/mapping-cii-ubl.xlsx` covers 2017 only | Wrong source consulted for 2026 work | Labelled in A17 |
 
 ## 9. Progress log

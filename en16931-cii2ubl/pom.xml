@@ -69,18 +69,6 @@
       <groupId>com.helger.ubl</groupId>
       <artifactId>ph-ubl21</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.helger.ubl</groupId>
-      <artifactId>ph-ubl22</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger.ubl</groupId>
-      <artifactId>ph-ubl23</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger.ubl</groupId>
-      <artifactId>ph-ubl24</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
