@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A5 done, next up A6** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A6 done, next up A7** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -239,33 +239,19 @@ converter (BT-150, BT-61, UBL-CR-275, BT-11, …) instead of risking their reint
 
 A6 now applies the 2026 path deltas, A7 verifies the carried-over rows with a comprehensive test
 file. Source of truth is the matching section of `docs/en16931-2026-syntax.md`.
-These 2017 paths **changed** in 2026 and are A6's work:
+These 2017 paths **changed** in 2026. Established by diffing all 180 rows present in both mapping
+documents: 58 rows differed textually, but 52 of those are only base-path notation differences
+between the two documents (e.g. the 2026 BG-4 base excludes `cac:Party`, and `[@format='102']` is
+now spelled out). **Six are real**, and all six are implemented in A6:
 
 | BT | 2017 | 2026 |
 |----|------|------|
-| BT-10 | `cbc:BuyerReference` (0..1) | `cac:BuyerAssignedReference/cbc:BuyerReference` (0..n) + BT-10-1 `cbc:BuyerReferenceCode` |
-| BT-32 | `cac:PartyTaxScheme/cac:TaxScheme/cbc:ID != 'VAT'` | fixed value `LOC` |
+| BG-1 (BT-21, BT-22) | `cbc:Note`, with BT-21 embedded as a `#code#` prefix | `cac:Annotation/cbc:SubjectCode` + `cac:Annotation/cbc:AnnotationContent` — a real element since UBL 2.5, so the prefix hack is gone |
+| BT-10 / BT-10-1 | `cbc:BuyerReference` (0..1), CII `ram:BuyerReference` | `cac:BuyerAssignedReference/cbc:BuyerReference` (0..n) + `cbc:BuyerReferenceCode`, CII `ram:BuyerReferenceID` |
 | BT-9 (CreditNote) | `cac:PaymentMeans/cbc:PaymentDueDate` | native `/CreditNote/cbc:DueDate` |
 | BT-11 (CreditNote) | `cac:AdditionalDocumentReference/cbc:ID` | native `/CreditNote/cac:ProjectReference/cbc:ID` |
-| BT-14 | — | `cac:OrderReference/cbc:SalesOrderID`; `cbc:ID` must be `"None"` when BT-13 absent |
-| BT-2 | `cbc:IssueDate` only | `cbc:IssueDate` + `cbc:IssueTime`; CII `@format` 102 vs 208 decides |
-
-- [x] **A5 — Bulk port of the 2017 converter to D25A / UBL 2.5** · done · covers all 214 carried-over rows
-  - Header (26): BT-1 2 2-1 3 5 6 7 7-1 8 9 9-1 10 10-1 11 11-1 12 13 14 15 16 17 17-1 18 18-1 18-2 19
-  - BG-33 (1): BT-20 · BG-1 (2): BT-21 22 · BG-2 (2): BT-23 24 · BG-3 (3): BT-25 26 26-1
-  - BG-4 (15): BT-27 28 29 29-1 30 30-1 31 31-1 31-2 32 32-1 32-2 33 34 34-1
-  - BG-5 (7): BT-35 36 162 37 38 39 40 · BG-6 (3): BT-41 42 43
-  - BG-7 (11): BT-44 45 46 46-1 47 47-1 48 48-1 48-2 49 49-1 · BG-8 (7): BT-50 51 163 52 53 54 55
-  - BG-9 (3): BT-56 57 58 · BG-10 (5): BT-59 60 60-1 61 61-1
-  - BG-11 (4): BT-62 63 63-1 63-2 · BG-12 (7): BT-64 65 164 66 67 68 69
-  - BG-13 (5): BT-70 71 71-1 72 72-1 · BG-14 (4): BT-73 73-1 74 74-1 · BG-15 (7): BT-75 76 165 77 78 79 80
-  - BG-16 (3): BT-81 82 83 · BG-17 (3): BT-84 85 86 · BG-18 (2): BT-87 88 · BG-19 (4): BT-89 90 90-1 91
-
-- [ ] **A6 — Apply the 2026 path deltas for carried-over BTs** · ~1 session
-  - BG-20 (8): BT-92 93 94 95 95-1 96 97 98 · BG-21 (8): BT-99 100 101 102 102-1 103 104 105
-  - BG-22 (12): BT-106 … 115 incl. BT-110-1 / BT-111-1 `@currencyID` discrimination
-  - BG-23 (8): BT-116 116-1 117 118 118-1 119 120 121
-  - BG-24 (8): BT-122 122-1 122-1-1 123 124 125 125-1 125-2
+| BT-32-2 | `cac:TaxScheme/cbc:ID` = anything except `VAT` | fixed value `LOC` (CII `@schemeID='FC'`) |
+| BT-127 | `cbc:Note` | unchanged — but it must **not** follow BG-1 into `cac:Annotation`; it has no subject-code counterpart |
 
 - [ ] **A7 — Comprehensive carried-over test file + XPath assertions** · ~1 session · 214 rows
   - BG-25 (10): BT-126 127 128 128-1 128-2 129 130 131 132 133
@@ -387,7 +373,7 @@ These 2017 paths **changed** in 2026 and are A6's work:
 | A3 | 2026-09-04 | `[4.0.0 A3]` | Base port is a pure import swap - every D25A accessor matches D16B by name. Skeleton also emits the UBL-mandatory containers, so both files convert to XSD-valid UBL 2.5. |
 | A4 | 2026-09-04 | `[4.0.0 A4]` | `MockD25ASettings` with `assertXPath` / `assertNoXPath` / `assertXPathCount`. XPaths are relative to the document element, matching the mapping table. Negative-probed: wrong value and wrong count both fail. |
 | A5 | 2026-09-04 | `[4.0.0 A5]` d9c9af4 | Bulk port instead of hand-porting. 17 compile errors, all cardinality widenings (4.4b). Also corrected the A3 skeleton's wrong BT-27 mapping. |
-| A6 | | | |
+| A6 | 2026-09-04 | `[4.0.0 A6]` | All 180 shared rows diffed programmatically between the two mapping docs; 58 differed, of which 6 were real changes (the rest were base-path notation). Verified with two new header test files. |
 | A7 | | | |
 | A8 | | | |
 | A9 | | | |

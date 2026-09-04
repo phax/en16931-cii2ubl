@@ -57,6 +57,8 @@ import un.unece.uncefact.data.standard.cii.d25a.udt.TextType;
 public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID25AToUBL25Converter>
 {
   private static final String UBL_VERSION = "2.5";
+  /** BT-32-2 National tax code - a fixed value since EN 16931:2026 */
+  public static final String NATIONAL_TAX_SCHEME = "LOC";
 
   public CIID25AToUBL25Converter ()
   {}
@@ -67,37 +69,59 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
   }
 
   // BG-1: BT-21 Invoice note subject code + BT-22 Invoice note
-  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.@Nullable NoteType _copyNote (final un.unece.uncefact.data.standard.cii.d25a.rabie.@Nullable NoteType aNote)
+  // Since UBL 2.5 this is the dedicated cac:Annotation element, so the EN 16931:2017 workaround of
+  // embedding BT-21 as a "#code#" prefix into cbc:Note is no longer needed.
+  @Nullable
+  private static AnnotationType _copyAnnotation (final un.unece.uncefact.data.standard.cii.d25a.rabie.@Nullable NoteType aNote)
   {
     if (aNote == null)
       return null;
 
-    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.NoteType ();
-    final StringBuilder aSB = new StringBuilder ();
+    final AnnotationType aUBLAnnotation = new AnnotationType ();
 
-    // CII D25A: SubjectCode is a 0..n element
+    // BT-21 - CII D25A: SubjectCode is a 0..n element
     if (aNote.hasSubjectCodeEntries ())
-    {
-      final String sSubjectCode = aNote.getSubjectCodeAtIndex (0).getValue ();
-      if (StringHelper.isNotEmpty (sSubjectCode))
-        aSB.append ('#').append (sSubjectCode).append ('#');
-    }
+      ifNotEmpty (aNote.getSubjectCodeAtIndex (0).getValue (), aUBLAnnotation::setSubjectCode);
 
-    boolean bFirst = true;
+    // BT-22
+    final StringBuilder aSB = new StringBuilder ();
     for (final TextType aText : aNote.getContent ())
     {
-      if (aSB.length () > 0 && !bFirst)
+      if (aSB.length () > 0)
         aSB.append ('\n');
       aSB.append (aText.getValue ());
-      bFirst = false;
     }
-    aUBLNote.setValue (aSB.toString ());
-    return aUBLNote;
+    if (aSB.length () == 0 && aUBLAnnotation.getSubjectCode () == null)
+      return null;
+
+    aUBLAnnotation.addAnnotationContent (new AnnotationContentType (aSB.toString ()));
+    return aUBLAnnotation;
   }
 
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.@Nullable NoteType _copyNote (@Nullable final TextType aText)
   {
     return copyName (aText, new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.NoteType ());
+  }
+
+  // BT-127 Invoice line note - unlike BG-1 this has no subject code counterpart
+  private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.@Nullable NoteType _copyLineNote (final un.unece.uncefact.data.standard.cii.d25a.rabie.@Nullable NoteType aNote)
+  {
+    if (aNote == null)
+      return null;
+
+    final StringBuilder aSB = new StringBuilder ();
+    for (final TextType aText : aNote.getContent ())
+    {
+      if (aSB.length () > 0)
+        aSB.append ('\n');
+      aSB.append (aText.getValue ());
+    }
+    if (aSB.length () == 0)
+      return null;
+
+    final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.NoteType aUBLNote = new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.NoteType ();
+    aUBLNote.setValue (aSB.toString ());
+    return aUBLNote;
   }
 
   // BG-3/BG-24: Document reference conversion
@@ -318,9 +342,15 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       sSchemeID = getVATScheme ();
     else
     {
+      // BT-31-2: CII "VA" is the VAT identifier
       // Special case CII validation artefacts 1.0.0 and 1.2.0
       if ("VA".equals (sSchemeID))
         sSchemeID = getVATScheme ();
+      else
+        // BT-32-2: since EN 16931:2026 the national tax code is the fixed value "LOC".
+        // EN 16931:2017 used "any value except VAT" instead.
+        if ("FC".equals (sSchemeID))
+          sSchemeID = NATIONAL_TAX_SCHEME;
     }
 
     final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
@@ -757,7 +787,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // BG-1 INVOICE NOTE (BT-21/BT-22)
     if (aED != null)
       for (final un.unece.uncefact.data.standard.cii.d25a.rabie.NoteType aEDNote : aED.getIncludedNote ())
-        ifNotNull (_copyNote (aEDNote), aUBLInvoice::addNote);
+        ifNotNull (_copyAnnotation (aEDNote), aUBLInvoice::addAnnotation);
 
     // BT-7 Value added tax point date
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
@@ -796,11 +826,17 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       }
     }
 
-    // BT-10 Buyer reference
-    if (aHeaderAgreement.getBuyerReferenceValue () != null)
-    {
-      aUBLInvoice.setBuyerReference (aHeaderAgreement.getBuyerReferenceValue ());
-    }
+    // BT-10 Buyer reference + BT-10-1 Scheme identifier
+    // Since UBL 2.5 / CII D25A this is the 0..n cac:BuyerAssignedReference element
+    for (final IDType aCIIBuyerRef : aHeaderAgreement.getBuyerReferenceID ())
+      if (StringHelper.isNotEmpty (aCIIBuyerRef.getValue ()))
+      {
+        final BuyerAssignedReferenceType aUBLBuyerRef = new BuyerAssignedReferenceType ();
+        aUBLBuyerRef.addBuyerReference (new BuyerReferenceType (aCIIBuyerRef.getValue ()));
+        // BT-10-1
+        ifNotEmpty (aCIIBuyerRef.getSchemeID (), aUBLBuyerRef::setBuyerReferenceCode);
+        aUBLInvoice.addBuyerAssignedReference (aUBLBuyerRef);
+      }
 
     // BG-14 INVOICING PERIOD (BT-73/BT-74)
     {
@@ -1298,7 +1334,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
 
       // BT-127 Invoice line note
       for (final un.unece.uncefact.data.standard.cii.d25a.rabie.NoteType aLineNote : aDLD.getIncludedNote ())
-        ifNotNull (_copyNote (aLineNote), aUBLInvoiceLine::addNote);
+        ifNotNull (_copyLineNote (aLineNote), aUBLInvoiceLine::addNote);
 
       // BT-131 Invoice line net amount
       boolean bLineExtensionAmountIsNegative = false;
@@ -1679,7 +1715,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     }
 
     // BT-9 Payment due date
-    final LocalDate aPaymentDueDate;
+    // Since UBL 2.2 the CreditNote has a native cbc:DueDate, so the EN 16931:2017 workaround of
+    // using PaymentMeans/PaymentDueDate is no longer needed.
     {
       LocalDate aDueDate = null;
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
@@ -1689,8 +1726,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           if (aDueDate != null)
             break;
         }
-      // Will be set in PaymentMeans/PaymentDueDate
-      aPaymentDueDate = aDueDate;
+      if (aDueDate != null)
+        aUBLCreditNote.setDueDate (aDueDate);
     }
 
     // BT-3 Invoice type code
@@ -1700,7 +1737,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // BG-1 INVOICE NOTE (BT-21/BT-22)
     if (aED != null)
       for (final un.unece.uncefact.data.standard.cii.d25a.rabie.NoteType aEDNote : aED.getIncludedNote ())
-        ifNotNull (_copyNote (aEDNote), aUBLCreditNote::addNote);
+        ifNotNull (_copyAnnotation (aEDNote), aUBLCreditNote::addAnnotation);
 
     // BT-7 TaxPointDate
     for (final TradeTaxType aTradeTax : aHeaderSettlement.getApplicableTradeTax ())
@@ -1739,11 +1776,17 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       }
     }
 
-    // BT-10 Buyer reference
-    if (aHeaderAgreement.getBuyerReferenceValue () != null)
-    {
-      aUBLCreditNote.setBuyerReference (aHeaderAgreement.getBuyerReferenceValue ());
-    }
+    // BT-10 Buyer reference + BT-10-1 Scheme identifier
+    // Since UBL 2.5 / CII D25A this is the 0..n cac:BuyerAssignedReference element
+    for (final IDType aCIIBuyerRef : aHeaderAgreement.getBuyerReferenceID ())
+      if (StringHelper.isNotEmpty (aCIIBuyerRef.getValue ()))
+      {
+        final BuyerAssignedReferenceType aUBLBuyerRef = new BuyerAssignedReferenceType ();
+        aUBLBuyerRef.addBuyerReference (new BuyerReferenceType (aCIIBuyerRef.getValue ()));
+        // BT-10-1
+        ifNotEmpty (aCIIBuyerRef.getSchemeID (), aUBLBuyerRef::setBuyerReferenceCode);
+        aUBLCreditNote.addBuyerAssignedReference (aUBLBuyerRef);
+      }
 
     // BG-14 INVOICING PERIOD (BT-73/BT-74)
     {
@@ -1854,9 +1897,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     }
 
     // BT-11 Project reference
-    // UBL 2.1 CreditNote lacks ProjectReference, so map to
-    // AdditionalDocumentReference without a DocumentType discriminator.
-    // BT-18 uses DocumentType="ATS" in CreditNote, so no clash.
+    // Since UBL 2.2 the CreditNote has a native cac:ProjectReference, so the EN 16931:2017
+    // workaround of using AdditionalDocumentReference is no longer needed.
     {
       final ProcuringProjectType aSpecifiedProcuring = aHeaderAgreement.getSpecifiedProcuringProject ();
       if (aSpecifiedProcuring != null)
@@ -1864,9 +1906,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         final String sID = aSpecifiedProcuring.getIDValue ();
         if (StringHelper.isNotEmpty (sID))
         {
-          final DocumentReferenceType aUBLDocRef = new DocumentReferenceType ();
-          aUBLDocRef.setID (sID);
-          aUBLCreditNote.addAdditionalDocumentReference (aUBLDocRef);
+          final ProjectReferenceType aUBLProjectRef = new ProjectReferenceType ();
+          aUBLProjectRef.setID (sID);
+          aUBLCreditNote.addProjectReference (aUBLProjectRef);
         }
       }
     }
@@ -2052,12 +2094,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
                                 else
                                   _addPartyID (x, aUBLCreditNote.getAccountingSupplierParty ().getParty ());
                               },
-                              aPM -> {
-                                // Add only to the first PaymentMeans
-                                if (aPaymentDueDate != null && aUBLCreditNote.getPaymentMeansCount () == 0)
-                                  aPM.setPaymentDueDate (aPaymentDueDate);
-                                aUBLCreditNote.addPaymentMeans (aPM);
-                              },
+                              aUBLCreditNote::addPaymentMeans,
                               aErrorList);
 
         // Allowed again in 1.2.1: exactly 2
@@ -2252,7 +2289,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
 
       // Note
       for (final un.unece.uncefact.data.standard.cii.d25a.rabie.NoteType aLineNote : aDLD.getIncludedNote ())
-        ifNotNull (_copyNote (aLineNote), aUBLCreditNoteLine::addNote);
+        ifNotNull (_copyLineNote (aLineNote), aUBLCreditNoteLine::addNote);
 
       // Line extension amount
       boolean bLineExtensionAmountIsNegative = false;
