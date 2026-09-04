@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A4 done, next up A5** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A5 done, next up A6** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -110,6 +110,32 @@ and on CreditNote the natively available `cbc:DueDate` and `cac:ProjectReference
 | The UBL 2.5 XSDs cannot be compiled standalone by `xmllint` - they need the CCTS and xmldsig schemas from sibling `ph-xsds-*` jars | Validate through the marshaller (which resolves the full schema set), not through external tooling |
 | UBL 2.5 mandatory Invoice children: `cbc:ID`, `cbc:IssueDate`, `cac:AccountingSupplierParty`, `cac:LegalMonetaryTotal`, `cac:InvoiceLine` (CreditNote: `cac:CreditNoteLine`) | Any 2026 test file must carry at least these, which is why the A3 skeleton reaches past its five planned BTs |
 
+### 4.4b The 17 API deltas the A5 bulk port surfaced
+
+Every one is a cardinality widening; there were no semantic surprises.
+
+**CII D16B → D25A (element became 0..n):**
+
+| Element | Handling |
+|---------|----------|
+| `NoteType/SubjectCode` | `getSubjectCodeValue ()` is gone — use `getSubjectCodeAtIndex (0)` |
+| `TradeProductType/Description` | loop instead of a single `getDescription ()` |
+| `HeaderTradeSettlementType/InvoiceReferencedDocument` | now loops, which finally matches BG-3's 0..n cardinality |
+| `TradeSettlementPaymentMeansType/PayeePartyCreditorFinancialAccount` | `getPayeePartyCreditorFinancialAccountAtIndex (0)` |
+
+**UBL 2.1 → 2.5 (element became 0..n):**
+
+| Element | Handling |
+|---------|----------|
+| `AddressType`: `StreetName`, `AdditionalStreetName`, `CityName`, `PostalZone`, `CountrySubentity` | `addX (new XType (s))` |
+| `AddressLineType/Line` | `addLine (new LineType (s))` |
+| `PartyLegalEntityType/CompanyLegalForm` | `addCompanyLegalForm (…)`; the presence check becomes `!getCompanyLegalForm ().isEmpty ()` |
+| `PaymentMeansType/CardAccount` | `addCardAccount (…)` |
+| `ItemType/Name` | `addName (…)` |
+
+`CompanyLegalForm` and `CardAccount` were already solved in the deleted `CIIToUBL24Converter`
+(UBL 2.3+ shares the widening); those variants were recovered from `git show fb6bcba^` and reused.
+
 ### 4.5 The D25A JAXB model is a separate Java package
 
 | Release | Package |
@@ -205,8 +231,15 @@ Deleted: `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
 
 ### Phase 3 — Port the 214 carried-over rows
 
-Source of truth for each item is the matching section of `docs/en16931-2026-syntax.md`.
-Several 2017 paths **changed** in 2026 — do not copy the 2017 converter blindly:
+**Approach changed during A5.** Hand-porting 214 rows section by section was neither the cheapest
+nor the safest route. Instead `CIID16BToUBL21Converter` was bulk transformed (CII package swap +
+UBL 2.1 → 2.5 package swap) and the **compiler enumerated every API delta** — 17 sites, all of them
+cardinality widenings, listed in 4.4b. This preserves every bug fix accumulated in the 2017
+converter (BT-150, BT-61, UBL-CR-275, BT-11, …) instead of risking their reintroduction.
+
+A6 now applies the 2026 path deltas, A7 verifies the carried-over rows with a comprehensive test
+file. Source of truth is the matching section of `docs/en16931-2026-syntax.md`.
+These 2017 paths **changed** in 2026 and are A6's work:
 
 | BT | 2017 | 2026 |
 |----|------|------|
@@ -217,7 +250,7 @@ Several 2017 paths **changed** in 2026 — do not copy the 2017 converter blindl
 | BT-14 | — | `cac:OrderReference/cbc:SalesOrderID`; `cbc:ID` must be `"None"` when BT-13 absent |
 | BT-2 | `cbc:IssueDate` only | `cbc:IssueDate` + `cbc:IssueTime`; CII `@format` 102 vs 208 decides |
 
-- [ ] **A5 — Carried-over header + BG-1 … BG-19** · ~1 session · 124 rows
+- [x] **A5 — Bulk port of the 2017 converter to D25A / UBL 2.5** · done · covers all 214 carried-over rows
   - Header (26): BT-1 2 2-1 3 5 6 7 7-1 8 9 9-1 10 10-1 11 11-1 12 13 14 15 16 17 17-1 18 18-1 18-2 19
   - BG-33 (1): BT-20 · BG-1 (2): BT-21 22 · BG-2 (2): BT-23 24 · BG-3 (3): BT-25 26 26-1
   - BG-4 (15): BT-27 28 29 29-1 30 30-1 31 31-1 31-2 32 32-1 32-2 33 34 34-1
@@ -228,13 +261,13 @@ Several 2017 paths **changed** in 2026 — do not copy the 2017 converter blindl
   - BG-13 (5): BT-70 71 71-1 72 72-1 · BG-14 (4): BT-73 73-1 74 74-1 · BG-15 (7): BT-75 76 165 77 78 79 80
   - BG-16 (3): BT-81 82 83 · BG-17 (3): BT-84 85 86 · BG-18 (2): BT-87 88 · BG-19 (4): BT-89 90 90-1 91
 
-- [ ] **A6 — Carried-over document level BG-20 … BG-24** · ~1 session · 44 rows
+- [ ] **A6 — Apply the 2026 path deltas for carried-over BTs** · ~1 session
   - BG-20 (8): BT-92 93 94 95 95-1 96 97 98 · BG-21 (8): BT-99 100 101 102 102-1 103 104 105
   - BG-22 (12): BT-106 … 115 incl. BT-110-1 / BT-111-1 `@currencyID` discrimination
   - BG-23 (8): BT-116 116-1 117 118 118-1 119 120 121
   - BG-24 (8): BT-122 122-1 122-1-1 123 124 125 125-1 125-2
 
-- [ ] **A7 — Carried-over line level BG-25 … BG-32** · ~1 session · 46 rows
+- [ ] **A7 — Comprehensive carried-over test file + XPath assertions** · ~1 session · 214 rows
   - BG-25 (10): BT-126 127 128 128-1 128-2 129 130 131 132 133
   - BG-26 (4): BT-134 134-1 135 135-1 · BG-27 (5): BT-136 … 140 · BG-28 (5): BT-141 … 145
   - BG-29 (7): BT-146 147 147-1 148 148-1 149 150 · BG-30 (3): BT-151 151-1 152
@@ -353,7 +386,7 @@ Several 2017 paths **changed** in 2026 — do not copy the 2017 converter blindl
 | A2 | 2026-09-04 | `[4.0.0 A2]` | Split verified: 44 members in, 44 out, none lost or duplicated. 102 conversions, `generated/toubl21/` unchanged. |
 | A3 | 2026-09-04 | `[4.0.0 A3]` | Base port is a pure import swap - every D25A accessor matches D16B by name. Skeleton also emits the UBL-mandatory containers, so both files convert to XSD-valid UBL 2.5. |
 | A4 | 2026-09-04 | `[4.0.0 A4]` | `MockD25ASettings` with `assertXPath` / `assertNoXPath` / `assertXPathCount`. XPaths are relative to the document element, matching the mapping table. Negative-probed: wrong value and wrong count both fail. |
-| A5 | | | |
+| A5 | 2026-09-04 | `[4.0.0 A5]` d9c9af4 | Bulk port instead of hand-porting. 17 compile errors, all cardinality widenings (4.4b). Also corrected the A3 skeleton's wrong BT-27 mapping. |
 | A6 | | | |
 | A7 | | | |
 | A8 | | | |
