@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A17 done — all 18 action items complete.** One open question remains: the wording of `docs/00readme.txt` (see A17). · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A17 done — all 18 action items complete.** Follow-ups after review: BT-122-1/BT-122-1-1 added to the "New in 2026" table and finding 7 (BT-218) recorded in the mapping document. One open question remains: the wording of `docs/00readme.txt` (see A17). · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -152,17 +152,17 @@ document has no such attribute**. Copying it blindly puts a bogus `@listID` on e
 Rule: propagate the list identifier **only** when it equals the fixed `5153` of BT-177-1 / BT-193-1.
 Watch for the same pattern on other `qdt:` code types before copying any `@listID` / `@listAgencyID`.
 
-### 4.4d One defect in the source mapping table
+### 4.4d One defect in the source mapping table — resolved
 
-`docs/en16931-2026-syntax.md` maps **BT-218 "Line-level preceding invoice issue date"** to
-`cac:InvoiceDocumentReference/cbc:IssueTime`.
+The source mapped **BT-218 "Line-level preceding invoice issue date"** to
+`cac:InvoiceDocumentReference/cbc:IssueTime`, which is not implementable: `cbc:IssueTime` is an
+`xs:time` in UBL, so a `CCYYMMDD` date cannot be written to it and the result would fail UBL 2.5
+XSD validation.
 
-That is not implementable: `cbc:IssueTime` is an `xs:time` in UBL, so a `CCYYMMDD` date cannot be
-written to it — the result would fail UBL 2.5 XSD validation. The converter therefore writes
-`cbc:IssueDate`, matching BT-26 (the header-level equivalent) and the element's own semantics.
-
-**This is the one place where the implementation knowingly deviates from the table.** Worth checking
-against the published CEN/TS text and reporting upstream if it is wrong there too.
+This was raised as **finding 7** against the source documents and confirmed. The correction is now
+recorded in the new "Findings in the Source Documents" section of `docs/en16931-2026-syntax.md`, and
+the BT-218 row there reads `cbc:IssueDate`. Table and implementation agree — there is no longer any
+knowing deviation.
 
 ### 4.4e BT-24 detection measured against the real corpus
 
@@ -214,8 +214,9 @@ shortfall was not just missing comments:
 2. **BT-91 did not fall back to `ram:ProprietaryID`.** 2026 allows it as an alternative to
    `ram:IBANID`, exactly as BT-84 already did on the creditor side.
 
-Lesson: the mapping document's own "new in 2026" table is **not** a complete diff. Trust the full
-row set, which is what the coverage test enforces from now on.
+Lesson: the mapping document's own "new in 2026" table was **not** a complete diff. BT-122-1 and
+BT-122-1-1 have since been added to it, together with a note that "number above BT-165" is not a
+complete test for what is new. The coverage test enforces the full row set regardless.
 
 ### 4.5 The D25A JAXB model is a separate Java package
 

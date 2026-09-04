@@ -1796,8 +1796,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
             final DocumentReferenceType aUBLDocRef = new DocumentReferenceType ();
             aUBLDocRef.setID (aRD.getIssuerAssignedIDValue ());
             // BT-218 Line-level preceding invoice issue date.
-            // The mapping table names cbc:IssueTime here, but that element is an xs:time and
-            // cannot hold a date, so cbc:IssueDate is used - consistent with BT-26 at header level.
+            // The source document named cbc:IssueTime, which is an xs:time and cannot hold a date.
+            // Corrected to cbc:IssueDate, consistent with BT-26 at header level - see finding 7 in
+            // docs/en16931-2026-syntax.md.
             if (aRD.getFormattedIssueDateTime () != null)
               ifNotNull (parseDate (aRD.getFormattedIssueDateTime ().getDateTimeString (), aErrorList),
                          aUBLDocRef::setIssueDate);
@@ -3011,8 +3012,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
             final DocumentReferenceType aUBLDocRef = new DocumentReferenceType ();
             aUBLDocRef.setID (aRD.getIssuerAssignedIDValue ());
             // BT-218 Line-level preceding invoice issue date.
-            // The mapping table names cbc:IssueTime here, but that element is an xs:time and
-            // cannot hold a date, so cbc:IssueDate is used - consistent with BT-26 at header level.
+            // The source document named cbc:IssueTime, which is an xs:time and cannot hold a date.
+            // Corrected to cbc:IssueDate, consistent with BT-26 at header level - see finding 7 in
+            // docs/en16931-2026-syntax.md.
             if (aRD.getFormattedIssueDateTime () != null)
               ifNotNull (parseDate (aRD.getFormattedIssueDateTime ().getDateTimeString (), aErrorList),
                          aUBLDocRef::setIssueDate);
