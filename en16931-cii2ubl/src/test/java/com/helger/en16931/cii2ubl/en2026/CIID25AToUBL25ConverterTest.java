@@ -46,12 +46,23 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aInv, "cbc:InvoiceTypeCode", "380");
     assertXPath (aInv, "cbc:DocumentCurrencyCode", "EUR");
 
-    // BG-4 SELLER
-    assertXPath (aInv, "cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name", "Seller Ltd");
-    // BG-7 BUYER
-    assertXPath (aInv, "cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name", "Buyer Ltd");
+    // BG-4 SELLER - BT-27 maps to PartyLegalEntity/RegistrationName, not PartyName/Name
+    assertXPath (aInv, "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName", "Seller Ltd");
+    // BG-7 BUYER - BT-44
+    assertXPath (aInv, "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName", "Buyer Ltd");
+
+    // BG-23 VAT BREAKDOWN
+    assertXPath (aInv, "cac:TaxTotal/cbc:TaxAmount", "20");
+    assertXPath (aInv, "cac:TaxTotal/cbc:TaxAmount/@currencyID", "EUR");
+    assertXPath (aInv, "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount", "100");
+    assertXPath (aInv, "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount", "20");
+    assertXPath (aInv, "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:ID", "S");
+    assertXPath (aInv, "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent", "20");
+    assertXPath (aInv, "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID", "VAT");
 
     // BG-22 DOCUMENT TOTALS
+    assertXPath (aInv, "cac:LegalMonetaryTotal/cbc:LineExtensionAmount", "100");
+    assertXPath (aInv, "cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount", "100");
     assertXPath (aInv, "cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount", "120");
     assertXPath (aInv, "cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount/@currencyID", "EUR");
     assertXPath (aInv, "cac:LegalMonetaryTotal/cbc:PayableAmount", "120");
@@ -63,6 +74,11 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aInv, "cac:InvoiceLine/cbc:InvoicedQuantity/@unitCode", "C62");
     assertXPath (aInv, "cac:InvoiceLine/cbc:LineExtensionAmount", "100");
     assertXPath (aInv, "cac:InvoiceLine/cac:Item/cbc:Name", "Test item");
+    // BG-30 LINE VAT INFORMATION
+    assertXPath (aInv, "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cbc:ID", "S");
+    assertXPath (aInv, "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cbc:Percent", "20");
+    assertXPath (aInv, "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cac:TaxScheme/cbc:ID", "VAT");
+    // BG-29 PRICE DETAILS
     assertXPath (aInv, "cac:InvoiceLine/cac:Price/cbc:PriceAmount", "25");
   }
 
@@ -79,7 +95,7 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aCN, "cbc:DocumentCurrencyCode", "EUR");
 
     // BG-4 SELLER
-    assertXPath (aCN, "cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name", "Seller Ltd");
+    assertXPath (aCN, "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName", "Seller Ltd");
 
     // BG-22 DOCUMENT TOTALS
     assertXPath (aCN, "cac:LegalMonetaryTotal/cbc:PayableAmount", "120");
