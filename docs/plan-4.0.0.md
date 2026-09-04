@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A14 done, next up A15** — all 284 mapping rows implemented; detection and dispatcher in place · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A15 done, next up A16** — library and CLI feature complete; only comprehensive test files and docs remain · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -180,6 +180,24 @@ correctly once the edition is forced.
 `DOMReader.readXMLDOM (File)` throws on a non-existent file, so `detect` guards with
 `aFile.isFile ()` first.
 
+### 4.4f Pre-existing CLI bug found in A15
+
+Running the CLI without `--ubl-customizationid` **and** `--ubl-profileid` threw:
+
+```
+java.lang.NullPointerException: The value of 'CustomizationID' may not be null!
+  at AbstractCIIToUBLConverter.setCustomizationID
+  at CIIToUBLConverter.call
+```
+
+Both options have no default, so both fields are `null`, and the setters call
+`ValueEnforcer.notNull`. The same unguarded setter chain is on `master` and in every released
+3.x version, so the CLI's plain `java -jar … file.xml` invocation has been broken for a long time —
+it was simply never exercised by a test, because the test suite only drives the library.
+
+Fixed in A15 by setting the two values only when non-empty. Worth a note in the release notes for
+users who worked around it by always passing both options.
+
 ### 4.5 The D25A JAXB model is a separate Java package
 
 | Release | Package |
@@ -354,7 +372,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
   - **Done when:** unit tests cover both prefixes, the XRechnung `#compliant#` suffix form, a
     missing BT-24, and an unknown identifier.
 
-- [ ] **A15 — CLI rework** · ~half session
+- [x] **A15 — CLI rework** · done
   - Default: auto-detect. `--en-version 2017|2026` forces and skips detection.
   - Retire `--ubl` (or keep it as a deprecated alias accepting only `2.1`/`2.5`, cross-checked
     against `--en-version` — decide when implementing).
@@ -426,6 +444,6 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A12 | 2026-09-05 | `[4.0.0 A12]` | **Source defect found on BT-218** — see 4.4d. |
 | A13 | 2026-09-05 | `[4.0.0 A13]` | BT-193/BT-193-1 came for free from the A11 `@listID` handling, since header and line allowances share `_copyAllowanceCharge`. **All 284 rows now implemented.** |
 | A14 | 2026-09-05 | `[4.0.0 A14]` | Detection verified against all 103 existing files: 101 detect as 2017, 2 legacy ZUGFeRD files are undeterminable — real-world evidence for the override (see 4.4e). |
-| A15 | | | |
+| A15 | 2026-09-05 | `[4.0.0 A15]` | `--ubl` kept as a deprecated alias (2.1/2.5), cross-checked against `--en-version`. **Fixed a pre-existing CLI NPE** — see 4.4f. |
 | A16 | | | |
 | A17 | | | |
