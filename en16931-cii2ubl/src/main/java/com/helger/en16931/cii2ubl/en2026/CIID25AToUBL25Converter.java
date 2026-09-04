@@ -66,6 +66,10 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
    * value that distinguishes BT-177 from BT-105 and BT-193 from BT-145.
    */
   public static final String NON_VAT_TAX_CODE_LIST_ID = "5153";
+  /** BT-122-1 Supporting document reference code - a fixed value since EN 16931:2026 */
+  public static final String SUPPORTING_DOCUMENT_TYPE_CODE = "916";
+  /** BT-122-1-1 Supporting document reference document type list */
+  public static final String SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID = "1001";
 
   public CIID25AToUBL25Converter ()
   {}
@@ -151,7 +155,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // BT-18-1/BT-128-1 scheme ID
     ret.setID (sID).setSchemeID (aRD.getReferenceTypeCodeValue ());
 
-    // Add DocumentTypeCode where possible
+    // BT-18-2/BT-128-2 Invoiced object identifier type code (fixed value "130")
     if (isValidDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
       ret.setDocumentTypeCode (aRD.getTypeCodeValue ());
 
@@ -206,34 +210,34 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     return ret;
   }
 
-  // Converts BG-5/BG-8/BG-12/BG-15 postal address
+  // Converts the postal address of BG-5/BG-8/BG-12/BG-15 and BG-38
   @NonNull
   private static AddressType _convertPostalAddress (@NonNull final TradeAddressType aPostalAddress)
   {
     final AddressType ret = new AddressType ();
-    // BT-35/BT-50/BT-64/BT-75 Address line 1
+    // BT-35/BT-50/BT-64/BT-75/BT-203 Address line 1
     if (StringHelper.isNotEmpty (aPostalAddress.getLineOneValue ()))
       ret.addStreetName (new StreetNameType (aPostalAddress.getLineOneValue ()));
-    // BT-36/BT-51/BT-65/BT-76 Address line 2
+    // BT-36/BT-51/BT-65/BT-76/BT-204 Address line 2
     if (StringHelper.isNotEmpty (aPostalAddress.getLineTwoValue ()))
       ret.addAdditionalStreetName (new AdditionalStreetNameType (aPostalAddress.getLineTwoValue ()));
-    // BT-162/BT-163/BT-164/BT-165 Address line 3
+    // BT-162/BT-163/BT-164/BT-165/BT-205 Address line 3
     if (StringHelper.isNotEmpty (aPostalAddress.getLineThreeValue ()))
     {
       final AddressLineType aUBLAddressLine = new AddressLineType ();
       aUBLAddressLine.addLine (new LineType (aPostalAddress.getLineThreeValue ()));
       ret.addAddressLine (aUBLAddressLine);
     }
-    // BT-37/BT-52/BT-66/BT-77 City
+    // BT-37/BT-52/BT-66/BT-77/BT-206 City
     if (StringHelper.isNotEmpty (aPostalAddress.getCityNameValue ()))
       ret.addCityName (new CityNameType (aPostalAddress.getCityNameValue ()));
-    // BT-38/BT-53/BT-67/BT-78 Post code
+    // BT-38/BT-53/BT-67/BT-78/BT-207 Post code
     if (StringHelper.isNotEmpty (aPostalAddress.getPostcodeCodeValue ()))
       ret.addPostalZone (new PostalZoneType (aPostalAddress.getPostcodeCodeValue ()));
-    // BT-39/BT-54/BT-68/BT-79 Country subdivision
+    // BT-39/BT-54/BT-68/BT-79/BT-208 Country subdivision
     if (aPostalAddress.hasCountrySubDivisionNameEntries ())
       ret.addCountrySubentity (new CountrySubentityType (aPostalAddress.getCountrySubDivisionNameAtIndex (0).getValue ()));
-    // BT-40/BT-55/BT-69/BT-80 Country code
+    // BT-40/BT-55/BT-69/BT-80/BT-209 Country code
     if (StringHelper.isNotEmpty (aPostalAddress.getCountryIDValue ()))
     {
       final CountryType aUBLCountry = new CountryType ();
@@ -344,6 +348,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     final PartyTaxSchemeType aUBLPartyTaxScheme = new PartyTaxSchemeType ();
     aUBLPartyTaxScheme.setCompanyID (aTaxRegistration.getIDValue ());
 
+    // BT-31-1/BT-32-1/BT-48-1/BT-63-1 Scheme identifier of the tax registration
     String sSchemeID = aTaxRegistration.getID ().getSchemeID ();
     if (StringHelper.isEmpty (sSchemeID))
       sSchemeID = getVATScheme ();
@@ -360,6 +365,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           sSchemeID = NATIONAL_TAX_SCHEME;
     }
 
+    // BT-31-2/BT-48-2/BT-63-2 VAT tax code respectively BT-32-2 national tax code
     final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
     aUBLTaxScheme.setID (sSchemeID);
     aUBLPartyTaxScheme.setTaxScheme (aUBLTaxScheme);
@@ -513,7 +519,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
                                                    new BaseAmountType (),
                                                    sDefaultCurrencyCode));
 
-    // BT-95/BT-102 VAT category code and BT-96/BT-103 VAT rate
+    // BT-95/BT-102 VAT category code, BT-96/BT-103 VAT rate and
+    // BT-95-1/BT-102-1 the fixed VAT tax code
     // (not applicable for line-level BG-27/BG-28)
     for (final TradeTaxType aTradeTax : aAllowanceCharge.getCategoryTradeTax ())
     {
@@ -651,7 +658,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       // BT-90 Bank assigned creditor identifier
       // CII has a dedicated CreditorReferenceID element.
       // In UBL it is placed as a PartyIdentification/ID on the Payee (if
-      // present) or the Seller. The @schemeID="SEPA" is required by the
+      // present) or the Seller. BT-90-1 requires @schemeID="SEPA", which is
       // EN 16931 Schematron to distinguish it from regular BT-29 identifiers.
       // Only mapped for BG-19 direct debit — EN 16931 defines BT-90 as part of BG-19.
       final IDType aCreditorRefID = aHeaderSettlement.getCreditorReferenceID ();
@@ -671,7 +678,11 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       final DebtorFinancialAccountType aAccount = aPaymentMeans.getPayerPartyDebtorFinancialAccount ();
       if (aAccount != null)
       {
+        // BT-91 Debited account identifier. Since EN 16931:2026 CII allows ram:ProprietaryID as an
+        // alternative to ram:IBANID, exactly like BT-84 on the creditor side.
         aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
+        if (aUBLFinancialAccount.getID () == null)
+          aUBLFinancialAccount.setID (_copyID (aAccount.getProprietaryID ()));
         // BT-216 Debited account name - new in EN 16931:2026
         ifNotNull (copyName (aAccount.getAccountName (), new NameType ()), aUBLFinancialAccount::setName);
       }
@@ -723,6 +734,29 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       return null;
 
     return aUBLOrderRef;
+  }
+
+  /**
+   * BT-122-1 Supporting document reference code and BT-122-1-1 its list identifier. Both are new in
+   * EN 16931:2026, which requires cbc:DocumentTypeCode="916" on BG-24. The EN 16931:2017 binding
+   * had no such element, which is why isValidDocumentReferenceTypeCode does not accept "916".
+   *
+   * @param aRD
+   *        The CII source document reference. May not be <code>null</code>.
+   * @param aUBLDocRef
+   *        The UBL document reference to complete. May not be <code>null</code>.
+   */
+  private static void _applySupportingDocumentTypeCode (@NonNull final ReferencedDocumentType aRD,
+                                                        @NonNull final DocumentReferenceType aUBLDocRef)
+  {
+    if (SUPPORTING_DOCUMENT_TYPE_CODE.equals (aRD.getTypeCodeValue ()))
+    {
+      final DocumentTypeCodeType aUBLTypeCode = new DocumentTypeCodeType ();
+      aUBLTypeCode.setValue (SUPPORTING_DOCUMENT_TYPE_CODE);
+      // BT-122-1-1
+      aUBLTypeCode.setListID (SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID);
+      aUBLDocRef.setDocumentTypeCode (aUBLTypeCode);
+    }
   }
 
   @Nullable
@@ -1121,16 +1155,19 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         aUBLInvoice.addContractDocumentReference (aUBLDocRef);
     }
 
-    // BG-24 ADDITIONAL SUPPORTING DOCUMENTS + BT-18/BT-18-1 Invoiced object identifier
+    // BG-24 ADDITIONAL SUPPORTING DOCUMENTS + BT-18/BT-18-1/BT-18-2 Invoiced object identifier
     {
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
-        // Except OriginatorDocumentReference (BT-17)
+        // Except OriginatorDocumentReference (BT-17/BT-17-1)
         if (!isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
+          {
+            _applySupportingDocumentTypeCode (aRD, aUBLDocRef);
             aUBLInvoice.addAdditionalDocumentReference (aUBLDocRef);
+          }
         }
       }
     }
@@ -1429,7 +1466,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       TaxTotalType aUBLTaxTotal = null;
       if (aSTSHMS != null && aSTSHMS.hasTaxTotalAmountEntries ())
       {
-        // BT-110 Invoice total VAT amount / BT-111 Invoice total VAT amount in accounting currency
+        // BT-110/BT-110-1 Invoice total VAT amount and its currency, respectively
+        // BT-111/BT-111-1 the same in the VAT accounting currency
         for (final AmountType aTaxTotalAmount : aSTSHMS.getTaxTotalAmount ())
         {
           final TaxTotalType aUBLCurTaxTotal = new TaxTotalType ();
@@ -1460,7 +1498,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       {
         final TaxSubtotalType aUBLTaxSubtotal = new TaxSubtotalType ();
 
-        // BT-116 VAT category taxable amount
+        // BT-116 VAT category taxable amount + BT-116-1 its currency
         if (aTradeTax.hasBasisAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxableAmount (copyAmount (aTradeTax.getBasisAmountAtIndex (0),
@@ -1481,7 +1519,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
-        // BT-118 VAT category code
+        // BT-118 VAT category code + BT-118-1 the fixed VAT tax type code
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         // BT-119 VAT category rate
         if (aTradeTax.getRateApplicablePercentValue () != null)
@@ -1882,7 +1920,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         }
       }
 
-      // BG-30 LINE VAT INFORMATION (BT-151/BT-152)
+      // BG-30 LINE VAT INFORMATION (BT-151/BT-151-1/BT-152)
       for (final TradeTaxType aTradeTax : aLineSettlement.getApplicableTradeTax ())
       {
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -1950,7 +1988,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         {
           if (aGPPTP.hasAppliedTradeAllowanceChargeEntries ())
           {
-            // BT-147 Item Price Discount (optional)
+            // BT-147 Item Price Discount with BT-147-1 the discount indicator (optional)
             final var aTAC = aGPPTP.getAppliedTradeAllowanceChargeAtIndex (0);
             if (aTAC.hasActualAmountEntries ())
             {
@@ -1966,7 +2004,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           }
           if (aGPPTP.hasChargeAmountEntries ())
           {
-            // BT-148 Item Gross Price (optional)
+            // BT-148 Item Gross Price with BT-148-1 the discount indicator (optional)
             final AmountType aBT148 = aGPPTP.getChargeAmountAtIndex (0);
             if (aBT148 != null)
             {
@@ -2328,16 +2366,19 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         aUBLCreditNote.addContractDocumentReference (aUBLDocRef);
     }
 
-    // BG-24 ADDITIONAL SUPPORTING DOCUMENTS + BT-18/BT-18-1 Invoiced object identifier
+    // BG-24 ADDITIONAL SUPPORTING DOCUMENTS + BT-18/BT-18-1/BT-18-2 Invoiced object identifier
     {
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
-        // Except OriginatorDocumentReference (BT-17)
+        // Except OriginatorDocumentReference (BT-17/BT-17-1)
         if (!isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
+          {
+            _applySupportingDocumentTypeCode (aRD, aUBLDocRef);
             aUBLCreditNote.addAdditionalDocumentReference (aUBLDocRef);
+          }
         }
       }
     }
@@ -2641,7 +2682,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       TaxTotalType aUBLTaxTotal = null;
       if (aSTSHMS != null && aSTSHMS.hasTaxTotalAmountEntries ())
       {
-        // BT-110 Invoice total VAT amount / BT-111 Invoice total VAT amount in accounting currency
+        // BT-110/BT-110-1 Invoice total VAT amount and its currency, respectively
+        // BT-111/BT-111-1 the same in the VAT accounting currency
         for (final AmountType aTaxTotalAmount : aSTSHMS.getTaxTotalAmount ())
         {
           final TaxTotalType aUBLCurTaxTotal = new TaxTotalType ();
@@ -2672,7 +2714,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       {
         final TaxSubtotalType aUBLTaxSubtotal = new TaxSubtotalType ();
 
-        // BT-116 VAT category taxable amount
+        // BT-116 VAT category taxable amount + BT-116-1 its currency
         if (aTradeTax.hasBasisAmountEntries ())
         {
           aUBLTaxSubtotal.setTaxableAmount (copyAmount (aTradeTax.getBasisAmountAtIndex (0),
@@ -2693,7 +2735,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
-        // BT-118 VAT category code
+        // BT-118 VAT category code + BT-118-1 the fixed VAT tax type code
         aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
         // BT-119 VAT category rate
         if (aTradeTax.getRateApplicablePercentValue () != null)
@@ -3093,7 +3135,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         }
       }
 
-      // BG-30 LINE VAT INFORMATION (BT-151/BT-152)
+      // BG-30 LINE VAT INFORMATION (BT-151/BT-151-1/BT-152)
       for (final TradeTaxType aTradeTax : aLineSettlement.getApplicableTradeTax ())
       {
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -3161,7 +3203,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         {
           if (aGPPTP.hasAppliedTradeAllowanceChargeEntries ())
           {
-            // BT-147 Item Price Discount (optional)
+            // BT-147 Item Price Discount with BT-147-1 the discount indicator (optional)
             final var aTAC = aGPPTP.getAppliedTradeAllowanceChargeAtIndex (0);
             if (aTAC.hasActualAmountEntries ())
             {
@@ -3177,7 +3219,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           }
           if (aGPPTP.hasChargeAmountEntries ())
           {
-            // BT-148 Item Gross Price (optional)
+            // BT-148 Item Gross Price with BT-148-1 the discount indicator (optional)
             final AmountType aBT148 = aGPPTP.getChargeAmountAtIndex (0);
             if (aBT148 != null)
             {

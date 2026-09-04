@@ -47,6 +47,7 @@
   </cac:AdditionalDocumentReference>
   <cac:AdditionalDocumentReference>
     <cbc:ID>DOC-916</cbc:ID>
+    <cbc:DocumentTypeCode listID="1001">916</cbc:DocumentTypeCode>
     <cbc:DocumentDescription>Supporting document</cbc:DocumentDescription>
     <cac:Attachment>
       <cac:ExternalReference>

@@ -242,6 +242,11 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aInv,
                  "cac:AdditionalDocumentReference[cbc:ID='DOC-916']/cac:Attachment/cac:ExternalReference/cbc:URI",
                  "https://example.org/doc");
+    // BT-122-1 Supporting document reference code + BT-122-1-1 its list identifier.
+    // Both are new in EN 16931:2026 - the 2017 binding deliberately emitted no DocumentTypeCode
+    // for BG-24.
+    assertXPath (aInv, "cac:AdditionalDocumentReference[cbc:ID='DOC-916']/cbc:DocumentTypeCode", "916");
+    assertXPath (aInv, "cac:AdditionalDocumentReference[cbc:ID='DOC-916']/cbc:DocumentTypeCode/@listID", "1001");
 
     // BG-10 PAYEE
     assertXPath (aInv, "cac:PayeeParty/cac:PartyName/cbc:Name", "Payee Ltd");
@@ -627,5 +632,39 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aInv, sProp + "[cbc:Name='Humidity']/cbc:ValueQuantity", "65");
     assertXPath (aInv, sProp + "[cbc:Name='Humidity']/cbc:ValueQuantity/@unitCode", "P1");
     assertNoXPath (aInv, sProp + "[cbc:Name='Humidity']/cbc:Value");
+  }
+
+  @Test
+  public void testConvertPaymentEdgeCases ()
+  {
+    final Element aInv = convertAndValidate ("d25a-edge-payment-invoice.xml", true);
+
+    // BT-84 Payment account identifier, here a proprietary account instead of an IBAN
+    assertXPath (aInv, "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:ID", "ACC-0099887766");
+    // BT-85 Payment account name
+    assertXPath (aInv, "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:Name", "Seller Account");
+
+    // BT-90 belongs to BG-19 DIRECT DEBIT, so a credit transfer must not emit it even though the
+    // source has a ram:CreditorReferenceID. The Seller keeps only its BT-29 identifier.
+    assertNoXPath (aInv,
+                   "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification[cbc:ID/@schemeID='SEPA']");
+    assertXPath (aInv, "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID", "4035811234567");
+  }
+
+  @Test
+  public void testConvertDirectDebitWithoutPayee ()
+  {
+    final Element aInv = convertAndValidate ("d25a-edge-directdebit-invoice.xml", true);
+
+    // BT-91 Debited account identifier, here a proprietary account instead of an IBAN
+    assertXPath (aInv, "cac:PaymentMeans/cac:PaymentMandate/cac:PayerFinancialAccount/cbc:ID", "DEBTOR-12345");
+    // BT-216 Debited account name
+    assertXPath (aInv, "cac:PaymentMeans/cac:PaymentMandate/cac:PayerFinancialAccount/cbc:Name", "Buyer Account");
+
+    // BT-90 + BT-90-1 Bank assigned creditor identifier. Without a Payee it goes on the Seller.
+    assertNoXPath (aInv, "cac:PayeeParty");
+    assertXPath (aInv,
+                 "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification[cbc:ID/@schemeID='SEPA']/cbc:ID",
+                 "SEPA-CRED-1");
   }
 }

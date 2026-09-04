@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A15 done, next up A16** — library and CLI feature complete; only comprehensive test files and docs remain · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A16 done, next up A17 (documentation, the last item)** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -198,6 +198,25 @@ it was simply never exercised by a test, because the test suite only drives the 
 Fixed in A15 by setting the two values only when non-empty. Worth a note in the release notes for
 users who worked around it by always passing both options.
 
+### 4.4g Two gaps the A16 coverage guard found
+
+`MappingCoverageTest` parses every row of `docs/en16931-2026-syntax.md` and fails if an identifier
+is never named in `CIID25AToUBL25Converter`. Running it the first time reported 279 of 284, and the
+shortfall was not just missing comments:
+
+1. **BT-122-1 / BT-122-1-1 were genuinely unimplemented.** BG-24 requires
+   `cbc:DocumentTypeCode = "916"` with `@listID = "1001"` since 2026. The 2017 binding had no such
+   element — `isValidDocumentReferenceTypeCode` deliberately accepts only `50` and `130` — so the
+   bulk port carried the suppression over. **These two rows appear in neither the 2017 document nor
+   the "Business Terms and Groups New in 2026" table**, so both the A6 delta diff and the A8–A13
+   pass over the "new" table missed them. 34 rows sit in that blind spot; the other 32 turned out
+   to be implemented sub-identifiers.
+2. **BT-91 did not fall back to `ram:ProprietaryID`.** 2026 allows it as an alternative to
+   `ram:IBANID`, exactly as BT-84 already did on the creditor side.
+
+Lesson: the mapping document's own "new in 2026" table is **not** a complete diff. Trust the full
+row set, which is what the coverage test enforces from now on.
+
 ### 4.5 The D25A JAXB model is a separate Java package
 
 | Release | Package |
@@ -380,7 +399,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
   - Error text when detection fails, per D4:
     `cannot determine EN 16931 edition (BT-24 missing); pass --en-version 2017|2026`.
 
-- [ ] **A16 — Comprehensive artificial D25A test files** · ~1–2 sessions
+- [x] **A16 — Comprehensive artificial D25A test files** · done
   - `d25a-full-invoice.xml` and `d25a-full-creditnote.xml` exercising **every** BT of the mapping.
   - One file per new group: BG-33/35/36, BG-34, BG-37+38, BG-39.
   - Edge cases: BT-2 with `@format='208'` (date **and** time); BT-6 + BT-111 dual currency;
@@ -445,5 +464,5 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A13 | 2026-09-05 | `[4.0.0 A13]` | BT-193/BT-193-1 came for free from the A11 `@listID` handling, since header and line allowances share `_copyAllowanceCharge`. **All 284 rows now implemented.** |
 | A14 | 2026-09-05 | `[4.0.0 A14]` | Detection verified against all 103 existing files: 101 detect as 2017, 2 legacy ZUGFeRD files are undeterminable — real-world evidence for the override (see 4.4e). |
 | A15 | 2026-09-05 | `[4.0.0 A15]` | `--ubl` kept as a deprecated alias (2.1/2.5), cross-checked against `--en-version`. **Fixed a pre-existing CLI NPE** — see 4.4f. |
-| A16 | | | |
+| A16 | 2026-09-05 | `[4.0.0 A16]` | Coverage guard added; it immediately found **BT-122-1/BT-122-1-1 unimplemented** and BT-91's missing ProprietaryID fallback — see 4.4g. |
 | A17 | | | |
