@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A2 done, next up A3** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A3 done, next up A4** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -100,6 +100,16 @@ and on CreditNote the natively available `cbc:DueDate` and `cac:ProjectReference
 | Existing converters, mutual difference | 52 diff lines between `CIIToUBL21Converter` and `CIIToUBL24Converter` (⇒ dropping 2.2/2.3/2.4 is pure deletion) |
 | `AbstractCIIToUBLConverter` split | ≈350 lines edition-independent / ≈430 lines CII-D16B-typed |
 
+### 4.4a Findings from the A3 port
+
+| Finding | Consequence |
+|---------|-------------|
+| Every D25A accessor used by the base class matches D16B **by name** (`getValue`, `getSchemeID`, `isIndicator`, `hasGlobalIDEntries`, `getDuePayableAmount`, …) | `AbstractCIIToUBL2026Converter` is a pure import swap of the 2017 one - no logic changes |
+| `cac:Item/cbc:Name` (BT-153) went **1..1 -> 0..n** between UBL 2.1 and 2.5 | Use `ItemType.addName (NameType)`; there is no `setName (String)`. Watch for the same cardinality widening on other UBL elements in A5-A7 |
+| `UBL25Marshaller.invoice ().write (...)` returns `ESuccess.FAILURE` for a schema invalid document (verified with a deliberately empty `InvoiceType`) | Asserting `write (...).isSuccess ()` **is** a real XSD validity assertion; no separate xmllint step is needed |
+| The UBL 2.5 XSDs cannot be compiled standalone by `xmllint` - they need the CCTS and xmldsig schemas from sibling `ph-xsds-*` jars | Validate through the marshaller (which resolves the full schema set), not through external tooling |
+| UBL 2.5 mandatory Invoice children: `cbc:ID`, `cbc:IssueDate`, `cac:AccountingSupplierParty`, `cac:LegalMonetaryTotal`, `cac:InvoiceLine` (CreditNote: `cac:CreditNoteLine`) | Any 2026 test file must carry at least these, which is why the A3 skeleton reaches past its five planned BTs |
+
 ### 4.5 The D25A JAXB model is a separate Java package
 
 | Release | Package |
@@ -176,7 +186,7 @@ Deleted: `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
 
 ### Phase 2 — 2026 skeleton and test harness
 
-- [ ] **A3 — `.en2026` scaffolding + typed base port** · ~4 h
+- [x] **A3 — `.en2026` scaffolding + typed base port** · ~4 h
   - Add `ph-cii-d25a` and `ph-ubl25` dependencies.
   - Port `AbstractCIIToUBL2017Converter`'s D25A-typed counterpart:
     `en2026.AbstractCIIToUBL2026Converter`.
@@ -341,7 +351,7 @@ Several 2017 paths **changed** in 2026 — do not copy the 2017 converter blindl
 | A0 | 2026-09-04 | (folded into A1) | Baseline confirmed: full test run leaves `generated/toubl21/` byte-identical. No new code needed. |
 | A1 | 2026-09-04 | `[4.0.0 A1]` fb6bcba | 315 files changed, -8209 lines. `generated/toubl21/` unchanged. |
 | A2 | 2026-09-04 | `[4.0.0 A2]` | Split verified: 44 members in, 44 out, none lost or duplicated. 102 conversions, `generated/toubl21/` unchanged. |
-| A3 | | | |
+| A3 | 2026-09-04 | `[4.0.0 A3]` | Base port is a pure import swap - every D25A accessor matches D16B by name. Skeleton also emits the UBL-mandatory containers, so both files convert to XSD-valid UBL 2.5. |
 | A4 | | | |
 | A5 | | | |
 | A6 | | | |

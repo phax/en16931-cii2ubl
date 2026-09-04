@@ -102,6 +102,8 @@ CII to UBL Converter for EN 16931 invoices
 # News and noteworthy
 
 v4.0.0 - work in progress
+* Added the EN 16931:2026 syntax binding: `com.helger.en16931.cii2ubl.en2026.CIID25AToUBL25Converter` converts CII D25A to UBL 2.5 (work in progress - see `docs/plan-4.0.0.md`)
+* Added the dependencies to `ph-cii-d25a` and `ph-ubl25`
 * Removed the support for creating UBL 2.2, 2.3 and 2.4 - only UBL 2.1 (EN 16931:2017) and UBL 2.5 (EN 16931:2026) remain
 * Moved the EN 16931:2017 conversion to the new package `com.helger.en16931.cii2ubl.en2017` and renamed `CIIToUBL21Converter` to `CIID16BToUBL21Converter`
 * Split `AbstractCIIToUBLConverter` into the edition independent `AbstractCIIToUBLConverterBase` and the CII D16B typed `AbstractCIIToUBL2017Converter`
