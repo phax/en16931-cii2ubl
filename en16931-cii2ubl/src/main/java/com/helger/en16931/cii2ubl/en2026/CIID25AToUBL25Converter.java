@@ -34,6 +34,7 @@ import com.helger.collection.CollectionFind;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.diagnostics.error.list.IErrorList;
+import com.helger.diagnostics.error.list.IErrorList;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_25.*;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.*;
@@ -695,6 +696,91 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     return aUBLOrderRef;
   }
 
+  // BG-35 EARLY PAYMENT DISCOUNT (BT-170/BT-170-1/BT-171/BT-172) - new in EN 16931:2026
+  @Nullable
+  private static PaymentTermsType _convertEarlyPaymentDiscount (@Nullable final TradePaymentDiscountTermsType aDiscount,
+                                                                @Nullable final String sDefaultCurrencyCode,
+                                                                @NonNull final IErrorList aErrorList)
+  {
+    if (aDiscount == null)
+      return null;
+
+    final PaymentTermsType aUBLPaymentTerms = new PaymentTermsType ();
+
+    // BT-170 Discount end date
+    if (aDiscount.getBasisDateTime () != null)
+    {
+      final LocalDate aEndDate = parseDate (aDiscount.getBasisDateTime ().getDateTimeString (), aErrorList);
+      if (aEndDate != null)
+      {
+        final PeriodType aUBLPeriod = new PeriodType ();
+        aUBLPeriod.setEndDate (aEndDate);
+        aUBLPaymentTerms.setSettlementPeriod (aUBLPeriod);
+      }
+    }
+
+    // BT-171 Discount percentage
+    ifNotNull (aDiscount.getCalculationPercentValue (), aUBLPaymentTerms::setSettlementDiscountPercent);
+
+    // BT-172 Discount amount
+    ifNotNull (copyAmount (aDiscount.getActualDiscountAmount (),
+                           new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.SettlementDiscountAmountType (),
+                           sDefaultCurrencyCode),
+               aUBLPaymentTerms::setSettlementDiscountAmount);
+
+    if (aUBLPaymentTerms.getSettlementPeriod () == null &&
+        aUBLPaymentTerms.getSettlementDiscountPercent () == null &&
+        aUBLPaymentTerms.getSettlementDiscountAmount () == null)
+      return null;
+
+    return aUBLPaymentTerms;
+  }
+
+  // BG-36 LATE PAYMENT PENALTY (BT-181/BT-181-1/BT-182/BT-183) - new in EN 16931:2026
+  @Nullable
+  private static PaymentTermsType _convertLatePaymentPenalty (@Nullable final TradePaymentPenaltyTermsType aPenalty,
+                                                              @Nullable final String sDefaultCurrencyCode,
+                                                              @NonNull final IErrorList aErrorList)
+  {
+    if (aPenalty == null)
+      return null;
+
+    final PaymentTermsType aUBLPaymentTerms = new PaymentTermsType ();
+
+    // BT-181 Penalty start date
+    if (aPenalty.getBasisDateTime () != null)
+    {
+      final LocalDate aStartDate = parseDate (aPenalty.getBasisDateTime ().getDateTimeString (), aErrorList);
+      if (aStartDate != null)
+      {
+        final PeriodType aUBLPeriod = new PeriodType ();
+        aUBLPeriod.setStartDate (aStartDate);
+        aUBLPaymentTerms.setPenaltyPeriod (aUBLPeriod);
+      }
+    }
+
+    // BT-182 Penalty yearly interest percentage
+    if (aPenalty.getCalculationPercentValue () != null)
+    {
+      final InterestRateType aUBLInterestRate = new InterestRateType ();
+      aUBLInterestRate.setInterestRatePercent (aPenalty.getCalculationPercentValue ());
+      aUBLPaymentTerms.setPenaltyInterestRate (aUBLInterestRate);
+    }
+
+    // BT-183 Penalty amount
+    ifNotNull (copyAmount (aPenalty.getActualPenaltyAmount (),
+                           new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.PenaltyAmountType (),
+                           sDefaultCurrencyCode),
+               aUBLPaymentTerms::setPenaltyAmount);
+
+    if (aUBLPaymentTerms.getPenaltyPeriod () == null &&
+        aUBLPaymentTerms.getPenaltyInterestRate () == null &&
+        aUBLPaymentTerms.getPenaltyAmount () == null)
+      return null;
+
+    return aUBLPaymentTerms;
+  }
+
   @Nullable
   public InvoiceType convertToInvoice (@NonNull final CrossIndustryInvoiceType aCIIInvoice,
                                        @NonNull final ErrorList aErrorList)
@@ -1193,10 +1279,13 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       }
     }
 
-    // BT-20 Payment terms
+    // BG-33 PAYMENT TERMS (BT-20) + BG-35 EARLY PAYMENT DISCOUNT + BG-36 LATE PAYMENT PENALTY
+    // All three groups share cac:PaymentTerms in UBL, but CII keeps them in separate containers.
+    // One cac:PaymentTerms is emitted per CII container so that they stay distinguishable.
     {
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
       {
+        // BG-33 - BT-20 Payment term text
         final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
 
         for (final TextType aDesc : aPaymentTerms.getDescription ())
@@ -1204,6 +1293,18 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
 
         if (aUBLPaymenTerms.hasNoteEntries ())
           aUBLInvoice.addPaymentTerms (aUBLPaymenTerms);
+
+        // BG-35 EARLY PAYMENT DISCOUNT
+        ifNotNull (_convertEarlyPaymentDiscount (aPaymentTerms.getApplicableTradePaymentDiscountTerms (),
+                                                 sDefaultCurrencyCode,
+                                                 aErrorList),
+                   aUBLInvoice::addPaymentTerms);
+
+        // BG-36 LATE PAYMENT PENALTY
+        ifNotNull (_convertLatePaymentPenalty (aPaymentTerms.getApplicableTradePaymentPenaltyTerms (),
+                                               sDefaultCurrencyCode,
+                                               aErrorList),
+                   aUBLInvoice::addPaymentTerms);
       }
     }
 
@@ -2193,10 +2294,13 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       }
     }
 
-    // BT-20 Payment terms
+    // BG-33 PAYMENT TERMS (BT-20) + BG-35 EARLY PAYMENT DISCOUNT + BG-36 LATE PAYMENT PENALTY
+    // All three groups share cac:PaymentTerms in UBL, but CII keeps them in separate containers.
+    // One cac:PaymentTerms is emitted per CII container so that they stay distinguishable.
     {
       for (final TradePaymentTermsType aPaymentTerms : aHeaderSettlement.getSpecifiedTradePaymentTerms ())
       {
+        // BG-33 - BT-20 Payment term text
         final PaymentTermsType aUBLPaymenTerms = new PaymentTermsType ();
 
         for (final TextType aDesc : aPaymentTerms.getDescription ())
@@ -2204,6 +2308,18 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
 
         if (aUBLPaymenTerms.hasNoteEntries ())
           aUBLCreditNote.addPaymentTerms (aUBLPaymenTerms);
+
+        // BG-35 EARLY PAYMENT DISCOUNT
+        ifNotNull (_convertEarlyPaymentDiscount (aPaymentTerms.getApplicableTradePaymentDiscountTerms (),
+                                                 sDefaultCurrencyCode,
+                                                 aErrorList),
+                   aUBLCreditNote::addPaymentTerms);
+
+        // BG-36 LATE PAYMENT PENALTY
+        ifNotNull (_convertLatePaymentPenalty (aPaymentTerms.getApplicableTradePaymentPenaltyTerms (),
+                                               sDefaultCurrencyCode,
+                                               aErrorList),
+                   aUBLCreditNote::addPaymentTerms);
       }
     }
 

@@ -434,4 +434,39 @@ public final class CIID25AToUBL25ConverterTest
     // BT-90 + BT-90-1 Bank assigned creditor identifier, on the Payee if present
     assertXPath (aInv, "cac:PayeeParty/cac:PartyIdentification[cbc:ID/@schemeID='SEPA']/cbc:ID", "SEPA-CRED-1");
   }
+
+  @Test
+  public void testConvertNewPaymentTermsGroups ()
+  {
+    final Element aInv = convertAndValidate ("d25a-new-paymentterms-invoice.xml", true);
+
+    // BG-33, BG-35 and BG-36 all share cac:PaymentTerms, so one element is emitted per group
+    assertXPathCount (aInv, "cac:PaymentTerms", 3);
+
+    // BG-33 PAYMENT TERMS - BT-20 Payment term text
+    assertXPath (aInv, "cac:PaymentTerms[cbc:Note]/cbc:Note", "Net 30 days");
+
+    // BG-35 EARLY PAYMENT DISCOUNT
+    final String sDiscount = "cac:PaymentTerms[cbc:SettlementDiscountPercent]/";
+    // BT-170 Discount end date
+    assertXPath (aInv, sDiscount + "cac:SettlementPeriod/cbc:EndDate", "2026-01-25");
+    // BT-171 Discount percentage
+    assertXPath (aInv, sDiscount + "cbc:SettlementDiscountPercent", "2.00");
+    // BT-172 Discount amount
+    assertXPath (aInv, sDiscount + "cbc:SettlementDiscountAmount", "2.64");
+
+    // BG-36 LATE PAYMENT PENALTY
+    final String sPenalty = "cac:PaymentTerms[cbc:PenaltyAmount]/";
+    // BT-181 Penalty start date
+    assertXPath (aInv, sPenalty + "cac:PenaltyPeriod/cbc:StartDate", "2026-02-15");
+    // BT-182 Penalty yearly interest percentage
+    assertXPath (aInv, sPenalty + "cac:PenaltyInterestRate/cbc:InterestRatePercent", "9.20");
+    // BT-183 Penalty amount
+    // copyAmount strips trailing zeroes, so 12.50 becomes 12.5
+    assertXPath (aInv, sPenalty + "cbc:PenaltyAmount", "12.5");
+
+    // The three groups must not be merged into one element
+    assertNoXPath (aInv, "cac:PaymentTerms[cbc:Note and cbc:SettlementDiscountPercent]");
+    assertNoXPath (aInv, "cac:PaymentTerms[cbc:SettlementDiscountPercent and cbc:PenaltyAmount]");
+  }
 }

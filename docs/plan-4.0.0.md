@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A8 done, next up A9** — Phase 3 complete; Phase 4 in progress (9 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A9 done, next up A10** — Phase 3 complete; Phase 4 in progress (17 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -267,7 +267,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
     BT-197 (`cac:DeliveryNoteDocumentReference`), BT-202 (BG-3 preceding invoice type code),
     BT-215 / BT-216 (BG-19 debited account PSP identifier and name).
 
-- [ ] **A9 — BG-33 / BG-35 / BG-36 payment terms, discount, penalty** · ~1 session · 8 rows
+- [x] **A9 — BG-33 / BG-35 / BG-36 payment terms, discount, penalty** · done · 8 rows
   - BG-35: BT-170 (`cac:SettlementPeriod/cbc:EndDate`), BT-170-1, BT-171, BT-172.
   - BG-36: BT-181 (`cac:PenaltyPeriod/cbc:StartDate`), BT-181-1,
     BT-182 (`cac:PenaltyInterestRate/cbc:InterestRatePercent`), BT-183 (`cbc:PenaltyAmount`).
@@ -376,7 +376,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A6 | 2026-09-04 | `[4.0.0 A6]` | All 180 shared rows diffed programmatically between the two mapping docs; 58 differed, of which 6 were real changes (the rest were base-path notation). Verified with two new header test files. |
 | A7 | 2026-09-05 | `[4.0.0 A7]` | `d25a-full-invoice.xml` + `d25a-full-creditnote.xml` cover BG-3 … BG-32 with ~150 XPath assertions. 6 test files, 10 tests, all green. |
 | A8 | 2026-09-05 | `[4.0.0 A8]` | Also added `parseDateTime` to the shared base for UNTDID 2379 format "208", which is what makes BT-166 possible at all. |
-| A9 | | | |
+| A9 | 2026-09-05 | `[4.0.0 A9]` | One `cac:PaymentTerms` per CII container, so the three groups stay distinguishable; asserted by two `assertNoXPath` checks that they are never merged. |
 | A10 | | | |
 | A11 | | | |
 | A12 | | | |
