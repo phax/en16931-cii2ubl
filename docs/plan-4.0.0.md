@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A10 done, next up A11** — Phase 3 complete; Phase 4 in progress (20 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A11 done, next up A12** — Phase 3 complete; Phase 4 in progress (30 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -135,6 +135,22 @@ Every one is a cardinality widening; there were no semantic surprises.
 
 `CompanyLegalForm` and `CardAccount` were already solved in the deleted `CIIToUBL24Converter`
 (UBL 2.3+ shares the widening); those variants were recovered from `git show fb6bcba^` and reused.
+
+### 4.4c Schema defaults that JAXB materialises
+
+`qdt:AllowanceChargeReasonCodeType` in the CII D25A schema declares:
+
+```xml
+<xsd:attribute name="listID" type="xsd:token" default="4465_AllowanceChargeReasonCode"/>
+<xsd:attribute name="listAgencyID" type="..." default="6"/>
+```
+
+JAXB materialises these defaults, so `getListID ()` returns a value **even when the instance
+document has no such attribute**. Copying it blindly puts a bogus `@listID` on every BT-98 / BT-105
+/ BT-140 / BT-145 reason code, which breaks the BT-177-1 discriminator.
+
+Rule: propagate the list identifier **only** when it equals the fixed `5153` of BT-177-1 / BT-193-1.
+Watch for the same pattern on other `qdt:` code types before copying any `@listID` / `@listAgencyID`.
 
 ### 4.5 The D25A JAXB model is a separate Java package
 
@@ -282,7 +298,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
   - CII source `ram:SpecifiedFinancialAdjustment` → UBL `/Invoice/cac:CollectionInvoiceLine`
     (`/CreditNote/cac:CollectionCreditNoteLine`).
 
-- [ ] **A11 — New allowance / charge / VAT-breakdown BTs** · ~1 session · 10 rows
+- [x] **A11 — New allowance / charge / VAT-breakdown BTs** · done · 10 rows
   - BG-20: BT-173, BT-174, BT-213 · BG-21: BT-175, BT-176, BT-177, BT-177-1, BT-214
   - BG-23: BT-184 (`cbc:TaxAmount/@currencyID`), BT-210
   - **Discriminator:** BT-105 and BT-177 share `cbc:AllowanceChargeReasonCode`. BT-177 is the one
@@ -378,7 +394,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A8 | 2026-09-05 | `[4.0.0 A8]` | Also added `parseDateTime` to the shared base for UNTDID 2379 format "208", which is what makes BT-166 possible at all. |
 | A9 | 2026-09-05 | `[4.0.0 A9]` | One `cac:PaymentTerms` per CII container, so the three groups stay distinguishable; asserted by two `assertNoXPath` checks that they are never merged. |
 | A10 | 2026-09-05 | `[4.0.0 A10]` | BT-179-1 has no CII counterpart, so a 1-based sequence number is synthesised. Note BT-215/216 were already done in A8. |
-| A11 | | | |
+| A11 | 2026-09-05 | `[4.0.0 A11]` | **Trap found:** the CII schema declares `default="4465_AllowanceChargeReasonCode"` on `@listID`, so JAXB always reports one. Only the fixed `5153` of BT-177-1 may be propagated — see 4.4c. |
 | A12 | | | |
 | A13 | | | |
 | A14 | | | |

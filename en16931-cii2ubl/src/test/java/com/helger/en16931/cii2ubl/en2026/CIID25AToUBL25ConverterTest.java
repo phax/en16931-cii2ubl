@@ -496,4 +496,45 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aCN, "cac:CollectionCreditNoteLine[1]/cbc:TaxInclusiveLineExtensionAmount", "3.2");
     assertXPath (aCN, "cac:CollectionCreditNoteLine[2]/cac:Item/cbc:Description", "Recycling fee");
   }
+
+  @Test
+  public void testConvertNewAllowanceChargeAndVatTerms ()
+  {
+    final Element aInv = convertAndValidate ("d25a-new-allowchg-invoice.xml", true);
+
+    // BG-20 DOCUMENT LEVEL ALLOWANCES
+    final String sAllow = "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cac:TaxCategory/";
+    // BT-173 Document level allowance exemption reason text
+    assertXPath (aInv, sAllow + "cbc:TaxExemptionReason", "Intra-community supply");
+    // BT-174 VAT exemption reason and specification code
+    assertXPath (aInv, sAllow + "cbc:TaxExemptionReasonCode", "VATEX-EU-IC");
+    // BT-213 Document level allowance goods/services code
+    assertXPath (aInv, sAllow + "cbc:SupplyTypeCode", "SUPPLY-A");
+
+    // BG-21 DOCUMENT LEVEL CHARGES AND TAXES
+    final String sCharge = "cac:AllowanceCharge[cbc:ChargeIndicator='true']/";
+    // BT-177 Document level non-VAT tax code + BT-177-1 its list identifier.
+    // BT-105 and BT-177 share cbc:AllowanceChargeReasonCode and are told apart by @listID.
+    assertXPath (aInv, sCharge + "cbc:AllowanceChargeReasonCode", "ENV");
+    assertXPath (aInv, sCharge + "cbc:AllowanceChargeReasonCode/@listID", "5153");
+    assertXPath (aInv, sCharge + "cbc:AllowanceChargeReasonCode/@listAgencyID", "6");
+    // BT-175 Document level charge or tax exemption reason text
+    assertXPath (aInv, sCharge + "cac:TaxCategory/cbc:TaxExemptionReason", "Not subject to VAT");
+    // BT-176 VAT exemption reason and specification code of the charge
+    assertXPath (aInv, sCharge + "cac:TaxCategory/cbc:TaxExemptionReasonCode", "VATEX-EU-O");
+    // BT-214 Document level charge goods/services code
+    assertXPath (aInv, sCharge + "cac:TaxCategory/cbc:SupplyTypeCode", "SUPPLY-B");
+
+    // BT-105 keeps no list identifier, so the allowance reason code stays plain
+    assertNoXPath (aInv, "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:AllowanceChargeReasonCode/@listID");
+
+    // BG-23 VAT BREAKDOWN
+    final String sVat2 = "cac:TaxTotal/cac:TaxSubtotal[cac:TaxCategory/cbc:ID='AE']/";
+    // BT-184 VAT breakdown currency overrides the invoice currency for this breakdown
+    assertXPath (aInv, sVat2 + "cbc:TaxAmount/@currencyID", "USD");
+    // BT-210 VAT breakdown goods/services code
+    assertXPath (aInv, sVat2 + "cac:TaxCategory/cbc:SupplyTypeCode", "SUPPLY-C");
+    // The other breakdown keeps the invoice currency
+    assertXPath (aInv, "cac:TaxTotal/cac:TaxSubtotal[cac:TaxCategory/cbc:ID='S']/cbc:TaxAmount/@currencyID", "EUR");
+  }
 }

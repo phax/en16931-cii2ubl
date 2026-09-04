@@ -61,6 +61,11 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
   private static final String UBL_VERSION = "2.5";
   /** BT-32-2 National tax code - a fixed value since EN 16931:2026 */
   public static final String NATIONAL_TAX_SCHEME = "LOC";
+  /**
+   * BT-177-1 / BT-193-1 list identifier of the non-VAT tax code (UNTDID 5153). It is the only
+   * value that distinguishes BT-177 from BT-105 and BT-193 from BT-145.
+   */
+  public static final String NON_VAT_TAX_CODE_LIST_ID = "5153";
 
   public CIID25AToUBL25Converter ()
   {}
@@ -466,8 +471,23 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
                                      @Nullable final String sDefaultCurrencyCode)
   {
     // BT-98/BT-105/BT-140/BT-145 Reason code
+    // BT-177/BT-177-1 and BT-193/BT-193-1 (non-VAT tax code, new in EN 16931:2026) share this
+    // element with BT-105/BT-145 and are told apart by @listID="5153".
+    // Note: the CII schema declares a default of "4465_AllowanceChargeReasonCode" for @listID and
+    // "6" for @listAgencyID, so JAXB always reports a value. Only the fixed value "5153" of
+    // BT-177-1 / BT-193-1 may be carried over, otherwise every BT-105 would get a bogus list ID.
     if (StringHelper.isNotEmpty (aAllowanceCharge.getReasonCodeValue ()))
-      aUBLAllowanceCharge.setAllowanceChargeReasonCode (aAllowanceCharge.getReasonCodeValue ());
+    {
+      final AllowanceChargeReasonCodeType aUBLReasonCode = new AllowanceChargeReasonCodeType ();
+      aUBLReasonCode.setValue (aAllowanceCharge.getReasonCodeValue ());
+      if (aAllowanceCharge.getReasonCode () != null &&
+          NON_VAT_TAX_CODE_LIST_ID.equals (aAllowanceCharge.getReasonCode ().getListID ()))
+      {
+        aUBLReasonCode.setListID (NON_VAT_TAX_CODE_LIST_ID);
+        aUBLReasonCode.setListAgencyID (aAllowanceCharge.getReasonCode ().getListAgencyID ());
+      }
+      aUBLAllowanceCharge.setAllowanceChargeReasonCode (aUBLReasonCode);
+    }
 
     // BT-97/BT-104/BT-139/BT-144 Reason
     if (aAllowanceCharge.getReason () != null)
@@ -501,6 +521,15 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       aUBLTaxCategory.setID (aTradeTax.getCategoryCodeValue ());
       if (aTradeTax.getRateApplicablePercentValue () != null)
         aUBLTaxCategory.setPercent (BigHelper.getWithoutTrailingZeroes (aTradeTax.getRateApplicablePercentValue ()));
+
+      // BT-173/BT-175 Exemption reason text - new in EN 16931:2026
+      ifNotEmpty (aTradeTax.getExemptionReasonValue (),
+                  x -> aUBLTaxCategory.addTaxExemptionReason (new TaxExemptionReasonType (x)));
+      // BT-174/BT-176 VAT exemption reason and specification code - new in EN 16931:2026
+      ifNotEmpty (aTradeTax.getExemptionReasonCodeValue (), aUBLTaxCategory::setTaxExemptionReasonCode);
+      // BT-213/BT-214 Goods/services code - new in EN 16931:2026
+      ifNotEmpty (aTradeTax.getSupplyTypeCodeValue (), aUBLTaxCategory::setSupplyTypeCode);
+
       final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
       aUBLTaxScheme.setID (getVATScheme ());
       aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -1411,9 +1440,13 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         // BT-117 VAT category tax amount
         if (aTradeTax.hasCalculatedAmountEntries ())
         {
+          // BT-184 VAT breakdown currency - new in EN 16931:2026. If present it takes precedence
+          // over the invoice currency for this breakdown.
+          final String sBreakdownCurrency = StringHelper.getNotEmpty (aTradeTax.getCurrencyCodeValue (),
+                                                                      sDefaultCurrencyCode);
           aUBLTaxSubtotal.setTaxAmount (copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
                                                     new TaxAmountType (),
-                                                    sDefaultCurrencyCode));
+                                                    sBreakdownCurrency));
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -1434,6 +1467,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           aUBLTaxExemptionReason.setLanguageLocaleID (aTradeTax.getExemptionReason ().getLanguageLocaleID ());
           aUBLTaxCategory.addTaxExemptionReason (aUBLTaxExemptionReason);
         }
+        // BT-210 VAT breakdown goods/services code - new in EN 16931:2026
+        ifNotEmpty (aTradeTax.getSupplyTypeCodeValue (), aUBLTaxCategory::setSupplyTypeCode);
+
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
@@ -2457,9 +2493,13 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         // BT-117 VAT category tax amount
         if (aTradeTax.hasCalculatedAmountEntries ())
         {
+          // BT-184 VAT breakdown currency - new in EN 16931:2026. If present it takes precedence
+          // over the invoice currency for this breakdown.
+          final String sBreakdownCurrency = StringHelper.getNotEmpty (aTradeTax.getCurrencyCodeValue (),
+                                                                      sDefaultCurrencyCode);
           aUBLTaxSubtotal.setTaxAmount (copyAmount (aTradeTax.getCalculatedAmountAtIndex (0),
                                                     new TaxAmountType (),
-                                                    sDefaultCurrencyCode));
+                                                    sBreakdownCurrency));
         }
 
         final TaxCategoryType aUBLTaxCategory = new TaxCategoryType ();
@@ -2480,6 +2520,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           aUBLTaxExemptionReason.setLanguageLocaleID (aTradeTax.getExemptionReason ().getLanguageLocaleID ());
           aUBLTaxCategory.addTaxExemptionReason (aUBLTaxExemptionReason);
         }
+        // BT-210 VAT breakdown goods/services code - new in EN 16931:2026
+        ifNotEmpty (aTradeTax.getSupplyTypeCodeValue (), aUBLTaxCategory::setSupplyTypeCode);
+
         final TaxSchemeType aUBLTaxScheme = new TaxSchemeType ();
         aUBLTaxScheme.setID (getVATScheme ());
         aUBLTaxCategory.setTaxScheme (aUBLTaxScheme);
