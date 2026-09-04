@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A7 done, next up A8** — Phase 3 (all 214 carried-over rows) complete · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A8 done, next up A9** — Phase 3 complete; Phase 4 in progress (9 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -262,7 +262,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 
 ### Phase 4 — The 70 new rows
 
-- [ ] **A8 — New header BTs** · ~half session · 9 rows
+- [x] **A8 — New header BTs** · done · 9 rows
   - BT-166 (`cbc:IssueTime`), BT-166-1, BT-167 / 167-1 / 167-2 (`cac:TaxExchangeRate`),
     BT-197 (`cac:DeliveryNoteDocumentReference`), BT-202 (BG-3 preceding invoice type code),
     BT-215 / BT-216 (BG-19 debited account PSP identifier and name).
@@ -375,7 +375,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A5 | 2026-09-04 | `[4.0.0 A5]` d9c9af4 | Bulk port instead of hand-porting. 17 compile errors, all cardinality widenings (4.4b). Also corrected the A3 skeleton's wrong BT-27 mapping. |
 | A6 | 2026-09-04 | `[4.0.0 A6]` | All 180 shared rows diffed programmatically between the two mapping docs; 58 differed, of which 6 were real changes (the rest were base-path notation). Verified with two new header test files. |
 | A7 | 2026-09-05 | `[4.0.0 A7]` | `d25a-full-invoice.xml` + `d25a-full-creditnote.xml` cover BG-3 … BG-32 with ~150 XPath assertions. 6 test files, 10 tests, all green. |
-| A8 | | | |
+| A8 | 2026-09-05 | `[4.0.0 A8]` | Also added `parseDateTime` to the shared base for UNTDID 2379 format "208", which is what makes BT-166 possible at all. |
 | A9 | | | |
 | A10 | | | |
 | A11 | | | |

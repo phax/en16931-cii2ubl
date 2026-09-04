@@ -394,4 +394,44 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aCN, "cac:CreditNoteLine/cac:Price/cbc:PriceAmount", "25");
     assertXPath (aCN, "cac:CreditNoteLine/cac:Item/cac:AdditionalItemProperty[1]/cbc:Value", "Blue");
   }
+
+  @Test
+  public void testConvertNewHeaderTerms ()
+  {
+    final Element aInv = convertAndValidate ("d25a-new-header-invoice.xml", true);
+
+    // BT-2 + BT-166: CII @format "208" carries date AND time in a single element
+    assertXPath (aInv, "cbc:IssueDate", "2026-01-15");
+    assertXPath (aInv, "cbc:IssueTime", "12:05:03+01:00");
+
+    // BT-167 + BT-167-1 + BT-167-2 VAT accounting currency exchange rate
+    assertXPath (aInv, "cac:TaxExchangeRate/cbc:CalculationRate", "1.1000");
+    assertXPath (aInv, "cac:TaxExchangeRate/cbc:TargetCurrencyCode", "EUR");
+    assertXPath (aInv, "cac:TaxExchangeRate/cbc:SourceCurrencyCode", "USD");
+
+    // BT-197 Delivery note reference
+    assertXPath (aInv, "cac:DeliveryNoteDocumentReference/cbc:ID", "DELNOTE-8");
+
+    // BT-202 Preceding invoice type code
+    assertXPath (aInv,
+                 "cac:BillingReference[cac:InvoiceDocumentReference/cbc:ID='PREV-INV-1']/cac:InvoiceDocumentReference/cbc:DocumentTypeCode",
+                 "380");
+    // The second preceding invoice has no type code
+    assertNoXPath (aInv,
+                   "cac:BillingReference[cac:InvoiceDocumentReference/cbc:ID='PREV-INV-2']/cac:InvoiceDocumentReference/cbc:DocumentTypeCode");
+
+    // BG-19 DIRECT DEBIT with BT-215 and BT-216
+    final String sMandate = "cac:PaymentMeans/cac:PaymentMandate/";
+    assertXPath (aInv, "cac:PaymentMeans/cbc:PaymentMeansCode", "59");
+    // BT-89 Mandate reference identifier
+    assertXPath (aInv, sMandate + "cbc:ID", "MANDATE-1");
+    // BT-91 Debited account identifier
+    assertXPath (aInv, sMandate + "cac:PayerFinancialAccount/cbc:ID", "AT022050302101023600");
+    // BT-216 Debited account name
+    assertXPath (aInv, sMandate + "cac:PayerFinancialAccount/cbc:Name", "Buyer Account");
+    // BT-215 Debited account payment service provider identifier
+    assertXPath (aInv, sMandate + "cac:PayerFinancialAccount/cac:FinancialInstitutionBranch/cbc:ID", "SPSBAT2SXXX");
+    // BT-90 + BT-90-1 Bank assigned creditor identifier, on the Payee if present
+    assertXPath (aInv, "cac:PayeeParty/cac:PartyIdentification[cbc:ID/@schemeID='SEPA']/cbc:ID", "SEPA-CRED-1");
+  }
 }

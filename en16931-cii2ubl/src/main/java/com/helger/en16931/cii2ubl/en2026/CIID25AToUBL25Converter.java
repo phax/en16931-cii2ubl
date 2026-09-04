@@ -31,6 +31,7 @@ import com.helger.base.numeric.BigHelper;
 import com.helger.base.state.ETriState;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.CollectionFind;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.diagnostics.error.list.IErrorList;
 
@@ -641,12 +642,11 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       if (aAccount != null)
       {
         aUBLFinancialAccount.setID (_copyID (aAccount.getIBANID ()));
-        // Name is not mapped
-        if (false)
-          aUBLFinancialAccount.setName (copyName (aAccount.getAccountName (), new NameType ()));
+        // BT-216 Debited account name - new in EN 16931:2026
+        ifNotNull (copyName (aAccount.getAccountName (), new NameType ()), aUBLFinancialAccount::setName);
       }
 
-      // BT-86
+      // BT-215 Debited account payment service provider identifier - new in EN 16931:2026
       final DebtorFinancialInstitutionType aInstitution = aPaymentMeans.getPayerSpecifiedDebtorFinancialInstitution ();
       if (aInstitution != null)
       {
@@ -756,14 +756,31 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     final CustomerPartyType aUBLCustomer = new CustomerPartyType ();
     aUBLInvoice.setAccountingCustomerParty (aUBLCustomer);
 
-    // BT-2 Invoice issue date
+    // BT-2 Invoice issue date + BT-166 Invoice issue time
+    // CII represents both with a single element; @format "102" is date only (BT-2-1) and
+    // @format "208" is date and time (BT-166-1).
     {
-      LocalDate aIssueDate = null;
-      if (aED != null && aED.getIssueDateTime () != null)
-        aIssueDate = parseDate (aED.getIssueDateTime ().getDateTimeString (), aErrorList);
-
-      if (aIssueDate != null)
-        aUBLInvoice.setIssueDate (aIssueDate);
+      final un.unece.uncefact.data.standard.cii.d25a.udt.DateTimeType.DateTimeString aDTS = aED == null ||
+                                                                                            aED.getIssueDateTime () == null ? null
+                                                                                                                            : aED.getIssueDateTime ()
+                                                                                                                                 .getDateTimeString ();
+      if (aDTS != null)
+        if (DATE_TIME_FORMAT_WITH_TIME.equals (aDTS.getFormat ()))
+        {
+          final XMLOffsetDateTime aIssueDateTime = parseDateTime (aDTS.getValue (), aDTS.getFormat (), aErrorList);
+          if (aIssueDateTime != null)
+          {
+            aUBLInvoice.setIssueDate (aIssueDateTime.toLocalDate ());
+            // BT-166
+            aUBLInvoice.setIssueTime (aIssueDateTime.toXMLOffsetTime ());
+          }
+        }
+        else
+        {
+          final LocalDate aIssueDate = parseDate (aDTS, aErrorList);
+          if (aIssueDate != null)
+            aUBLInvoice.setIssueDate (aIssueDate);
+        }
     }
 
     // BT-9 Payment due date
@@ -807,6 +824,22 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // BT-5 Invoice currency code
     final String sDefaultCurrencyCode = aHeaderSettlement.getInvoiceCurrencyCodeValue ();
     aUBLInvoice.setDocumentCurrencyCode (sDefaultCurrencyCode);
+
+    // BT-167 VAT accounting currency exchange rate + BT-167-1 target and BT-167-2 source currency
+    // New in EN 16931:2026
+    {
+      final TradeCurrencyExchangeType aExchange = aHeaderSettlement.getInvoiceApplicableTradeCurrencyExchange ();
+      if (aExchange != null && aExchange.getConversionRateValue () != null)
+      {
+        final ExchangeRateType aUBLExchangeRate = new ExchangeRateType ();
+        aUBLExchangeRate.setCalculationRate (aExchange.getConversionRateValue ());
+        // BT-167-1
+        ifNotEmpty (aExchange.getTargetCurrencyCodeValue (), aUBLExchangeRate::setTargetCurrencyCode);
+        // BT-167-2
+        ifNotEmpty (aExchange.getSourceCurrencyCodeValue (), aUBLExchangeRate::setSourceCurrencyCode);
+        aUBLInvoice.setTaxExchangeRate (aUBLExchangeRate);
+      }
+    }
 
     // BT-6 VAT accounting currency code
     if (aHeaderSettlement.getTaxCurrencyCodeValue () != null)
@@ -882,6 +915,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
         if (aUBLDocRef != null)
         {
+          // BT-202 Preceding invoice type code - new in EN 16931:2026
+          ifNotEmpty (aRD.getTypeCodeValue (), aUBLDocRef::setDocumentTypeCode);
+
           final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
           aUBLBillingRef.setInvoiceDocumentReference (aUBLDocRef);
           aUBLInvoice.addBillingReference (aUBLBillingRef);
@@ -903,6 +939,14 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
                                                                           aErrorList);
       if (aUBLDocRef != null)
         aUBLInvoice.addReceiptDocumentReference (aUBLDocRef);
+    }
+
+    // BT-197 Delivery note reference - new in EN 16931:2026
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getDeliveryNoteReferencedDocument (),
+                                                                          aErrorList);
+      if (aUBLDocRef != null)
+        aUBLInvoice.addDeliveryNoteDocumentReference (aUBLDocRef);
     }
 
     // BT-17 Tender or lot reference (OriginatorDocumentReference)
@@ -1704,14 +1748,31 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     final CustomerPartyType aUBLCustomer = new CustomerPartyType ();
     aUBLCreditNote.setAccountingCustomerParty (aUBLCustomer);
 
-    // BT-2 Invoice issue date
+    // BT-2 Invoice issue date + BT-166 Invoice issue time
+    // CII represents both with a single element; @format "102" is date only (BT-2-1) and
+    // @format "208" is date and time (BT-166-1).
     {
-      LocalDate aIssueDate = null;
-      if (aED != null && aED.getIssueDateTime () != null)
-        aIssueDate = parseDate (aED.getIssueDateTime ().getDateTimeString (), aErrorList);
-
-      if (aIssueDate != null)
-        aUBLCreditNote.setIssueDate (aIssueDate);
+      final un.unece.uncefact.data.standard.cii.d25a.udt.DateTimeType.DateTimeString aDTS = aED == null ||
+                                                                                            aED.getIssueDateTime () == null ? null
+                                                                                                                            : aED.getIssueDateTime ()
+                                                                                                                                 .getDateTimeString ();
+      if (aDTS != null)
+        if (DATE_TIME_FORMAT_WITH_TIME.equals (aDTS.getFormat ()))
+        {
+          final XMLOffsetDateTime aIssueDateTime = parseDateTime (aDTS.getValue (), aDTS.getFormat (), aErrorList);
+          if (aIssueDateTime != null)
+          {
+            aUBLCreditNote.setIssueDate (aIssueDateTime.toLocalDate ());
+            // BT-166
+            aUBLCreditNote.setIssueTime (aIssueDateTime.toXMLOffsetTime ());
+          }
+        }
+        else
+        {
+          final LocalDate aIssueDate = parseDate (aDTS, aErrorList);
+          if (aIssueDate != null)
+            aUBLCreditNote.setIssueDate (aIssueDate);
+        }
     }
 
     // BT-9 Payment due date
@@ -1757,6 +1818,22 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // BT-5 Invoice currency code
     final String sDefaultCurrencyCode = aHeaderSettlement.getInvoiceCurrencyCodeValue ();
     aUBLCreditNote.setDocumentCurrencyCode (sDefaultCurrencyCode);
+
+    // BT-167 VAT accounting currency exchange rate + BT-167-1 target and BT-167-2 source currency
+    // New in EN 16931:2026
+    {
+      final TradeCurrencyExchangeType aExchange = aHeaderSettlement.getInvoiceApplicableTradeCurrencyExchange ();
+      if (aExchange != null && aExchange.getConversionRateValue () != null)
+      {
+        final ExchangeRateType aUBLExchangeRate = new ExchangeRateType ();
+        aUBLExchangeRate.setCalculationRate (aExchange.getConversionRateValue ());
+        // BT-167-1
+        ifNotEmpty (aExchange.getTargetCurrencyCodeValue (), aUBLExchangeRate::setTargetCurrencyCode);
+        // BT-167-2
+        ifNotEmpty (aExchange.getSourceCurrencyCodeValue (), aUBLExchangeRate::setSourceCurrencyCode);
+        aUBLCreditNote.setTaxExchangeRate (aUBLExchangeRate);
+      }
+    }
 
     // BT-6 VAT accounting currency code
     if (aHeaderSettlement.getTaxCurrencyCodeValue () != null)
@@ -1832,6 +1909,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
         if (aUBLDocRef != null)
         {
+          // BT-202 Preceding invoice type code - new in EN 16931:2026
+          ifNotEmpty (aRD.getTypeCodeValue (), aUBLDocRef::setDocumentTypeCode);
+
           final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
           // Must be the InvoiceDocumentReference - even for CreditNotes
           aUBLBillingRef.setInvoiceDocumentReference (aUBLDocRef);
@@ -1854,6 +1934,14 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
                                                                           aErrorList);
       if (aUBLDocRef != null)
         aUBLCreditNote.addReceiptDocumentReference (aUBLDocRef);
+    }
+
+    // BT-197 Delivery note reference - new in EN 16931:2026
+    {
+      final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aHeaderDelivery.getDeliveryNoteReferencedDocument (),
+                                                                          aErrorList);
+      if (aUBLDocRef != null)
+        aUBLCreditNote.addDeliveryNoteDocumentReference (aUBLDocRef);
     }
 
     // BT-17 Tender or lot reference (OriginatorDocumentReference)

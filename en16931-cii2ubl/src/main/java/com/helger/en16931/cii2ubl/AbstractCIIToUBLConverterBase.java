@@ -34,6 +34,7 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.string.StringImplode;
 import com.helger.base.trait.IGenericImplTrait;
 import com.helger.datetime.format.PDTFromString;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.diagnostics.error.IError;
 import com.helger.diagnostics.error.SingleError;
 import com.helger.diagnostics.error.list.ErrorList;
@@ -57,6 +58,13 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
   public static final String DEFAULT_VAT_SCHEME = "VAT";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
   public static final String DEFAULT_DATE_TIME_FORMAT = "102";
+  /**
+   * UNTDID 2379 format "208" - CCYYMMDDHHMMSSZHHMM. Used by EN 16931:2026 when BT-166 (Invoice
+   * issue time) is present.
+   *
+   * @since 4.0.0
+   */
+  public static final String DATE_TIME_FORMAT_WITH_TIME = "208";
   public static final String DEFAULT_ORDER_REF_ID = "";
   public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
   public static final boolean DEFAULT_SWAP_PRICE_SIGN_IF_NEEDED = true;
@@ -261,6 +269,46 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
         yield null;
       }
     };
+  }
+
+  /**
+   * Parse a UNTDID 2379 formatted date and time. Only format "208" (CCYYMMDDHHMMSSZHHMM) carries a
+   * time, which is what EN 16931:2026 uses when BT-166 is present.
+   *
+   * @param sDateTime
+   *        The value to parse. May be <code>null</code>.
+   * @param sFormat
+   *        Format to use. May be <code>null</code>.
+   * @param aErrorList
+   *        The error list to be filled. May not be <code>null</code>.
+   * @return <code>null</code> if the value could not be parsed.
+   * @since 4.0.0
+   */
+  @Nullable
+  protected static XMLOffsetDateTime parseDateTime (@Nullable final String sDateTime,
+                                                    @Nullable final String sFormat,
+                                                    @NonNull final IErrorList aErrorList)
+  {
+    if (StringHelper.isEmpty (sDateTime))
+      return null;
+
+    if (!DATE_TIME_FORMAT_WITH_TIME.equals (sFormat))
+    {
+      aErrorList.add (buildError (null, "Unsupported date time format '" + sFormat + "'"));
+      return null;
+    }
+
+    final XMLOffsetDateTime aDateTime = PDTFromString.getXMLOffsetDateTimeFromString (sDateTime,
+                                                                                     "uuuuMMddHHmmssZ");
+    if (aDateTime == null)
+      aErrorList.add (buildError (null,
+                                  "Failed to parse the date time '" +
+                                        sDateTime +
+                                        "' using format '" +
+                                        sFormat +
+                                        "'"));
+
+    return aDateTime;
   }
 
   @Nullable
