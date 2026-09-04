@@ -101,6 +101,9 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v3.1.8 - work in progress
+* Added `docs/en16931-2026-syntax.md` with the three-way field mapping (UBL 2.5 invoice / UBL 2.5 credit note / CII D25A) of EN 16931:2026, extracted from the CEN/TS 16931-3-2:2026 and CEN/TS 16931-3-3:2026 Formal Vote drafts
+
 v3.1.7 - 2026-04-22
 * Fixed BT-150 (Item price base quantity unit of measure): now falls back to the net price unitCode when no gross price is present, instead of losing it
 * Fixed BT-61/BT-61-1 (Payee legal registration identifier): `_convertPartyLegalEntity` is now called for the Payee party, mapping `SpecifiedLegalOrganization/ID` to `PartyLegalEntity/CompanyID`
