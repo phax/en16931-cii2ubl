@@ -725,6 +725,37 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     return aUBLOrderRef;
   }
 
+  @Nullable
+  private static DocumentReferenceType _toDocumentReference (@Nullable final String sID)
+  {
+    if (StringHelper.isEmpty (sID))
+      return null;
+
+    final DocumentReferenceType ret = new DocumentReferenceType ();
+    ret.setID (sID);
+    return ret;
+  }
+
+  // BT-189/BT-190, BT-191/BT-192: a UBL LineReference with a mandatory cbc:LineID plus the
+  // referenced document identifier
+  @Nullable
+  private static LineReferenceType _toLineReference (@Nullable final ReferencedDocumentType aRD)
+  {
+    if (aRD == null)
+      return null;
+
+    final String sLineID = aRD.getLineIDValue ();
+    final DocumentReferenceType aUBLDocRef = _toDocumentReference (aRD.getIssuerAssignedIDValue ());
+    if (StringHelper.isEmpty (sLineID) && aUBLDocRef == null)
+      return null;
+
+    final LineReferenceType ret = new LineReferenceType ();
+    // cbc:LineID is mandatory in UBL
+    ret.setLineID (StringHelper.isNotEmpty (sLineID) ? sLineID : "1");
+    ret.setDocumentReference (aUBLDocRef);
+    return ret;
+  }
+
   // BG-35 EARLY PAYMENT DISCOUNT (BT-170/BT-170-1/BT-171/BT-172) - new in EN 16931:2026
   @Nullable
   private static PaymentTermsType _convertEarlyPaymentDiscount (@Nullable final TradePaymentDiscountTermsType aDiscount,
@@ -1600,17 +1631,113 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           aUBLInvoiceLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
-      // BT-132 Referenced purchase order line reference
+      // BT-132 Referenced purchase order line reference + BT-188 Invoice line purchase order
+      // reference + BT-200/BT-201 Invoice line sales order reference (new in EN 16931:2026)
       final LineTradeAgreementType aLineAgreement = aLineItem.getSpecifiedLineTradeAgreement ();
       if (aLineAgreement != null)
       {
         final ReferencedDocumentType aBuyerOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
-        if (aBuyerOrderReference != null && StringHelper.isNotEmpty (aBuyerOrderReference.getLineIDValue ()))
+        final ReferencedDocumentType aSellerOrderReference = aLineAgreement.getSellerOrderReferencedDocument ();
+        final String sBuyerOrderID = aBuyerOrderReference == null ? null : aBuyerOrderReference.getIssuerAssignedIDValue ();
+        final String sSellerOrderID = aSellerOrderReference == null ? null : aSellerOrderReference.getIssuerAssignedIDValue ();
+        final boolean bHasBuyerOrderRef = aBuyerOrderReference != null &&
+                                          (StringHelper.isNotEmpty (aBuyerOrderReference.getLineIDValue ()) ||
+                                           StringHelper.isNotEmpty (sBuyerOrderID));
+        final boolean bHasSellerOrderRef = aSellerOrderReference != null &&
+                                           (StringHelper.isNotEmpty (aSellerOrderReference.getLineIDValue ()) ||
+                                            StringHelper.isNotEmpty (sSellerOrderID));
+        if (bHasBuyerOrderRef || bHasSellerOrderRef)
         {
           final OrderLineReferenceType aUBLOrderLineReference = new OrderLineReferenceType ();
-          aUBLOrderLineReference.setLineID (copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
+          // BT-132
+          if (aBuyerOrderReference != null)
+            aUBLOrderLineReference.setLineID (copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
+          // BT-201 Invoice line sales order line reference - new in EN 16931:2026
+          if (aSellerOrderReference != null)
+            ifNotEmpty (aSellerOrderReference.getLineIDValue (), aUBLOrderLineReference::setSalesOrderLineID);
+
+          // BT-188 Invoice line purchase order reference + BT-200 Invoice line sales order
+          // reference - both new in EN 16931:2026
+          if (StringHelper.isNotEmpty (sBuyerOrderID) || StringHelper.isNotEmpty (sSellerOrderID))
+          {
+            final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
+            // cbc:ID is mandatory in UBL
+            aUBLOrderRef.setID (StringHelper.isNotEmpty (sBuyerOrderID) ? sBuyerOrderID : getDefaultOrderRefID ());
+            ifNotEmpty (sSellerOrderID, aUBLOrderRef::setSalesOrderID);
+            aUBLOrderLineReference.setOrderReference (aUBLOrderRef);
+          }
           aUBLInvoiceLine.addOrderLineReference (aUBLOrderLineReference);
         }
+      }
+
+      // BT-189/BT-190 despatch advice, BT-191/BT-192 receiving advice and BT-198/BT-199 delivery
+      // note references at line level - all new in EN 16931:2026
+      {
+        final LineTradeDeliveryType aRefLineDelivery = aLineItem.getSpecifiedLineTradeDelivery ();
+        if (aRefLineDelivery != null)
+        {
+          // BT-189 + BT-190
+          ifNotNull (_toLineReference (aRefLineDelivery.getDespatchAdviceReferencedDocument ()),
+                     aUBLInvoiceLine::addDespatchLineReference);
+          // BT-191 + BT-192
+          ifNotNull (_toLineReference (aRefLineDelivery.getReceivingAdviceReferencedDocument ()),
+                     aUBLInvoiceLine::addReceiptLineReference);
+
+          // BT-198 + BT-199 - the delivery note reference lives inside cac:Delivery
+          final ReferencedDocumentType aDeliveryNote = aRefLineDelivery.getDeliveryNoteReferencedDocument ();
+          if (aDeliveryNote != null)
+          {
+            final DeliveryType aUBLDelivery = new DeliveryType ();
+            // BT-198
+            ifNotNull (_toDocumentReference (aDeliveryNote.getIssuerAssignedIDValue ()),
+                       aUBLDelivery::addDeliveryNoteDocumentReference);
+            // BT-199
+            if (StringHelper.isNotEmpty (aDeliveryNote.getLineIDValue ()))
+            {
+              final LineReferenceType aUBLLineRef = new LineReferenceType ();
+              aUBLLineRef.setLineID (aDeliveryNote.getLineIDValue ());
+              aUBLDelivery.addDeliveryNoteLineReference (aUBLLineRef);
+            }
+            if (aUBLDelivery.hasDeliveryNoteDocumentReferenceEntries () ||
+                aUBLDelivery.hasDeliveryNoteLineReferenceEntries ())
+              aUBLInvoiceLine.addDelivery (aUBLDelivery);
+          }
+        }
+      }
+
+      // BG-39 LINE-LEVEL PRECEDING INVOICE REFERENCE (BT-217/BT-218/BT-219/BT-220)
+      // New in EN 16931:2026
+      {
+        final LineTradeSettlementType aRefLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
+        if (aRefLineSettlement != null)
+          for (final ReferencedDocumentType aRD : aRefLineSettlement.getInvoiceReferencedDocument ())
+          {
+            // BT-217 Line-level preceding invoice reference - mandatory within BG-39
+            if (StringHelper.isEmpty (aRD.getIssuerAssignedIDValue ()))
+              continue;
+
+            final DocumentReferenceType aUBLDocRef = new DocumentReferenceType ();
+            aUBLDocRef.setID (aRD.getIssuerAssignedIDValue ());
+            // BT-218 Line-level preceding invoice issue date.
+            // The mapping table names cbc:IssueTime here, but that element is an xs:time and
+            // cannot hold a date, so cbc:IssueDate is used - consistent with BT-26 at header level.
+            if (aRD.getFormattedIssueDateTime () != null)
+              ifNotNull (parseDate (aRD.getFormattedIssueDateTime ().getDateTimeString (), aErrorList),
+                         aUBLDocRef::setIssueDate);
+            // BT-219 Line-level preceding invoice type code
+            ifNotEmpty (aRD.getTypeCodeValue (), aUBLDocRef::setDocumentTypeCode);
+
+            final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
+            aUBLBillingRef.setInvoiceDocumentReference (aUBLDocRef);
+            // BT-220 Line-level preceding invoice line reference
+            if (StringHelper.isNotEmpty (aRD.getLineIDValue ()))
+            {
+              final BillingReferenceLineType aUBLBillingRefLine = new BillingReferenceLineType ();
+              aUBLBillingRefLine.setID (aRD.getLineIDValue ());
+              aUBLBillingRef.addBillingReferenceLine (aUBLBillingRefLine);
+            }
+            aUBLInvoiceLine.addBillingReference (aUBLBillingRef);
+          }
       }
 
       // BT-128/BT-128-1 Invoice line object identifier
@@ -2652,17 +2779,113 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           aUBLCreditNoteLine.addInvoicePeriod (aUBLLinePeriod);
       }
 
-      // BT-132 Referenced purchase order line reference
+      // BT-132 Referenced purchase order line reference + BT-188 Invoice line purchase order
+      // reference + BT-200/BT-201 Invoice line sales order reference (new in EN 16931:2026)
       final LineTradeAgreementType aLineAgreement = aLineItem.getSpecifiedLineTradeAgreement ();
       if (aLineAgreement != null)
       {
         final ReferencedDocumentType aBuyerOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
-        if (aBuyerOrderReference != null && StringHelper.isNotEmpty (aBuyerOrderReference.getLineIDValue ()))
+        final ReferencedDocumentType aSellerOrderReference = aLineAgreement.getSellerOrderReferencedDocument ();
+        final String sBuyerOrderID = aBuyerOrderReference == null ? null : aBuyerOrderReference.getIssuerAssignedIDValue ();
+        final String sSellerOrderID = aSellerOrderReference == null ? null : aSellerOrderReference.getIssuerAssignedIDValue ();
+        final boolean bHasBuyerOrderRef = aBuyerOrderReference != null &&
+                                          (StringHelper.isNotEmpty (aBuyerOrderReference.getLineIDValue ()) ||
+                                           StringHelper.isNotEmpty (sBuyerOrderID));
+        final boolean bHasSellerOrderRef = aSellerOrderReference != null &&
+                                           (StringHelper.isNotEmpty (aSellerOrderReference.getLineIDValue ()) ||
+                                            StringHelper.isNotEmpty (sSellerOrderID));
+        if (bHasBuyerOrderRef || bHasSellerOrderRef)
         {
           final OrderLineReferenceType aUBLOrderLineReference = new OrderLineReferenceType ();
-          aUBLOrderLineReference.setLineID (copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
+          // BT-132
+          if (aBuyerOrderReference != null)
+            aUBLOrderLineReference.setLineID (copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
+          // BT-201 Invoice line sales order line reference - new in EN 16931:2026
+          if (aSellerOrderReference != null)
+            ifNotEmpty (aSellerOrderReference.getLineIDValue (), aUBLOrderLineReference::setSalesOrderLineID);
+
+          // BT-188 Invoice line purchase order reference + BT-200 Invoice line sales order
+          // reference - both new in EN 16931:2026
+          if (StringHelper.isNotEmpty (sBuyerOrderID) || StringHelper.isNotEmpty (sSellerOrderID))
+          {
+            final OrderReferenceType aUBLOrderRef = new OrderReferenceType ();
+            // cbc:ID is mandatory in UBL
+            aUBLOrderRef.setID (StringHelper.isNotEmpty (sBuyerOrderID) ? sBuyerOrderID : getDefaultOrderRefID ());
+            ifNotEmpty (sSellerOrderID, aUBLOrderRef::setSalesOrderID);
+            aUBLOrderLineReference.setOrderReference (aUBLOrderRef);
+          }
           aUBLCreditNoteLine.addOrderLineReference (aUBLOrderLineReference);
         }
+      }
+
+      // BT-189/BT-190 despatch advice, BT-191/BT-192 receiving advice and BT-198/BT-199 delivery
+      // note references at line level - all new in EN 16931:2026
+      {
+        final LineTradeDeliveryType aRefLineDelivery = aLineItem.getSpecifiedLineTradeDelivery ();
+        if (aRefLineDelivery != null)
+        {
+          // BT-189 + BT-190
+          ifNotNull (_toLineReference (aRefLineDelivery.getDespatchAdviceReferencedDocument ()),
+                     aUBLCreditNoteLine::addDespatchLineReference);
+          // BT-191 + BT-192
+          ifNotNull (_toLineReference (aRefLineDelivery.getReceivingAdviceReferencedDocument ()),
+                     aUBLCreditNoteLine::addReceiptLineReference);
+
+          // BT-198 + BT-199 - the delivery note reference lives inside cac:Delivery
+          final ReferencedDocumentType aDeliveryNote = aRefLineDelivery.getDeliveryNoteReferencedDocument ();
+          if (aDeliveryNote != null)
+          {
+            final DeliveryType aUBLDelivery = new DeliveryType ();
+            // BT-198
+            ifNotNull (_toDocumentReference (aDeliveryNote.getIssuerAssignedIDValue ()),
+                       aUBLDelivery::addDeliveryNoteDocumentReference);
+            // BT-199
+            if (StringHelper.isNotEmpty (aDeliveryNote.getLineIDValue ()))
+            {
+              final LineReferenceType aUBLLineRef = new LineReferenceType ();
+              aUBLLineRef.setLineID (aDeliveryNote.getLineIDValue ());
+              aUBLDelivery.addDeliveryNoteLineReference (aUBLLineRef);
+            }
+            if (aUBLDelivery.hasDeliveryNoteDocumentReferenceEntries () ||
+                aUBLDelivery.hasDeliveryNoteLineReferenceEntries ())
+              aUBLCreditNoteLine.addDelivery (aUBLDelivery);
+          }
+        }
+      }
+
+      // BG-39 LINE-LEVEL PRECEDING INVOICE REFERENCE (BT-217/BT-218/BT-219/BT-220)
+      // New in EN 16931:2026
+      {
+        final LineTradeSettlementType aRefLineSettlement = aLineItem.getSpecifiedLineTradeSettlement ();
+        if (aRefLineSettlement != null)
+          for (final ReferencedDocumentType aRD : aRefLineSettlement.getInvoiceReferencedDocument ())
+          {
+            // BT-217 Line-level preceding invoice reference - mandatory within BG-39
+            if (StringHelper.isEmpty (aRD.getIssuerAssignedIDValue ()))
+              continue;
+
+            final DocumentReferenceType aUBLDocRef = new DocumentReferenceType ();
+            aUBLDocRef.setID (aRD.getIssuerAssignedIDValue ());
+            // BT-218 Line-level preceding invoice issue date.
+            // The mapping table names cbc:IssueTime here, but that element is an xs:time and
+            // cannot hold a date, so cbc:IssueDate is used - consistent with BT-26 at header level.
+            if (aRD.getFormattedIssueDateTime () != null)
+              ifNotNull (parseDate (aRD.getFormattedIssueDateTime ().getDateTimeString (), aErrorList),
+                         aUBLDocRef::setIssueDate);
+            // BT-219 Line-level preceding invoice type code
+            ifNotEmpty (aRD.getTypeCodeValue (), aUBLDocRef::setDocumentTypeCode);
+
+            final BillingReferenceType aUBLBillingRef = new BillingReferenceType ();
+            aUBLBillingRef.setInvoiceDocumentReference (aUBLDocRef);
+            // BT-220 Line-level preceding invoice line reference
+            if (StringHelper.isNotEmpty (aRD.getLineIDValue ()))
+            {
+              final BillingReferenceLineType aUBLBillingRefLine = new BillingReferenceLineType ();
+              aUBLBillingRefLine.setID (aRD.getLineIDValue ());
+              aUBLBillingRef.addBillingReferenceLine (aUBLBillingRefLine);
+            }
+            aUBLCreditNoteLine.addBillingReference (aUBLBillingRef);
+          }
       }
 
       // BT-128/BT-128-1 Invoice line object identifier

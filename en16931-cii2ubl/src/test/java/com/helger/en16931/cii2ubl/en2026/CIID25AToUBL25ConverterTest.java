@@ -537,4 +537,39 @@ public final class CIID25AToUBL25ConverterTest
     // The other breakdown keeps the invoice currency
     assertXPath (aInv, "cac:TaxTotal/cac:TaxSubtotal[cac:TaxCategory/cbc:ID='S']/cbc:TaxAmount/@currencyID", "EUR");
   }
+
+  @Test
+  public void testConvertNewLineLevelReferences ()
+  {
+    final Element aInv = convertAndValidate ("d25a-new-lineref-invoice.xml", true);
+    final String sLine = "cac:InvoiceLine/";
+
+    // BT-132 Referenced purchase order line reference + BT-188 Invoice line purchase order reference
+    assertXPath (aInv, sLine + "cac:OrderLineReference/cbc:LineID", "PO-LINE-5");
+    assertXPath (aInv, sLine + "cac:OrderLineReference/cac:OrderReference/cbc:ID", "LINE-PO-1");
+    // BT-200 + BT-201 Invoice line sales order reference
+    assertXPath (aInv, sLine + "cac:OrderLineReference/cac:OrderReference/cbc:SalesOrderID", "LINE-SO-1");
+    assertXPath (aInv, sLine + "cac:OrderLineReference/cbc:SalesOrderLineID", "SO-LINE-9");
+
+    // BT-189 + BT-190 Invoice line despatch advice reference
+    assertXPath (aInv, sLine + "cac:DespatchLineReference/cbc:LineID", "DESP-LINE-2");
+    assertXPath (aInv, sLine + "cac:DespatchLineReference/cac:DocumentReference/cbc:ID", "LINE-DESP-1");
+    // BT-191 + BT-192 Invoice line receiving advice reference
+    assertXPath (aInv, sLine + "cac:ReceiptLineReference/cbc:LineID", "RECV-LINE-3");
+    assertXPath (aInv, sLine + "cac:ReceiptLineReference/cac:DocumentReference/cbc:ID", "LINE-RECV-1");
+    // BT-198 + BT-199 Invoice line delivery note reference
+    assertXPath (aInv, sLine + "cac:Delivery/cac:DeliveryNoteDocumentReference/cbc:ID", "LINE-DELN-1");
+    assertXPath (aInv, sLine + "cac:Delivery/cac:DeliveryNoteLineReference/cbc:LineID", "DELN-LINE-4");
+
+    // BG-39 LINE-LEVEL PRECEDING INVOICE REFERENCE
+    final String sBillRef = sLine + "cac:BillingReference/";
+    // BT-217 Line-level preceding invoice reference
+    assertXPath (aInv, sBillRef + "cac:InvoiceDocumentReference/cbc:ID", "LINE-PREV-INV-1");
+    // BT-218 Line-level preceding invoice issue date
+    assertXPath (aInv, sBillRef + "cac:InvoiceDocumentReference/cbc:IssueDate", "2025-12-10");
+    // BT-219 Line-level preceding invoice type code
+    assertXPath (aInv, sBillRef + "cac:InvoiceDocumentReference/cbc:DocumentTypeCode", "380");
+    // BT-220 Line-level preceding invoice line reference
+    assertXPath (aInv, sBillRef + "cac:BillingReferenceLine/cbc:ID", "PREV-LINE-7");
+  }
 }

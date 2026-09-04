@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **A0–A11 done, next up A12** — Phase 3 complete; Phase 4 in progress (30 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
+Status: **A0–A12 done, next up A13** — Phase 3 complete; Phase 4 in progress (44 of 70 new rows) · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -151,6 +151,18 @@ document has no such attribute**. Copying it blindly puts a bogus `@listID` on e
 
 Rule: propagate the list identifier **only** when it equals the fixed `5153` of BT-177-1 / BT-193-1.
 Watch for the same pattern on other `qdt:` code types before copying any `@listID` / `@listAgencyID`.
+
+### 4.4d One defect in the source mapping table
+
+`docs/en16931-2026-syntax.md` maps **BT-218 "Line-level preceding invoice issue date"** to
+`cac:InvoiceDocumentReference/cbc:IssueTime`.
+
+That is not implementable: `cbc:IssueTime` is an `xs:time` in UBL, so a `CCYYMMDD` date cannot be
+written to it — the result would fail UBL 2.5 XSD validation. The converter therefore writes
+`cbc:IssueDate`, matching BT-26 (the header-level equivalent) and the element's own semantics.
+
+**This is the one place where the implementation knowingly deviates from the table.** Worth checking
+against the published CEN/TS text and reporting upstream if it is wrong there too.
 
 ### 4.5 The D25A JAXB model is a separate Java package
 
@@ -304,7 +316,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
   - **Discriminator:** BT-105 and BT-177 share `cbc:AllowanceChargeReasonCode`. BT-177 is the one
     carrying `@listID='5153'` (BT-177-1). CII writes BT-177 as `ram:ReasonCode[.!='VAT']`.
 
-- [ ] **A12 — New line-level document references + BG-39** · ~1 session · 14 rows
+- [x] **A12 — New line-level document references + BG-39** · done · 14 rows
   - BG-25: BT-188, BT-200, BT-201, BT-189, BT-190, BT-191, BT-192, BT-198, BT-199
   - BG-39: BT-217, BT-218, BT-218-1, BT-219, BT-220 (`cac:InvoiceLine/cac:BillingReference`)
 
@@ -395,7 +407,7 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A9 | 2026-09-05 | `[4.0.0 A9]` | One `cac:PaymentTerms` per CII container, so the three groups stay distinguishable; asserted by two `assertNoXPath` checks that they are never merged. |
 | A10 | 2026-09-05 | `[4.0.0 A10]` | BT-179-1 has no CII counterpart, so a 1-based sequence number is synthesised. Note BT-215/216 were already done in A8. |
 | A11 | 2026-09-05 | `[4.0.0 A11]` | **Trap found:** the CII schema declares `default="4465_AllowanceChargeReasonCode"` on `@listID`, so JAXB always reports one. Only the fixed `5153` of BT-177-1 may be propagated — see 4.4c. |
-| A12 | | | |
+| A12 | 2026-09-05 | `[4.0.0 A12]` | **Source defect found on BT-218** — see 4.4d. |
 | A13 | | | |
 | A14 | | | |
 | A15 | | | |
