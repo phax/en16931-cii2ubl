@@ -101,9 +101,12 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-v3.1.8 - work in progress
+v4.0.0 - work in progress
+* Removed the support for creating UBL 2.2, 2.3 and 2.4 - only UBL 2.1 (EN 16931:2017) and UBL 2.5 (EN 16931:2026) remain
+* Moved the EN 16931:2017 conversion to the new package `com.helger.en16931.cii2ubl.en2017` and renamed `CIIToUBL21Converter` to `CIID16BToUBL21Converter`
+* Split `AbstractCIIToUBLConverter` into the edition independent `AbstractCIIToUBLConverterBase` and the CII D16B typed `AbstractCIIToUBL2017Converter`
+* Added `docs/plan-4.0.0.md` with the implementation plan for v4.0.0 (EN 16931:2026 syntax binding next to EN 16931:2017)
 * Added `docs/en16931-2026-syntax.md` with the three-way field mapping (UBL 2.5 invoice / UBL 2.5 credit note / CII D25A) of EN 16931:2026, extracted from the CEN/TS 16931-3-2:2026 and CEN/TS 16931-3-3:2026 Formal Vote drafts
-* Added `docs/plan-4.0.0.md` with the implementation plan for v4.0.0 (EN 16931:2026 syntax binding next to EN 16931:2017; drop UBL 2.2/2.3/2.4, add UBL 2.5)
 
 v3.1.7 - 2026-04-22
 * Fixed BT-150 (Item price base quantity unit of measure): now falls back to the net price unitCode when no gross price is present, instead of losing it

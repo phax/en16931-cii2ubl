@@ -1,6 +1,6 @@
 # Plan: en16931-cii2ubl 4.0.0
 
-Status: **not started** · Created 2026-09-04 · Current release line: 3.1.8-SNAPSHOT
+Status: **A0–A2 done, next up A3** · Created 2026-09-04 · Version: 4.0.0-SNAPSHOT · Branch: `v4`
 
 ## 1. Goal
 
@@ -41,6 +41,7 @@ artifacts and schemas.
 | D4 | CLI auto-detects the edition from BT-24; `--en-version 2017\|2026` overrides | Namespace-based detection is impossible (see 4.2); BT-24 is mandatory in every conformant instance |
 | D5 | Edition detection is **public library API**, not CLI-only | Embedders face mixed inbound traffic too |
 | D6 | The 2017 path stays behaviour-identical to 3.1.x | Enforced by the git-tracked `generated/toubl21/` output (A0) |
+| D7 | `convertCIItoUBL (File, ErrorList)` is declared **abstract on `AbstractCIIToUBLConverterBase`** | The CLI needs one edition-independent entry point; this is the seam `CIIToUBLDispatcher` (A14) will route through. Added in A2. |
 
 ## 4. Verified preconditions
 
@@ -145,7 +146,7 @@ Deleted: `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
 
 ### Phase 1 — Prepare and shrink
 
-- [ ] **A0 — Establish the regression baseline** · ~15 min
+- [x] **A0 — Establish the regression baseline** · ~15 min
   - No new code needed. `CIIToUBL21ConverterTest.testConvertAndValidateAll` already writes all 102
     converted documents to `en16931-cii2ubl/generated/toubl21/`, and that folder is **tracked in
     git**. It is the golden baseline.
@@ -157,7 +158,7 @@ Deleted: `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
   - **Why first:** `git diff` on that folder is the proof that A1/A2 do not change 2017 behaviour (D6).
   - A1 additionally deletes `generated/toubl22/`, `toubl23/` and `toubl24/` (102 files each).
 
-- [ ] **A1 — Drop UBL 2.2 / 2.3 / 2.4** · ~2 h
+- [x] **A1 — Drop UBL 2.2 / 2.3 / 2.4** · ~2 h
   - Delete `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
     `CIIToUBL22ConverterTest`, `CIIToUBL23ConverterTest`, `CIIToUBL24ConverterTest`.
   - Remove `ph-ubl22` / `ph-ubl23` / `ph-ubl24` from `en16931-cii2ubl/pom.xml` and the CLI pom.
@@ -165,7 +166,7 @@ Deleted: `CIIToUBL22Converter`, `CIIToUBL23Converter`, `CIIToUBL24Converter` and
     `cli/CIIToUBLConverter.java` (leave the option in place for now; A15 reworks it).
   - **Done when:** `mvn clean test` green, A0 golden test still byte-identical.
 
-- [ ] **A2 — Split the base class, introduce `.en2017`, bump to 4.0.0-SNAPSHOT** · ~3 h
+- [x] **A2 — Split the base class, introduce `.en2017`, bump to 4.0.0-SNAPSHOT** · ~3 h
   - Create `AbstractCIIToUBLConverterBase` with the ~350 edition-independent lines.
   - Move the remainder to `en2017.AbstractCIIToUBL2017Converter`.
   - Move + rename `CIIToUBL21Converter` → `en2017.CIID16BToUBL21Converter`.
@@ -337,9 +338,9 @@ Several 2017 paths **changed** in 2026 — do not copy the 2017 converter blindl
 
 | Item | Session date | Commit | Notes |
 |------|--------------|--------|-------|
-| A0 | | | |
-| A1 | | | |
-| A2 | | | |
+| A0 | 2026-09-04 | (folded into A1) | Baseline confirmed: full test run leaves `generated/toubl21/` byte-identical. No new code needed. |
+| A1 | 2026-09-04 | `[4.0.0 A1]` fb6bcba | 315 files changed, -8209 lines. `generated/toubl21/` unchanged. |
+| A2 | 2026-09-04 | `[4.0.0 A2]` | Split verified: 44 members in, 44 out, none lost or duplicated. 102 conversions, `generated/toubl21/` unchanged. |
 | A3 | | | |
 | A4 | | | |
 | A5 | | | |

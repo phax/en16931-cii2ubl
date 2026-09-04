@@ -31,48 +31,48 @@ import com.helger.datetime.helper.PDTFactory;
 import com.helger.diagnostics.error.list.ErrorList;
 
 /**
- * Test class for class {@link AbstractCIIToUBLConverter}.
+ * Test class for class {@link AbstractCIIToUBLConverterBase}.
  *
  * @author Philip Helger
  */
-public final class AbstractCIIToUBLConverterTest
+public final class AbstractCIIToUBLConverterBaseTest
 {
   @Test
   public void testParseDate ()
   {
     final ErrorList aList = new ErrorList ();
     assertEquals (PDTFactory.createLocalDate (2005, Month.JULY, 6),
-                  AbstractCIIToUBLConverter.parseDate ("060705", "2", aList));
+                  AbstractCIIToUBLConverterBase.parseDate ("060705", "2", aList));
     assertTrue (aList.isEmpty ());
 
     assertEquals (PDTFactory.createLocalDate (2005, Month.JULY, 6),
-                  AbstractCIIToUBLConverter.parseDate ("070605", "3", aList));
+                  AbstractCIIToUBLConverterBase.parseDate ("070605", "3", aList));
     assertTrue (aList.isEmpty ());
 
     assertEquals (PDTFactory.createLocalDate (2005, Month.JULY, 6),
-                  AbstractCIIToUBLConverter.parseDate ("06072005", "4", aList));
+                  AbstractCIIToUBLConverterBase.parseDate ("06072005", "4", aList));
     assertTrue (aList.isEmpty ());
 
     assertEquals (PDTFactory.createLocalDate (2005, Month.JULY, 6),
-                  AbstractCIIToUBLConverter.parseDate ("050706", "101", aList));
+                  AbstractCIIToUBLConverterBase.parseDate ("050706", "101", aList));
     assertTrue (aList.isEmpty ());
 
     assertEquals (PDTFactory.createLocalDate (2005, Month.JULY, 6),
-                  AbstractCIIToUBLConverter.parseDate ("20050706", "102", aList));
+                  AbstractCIIToUBLConverterBase.parseDate ("20050706", "102", aList));
     assertTrue (aList.isEmpty ());
 
-    final LocalDate aLD = AbstractCIIToUBLConverter.parseDate ("050101", "103", aList);
+    final LocalDate aLD = AbstractCIIToUBLConverterBase.parseDate ("050101", "103", aList);
     // Windows: 2005, Linux: 2004
     assertTrue (aLD.equals (PDTFactory.createLocalDate (2005, Month.JANUARY, 3)) ||
                 aLD.equals (PDTFactory.createLocalDate (2004, Month.DECEMBER, 26)));
     assertTrue (aList.isEmpty ());
 
     assertEquals (PDTFactory.createLocalDate (2019, Month.JANUARY, 5),
-                  AbstractCIIToUBLConverter.parseDate ("19005", "105", aList));
+                  AbstractCIIToUBLConverterBase.parseDate ("19005", "105", aList));
     assertTrue (aList.isEmpty ());
 
     // Unsupported format
-    assertNull (AbstractCIIToUBLConverter.parseDate ("050101", "999", aList));
+    assertNull (AbstractCIIToUBLConverterBase.parseDate ("050101", "999", aList));
     assertFalse (aList.isEmpty ());
   }
 }

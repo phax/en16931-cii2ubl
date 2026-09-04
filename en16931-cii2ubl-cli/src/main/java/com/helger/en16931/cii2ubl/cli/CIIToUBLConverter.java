@@ -39,10 +39,10 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.diagnostics.error.IError;
 import com.helger.diagnostics.error.list.ErrorList;
-import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverter;
-import com.helger.en16931.cii2ubl.CIIToUBL21Converter;
+import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverterBase;
 import com.helger.en16931.cii2ubl.CIIToUBLVersion;
 import com.helger.en16931.cii2ubl.EUBLCreationMode;
+import com.helger.en16931.cii2ubl.en2017.CIID16BToUBL21Converter;
 import com.helger.io.file.FileSystemIterator;
 import com.helger.io.file.FileSystemRecursiveIterator;
 import com.helger.io.file.FilenameHelper;
@@ -92,7 +92,7 @@ public class CIIToUBLConverter implements Callable <Integer>
 
   @Option (names = "--ubl-vatscheme",
            paramLabel = "vat scheme",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME,
+           defaultValue = AbstractCIIToUBLConverterBase.DEFAULT_VAT_SCHEME,
            description = "The UBL VAT scheme to be used (default: '${DEFAULT-VALUE}')")
   private String m_sVATScheme;
 
@@ -104,13 +104,13 @@ public class CIIToUBLConverter implements Callable <Integer>
 
   @Option (names = "--ubl-cardaccountnetworkid",
            paramLabel = "ID",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID,
+           defaultValue = AbstractCIIToUBLConverterBase.DEFAULT_CARD_ACCOUNT_NETWORK_ID,
            description = "The UBL CardAccount network ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sCardAccountNetworkID;
 
   @Option (names = "--ubl-defaultorderrefid",
            paramLabel = "ID",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_ORDER_REF_ID,
+           defaultValue = AbstractCIIToUBLConverterBase.DEFAULT_ORDER_REF_ID,
            description = "The UBL default order reference ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sDefaultOrderRefID;
 
@@ -264,9 +264,9 @@ public class CIIToUBLConverter implements Callable <Integer>
     m_sOutputDir = _normalizeOutputDirectory (m_sOutputDir);
     final List <File> m_aSourceFiles = _normalizeInputFiles (m_aSourceFilenames);
 
-    final AbstractCIIToUBLConverter <?> aConverter;
+    final AbstractCIIToUBLConverterBase <?> aConverter;
     if ("2.1".equals (m_sUBLVersion))
-      aConverter = new CIIToUBL21Converter ();
+      aConverter = new CIID16BToUBL21Converter ();
     else
       throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
 

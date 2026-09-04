@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.en16931.cii2ubl;
+package com.helger.en16931.cii2ubl.en2017;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.diagnostics.error.list.ErrorList;
+import com.helger.en16931.cii2ubl.MockSettings;
 import com.helger.io.file.FilenameHelper;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.jaxb.GenericJAXBMarshaller;
@@ -50,13 +51,13 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 
 /**
- * Test class for class {@link CIIToUBL21Converter}.
+ * Test class for class {@link CIID16BToUBL21Converter}.
  *
  * @author Philip Helger
  */
-public final class CIIToUBL21ConverterTest
+public final class CIID16BToUBL21ConverterTest
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBL21ConverterTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (CIID16BToUBL21ConverterTest.class);
 
   @Test
   public void testConvertAndValidateAll ()
@@ -69,7 +70,7 @@ public final class CIIToUBL21ConverterTest
 
       // Main conversion
       final ErrorList aErrorList = new ErrorList ();
-      final Serializable aInvoice = new CIIToUBL21Converter ().convertCIItoUBL (aFile, aErrorList);
+      final Serializable aInvoice = new CIID16BToUBL21Converter ().convertCIItoUBL (aFile, aErrorList);
       assertTrue ("Errors: " + aErrorList.toString (), aErrorList.containsNoError ());
       assertNotNull (aInvoice);
 
@@ -116,7 +117,7 @@ public final class CIIToUBL21ConverterTest
   @Nullable
   private static Serializable _convert (@NonNull final CrossIndustryInvoiceType aInvoice)
   {
-    return new CIIToUBL21Converter ().convertCIItoUBL (aInvoice, new ErrorList ());
+    return new CIID16BToUBL21Converter ().convertCIItoUBL (aInvoice, new ErrorList ());
   }
 
   @Test

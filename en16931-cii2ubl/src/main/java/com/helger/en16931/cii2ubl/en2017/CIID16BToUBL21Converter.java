@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.en16931.cii2ubl;
+package com.helger.en16931.cii2ubl.en2017;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -54,11 +54,11 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  *
  * @author Philip Helger
  */
-public class CIIToUBL21Converter extends AbstractCIIToUBLConverter <CIIToUBL21Converter>
+public class CIID16BToUBL21Converter extends AbstractCIIToUBL2017Converter <CIID16BToUBL21Converter>
 {
   private static final String UBL_VERSION = "2.1";
 
-  public CIIToUBL21Converter ()
+  public CIID16BToUBL21Converter ()
   {}
 
   private static oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.@Nullable IDType _copyID (@Nullable final IDType aCIIID)
