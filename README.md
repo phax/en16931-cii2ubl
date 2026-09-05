@@ -130,7 +130,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-v4.0.0 - work in progress
+v4.0.0 - 2026-09-05
 * Added the **EN 16931:2026** syntax binding: `com.helger.en16931.cii2ubl.en2026.CIID25AToUBL25Converter` converts CII D25A to UBL 2.5, covering all 284 rows of the mapping table including the 70 business terms and groups that are new in 2026 (BG-33 to BG-39, BT-166 to BT-220)
 * Removed the support for creating UBL 2.2, 2.3 and 2.4 - the two editions of EN 16931 prescribe exactly UBL 2.1 and UBL 2.5
 * Moved the EN 16931:2017 conversion to the new package `com.helger.en16931.cii2ubl.en2017` and renamed `CIIToUBL21Converter` to `CIID16BToUBL21Converter`. The UBL 2.1 output is unchanged
