@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.diagnostics.error.list.ErrorList;
+import com.helger.en16931.basics.EEN16931Edition;
 import com.helger.en16931.cii2ubl.en2017.CIID16BToUBL21Converter;
 import com.helger.en16931.cii2ubl.en2026.CIID25AToUBL25Converter;
 
@@ -113,8 +114,8 @@ public class CIIToUBLDispatcher extends AbstractCIIToUBLConverterBase <CIIToUBLD
     EEN16931Edition eEdition = m_eEdition;
     if (eEdition == null)
     {
-      // Peek at BT-24 - the correct JAXB model is exactly what is not known yet
-      final String sSpecID = EEN16931Edition.getSpecificationIdentifierCII (aFile);
+      // Read BT-24 via SAX - the correct JAXB model is exactly what is not known yet
+      final String sSpecID = EEN16931Edition.getSpecificationIdentifier (aFile);
       eEdition = EEN16931Edition.getFromSpecificationIdentifierOrNull (sSpecID);
       if (eEdition == null)
       {

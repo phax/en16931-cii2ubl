@@ -31,52 +31,20 @@ import org.junit.Test;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.diagnostics.error.list.ErrorList;
+import com.helger.en16931.basics.EEN16931Edition;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 
 /**
- * Test class for class {@link CIIToUBLDispatcher} and {@link EEN16931Edition}.
+ * Test class for class {@link CIIToUBLDispatcher}. The BT-24 based detection of
+ * {@link EEN16931Edition} itself is tested in en16931-basics; what is tested here is that it
+ * classifies the test corpus of this project correctly.
  *
  * @author Philip Helger
  */
 public final class CIIToUBLDispatcherTest
 {
   private static final String D25A_TEST_DIR = "src/test/resources/external/cii-d25a/";
-
-  @Test
-  public void testGetFromSpecificationIdentifier ()
-  {
-    // Plain
-    assertEquals (EEN16931Edition.EN2017,
-                  EEN16931Edition.getFromSpecificationIdentifierOrNull ("urn:cen.eu:en16931:2017"));
-    assertEquals (EEN16931Edition.EN2026,
-                  EEN16931Edition.getFromSpecificationIdentifierOrNull ("urn:cen.eu:en16931:2026"));
-
-    // With a customization suffix, as used by XRechnung
-    assertEquals (EEN16931Edition.EN2017,
-                  EEN16931Edition.getFromSpecificationIdentifierOrNull ("urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0"));
-    assertEquals (EEN16931Edition.EN2026,
-                  EEN16931Edition.getFromSpecificationIdentifierOrNull ("urn:cen.eu:en16931:2026#compliant#urn:example:profile"));
-
-    // Surrounding whitespace is tolerated
-    assertEquals (EEN16931Edition.EN2026,
-                  EEN16931Edition.getFromSpecificationIdentifierOrNull ("  urn:cen.eu:en16931:2026  "));
-
-    // Unknown or missing
-    assertNull (EEN16931Edition.getFromSpecificationIdentifierOrNull ("urn:cen.eu:en16931:2099"));
-    assertNull (EEN16931Edition.getFromSpecificationIdentifierOrNull ("something else"));
-    assertNull (EEN16931Edition.getFromSpecificationIdentifierOrNull (""));
-    assertNull (EEN16931Edition.getFromSpecificationIdentifierOrNull (null));
-  }
-
-  @Test
-  public void testGetFromID ()
-  {
-    for (final EEN16931Edition e : EEN16931Edition.values ())
-      assertEquals (e, EEN16931Edition.getFromIDOrNull (e.getID ()));
-    assertNull (EEN16931Edition.getFromIDOrNull ("2099"));
-    assertNull (EEN16931Edition.getFromIDOrNull (null));
-  }
 
   @Test
   public void testDetectAll2017TestFiles ()
@@ -119,16 +87,6 @@ public final class CIIToUBLDispatcherTest
       assertTrue ("Not existing: " + aFile.getAbsolutePath (), aFile.exists ());
       assertEquals (sFilename, EEN16931Edition.EN2026, EEN16931Edition.detect (aFile));
     }
-  }
-
-  @Test
-  public void testDetectUndeterminable ()
-  {
-    assertNull (EEN16931Edition.detect ((File) null));
-    // Not a CII document at all
-    assertNull (EEN16931Edition.detect (new File ("pom.xml")));
-    // Not existing
-    assertNull (EEN16931Edition.detect (new File ("does-not-exist.xml")));
   }
 
   @Test

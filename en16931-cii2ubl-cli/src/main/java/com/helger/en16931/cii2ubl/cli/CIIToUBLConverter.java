@@ -41,9 +41,9 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.diagnostics.error.IError;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.base.string.StringHelper;
+import com.helger.en16931.basics.EEN16931Edition;
 import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverterBase;
 import com.helger.en16931.cii2ubl.CIIToUBLDispatcher;
-import com.helger.en16931.cii2ubl.EEN16931Edition;
 import com.helger.en16931.cii2ubl.CIIToUBLVersion;
 import com.helger.en16931.cii2ubl.EUBLCreationMode;
 import com.helger.io.file.FileSystemIterator;
@@ -288,14 +288,17 @@ public class CIIToUBLConverter implements Callable <Integer>
     EEN16931Edition eFromUBLVersion = null;
     if (StringHelper.isNotEmpty (m_sUBLVersion))
     {
-      eFromUBLVersion = switch (m_sUBLVersion)
-      {
-        case "2.1" -> EEN16931Edition.EN2017;
-        case "2.5" -> EEN16931Edition.EN2026;
-        default -> throw new IllegalStateException ("Unsupported UBL version '" +
-                                                    m_sUBLVersion +
-                                                    "' provided. Use '2.1' or '2.5', or better use --en-version.");
-      };
+      // Each edition prescribes exactly one UBL version, so the edition can be derived from it
+      for (final EEN16931Edition e : EEN16931Edition.values ())
+        if (e.getUBLSyntaxVersion ().equals (m_sUBLVersion))
+        {
+          eFromUBLVersion = e;
+          break;
+        }
+      if (eFromUBLVersion == null)
+        throw new IllegalStateException ("Unsupported UBL version '" +
+                                         m_sUBLVersion +
+                                         "' provided. Use '2.1' or '2.5', or better use --en-version.");
       LOGGER.warn ("The option --ubl is deprecated - use --en-version " + eFromUBLVersion.getID () + " instead");
     }
 

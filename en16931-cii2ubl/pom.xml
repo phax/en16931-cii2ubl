@@ -50,6 +50,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>en16931-basics</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.helger.commons</groupId>
       <artifactId>ph-jaxb</artifactId>
     </dependency>

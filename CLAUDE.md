@@ -43,10 +43,15 @@ Requires Java 17+.
 ### Converter Hierarchy
 
 ```
+com.helger.en16931.basics                          from en16931-basics, not from this repo
+  EEN16931Edition                                  EN2017 / EN2026 + detect() from BT-24
+  EEN16931DateFormatCode                           UNTDID 2379 date formats of the CII binding
+  ConversionHelper                                 ifNotNull, ifNotEmpty
+  codelist.EN16931CodeLists                        BT-3, BT-8, BT-17/BT-18 and BT-81 classification
+
 com.helger.en16931.cii2ubl                         edition independent
   AbstractCIIToUBLConverterBase<IMPLTYPE>          config API, error helpers, date parsing,
-                                                   code predicates, swapQuantityAndPriceIfNeeded
-  EEN16931Edition                                  EN2017 / EN2026 + detect() from BT-24
+                                                   swapQuantityAndPriceIfNeeded
   CIIToUBLDispatcher                               parse -> detect -> route
   EUBLCreationMode                                 enum: AUTOMATIC, INVOICE, CREDIT_NOTE
   CIIToUBLVersion                                  version constants from properties
@@ -64,10 +69,12 @@ The converters are **not auto-generated** — they are manually maintained. The 
 
 CLI entry point: `com.helger.en16931.cii2ubl.cli.CIIToUBLConverter` (picocli command, shaded into fat JAR). The edition is taken from BT-24 per file unless `--en-version 2017|2026` is given.
 
+`ifNotNull` and `ifNotEmpty` stay as `protected static` members of `AbstractCIIToUBLConverterBase`, but only forward to `ConversionHelper` — the mapping code calls them several hundred times and the unqualified call is what keeps it readable.
+
 ### Conversion Flow
 
 1. Parse CII XML → `CrossIndustryInvoiceType` JAXB object (via ph-cii `CIID16BCrossIndustryInvoiceTypeMarshaller` or `CIID25ACrossIndustryInvoiceTypeMarshaller`)
-2. Determine document type (Invoice vs CreditNote) based on `TypeCode` — see `CREDIT_NOTE_TYPE_CODES` / `INVOICE_TYPE_CODES` constants
+2. Determine document type (Invoice vs CreditNote) based on `TypeCode` — see `EN16931CodeLists.isInvoiceTypeCode` / `isCreditNoteTypeCode` of en16931-basics
 3. Map CII fields to UBL equivalents field-by-field (BT-1 through BT-220 from EN 16931)
 4. Apply business rules (quantity/price sign swapping for credit notes)
 5. Serialize UBL via `UBL21Marshaller` respectively `UBL25Marshaller` (from ph-ubl)
@@ -93,6 +100,7 @@ Converters accept an `ErrorList` parameter. Conversion is successful only if a n
 
 ## Key Dependencies
 
+- **en16931-basics** — everything that changes when the *standard* changes: `EEN16931Edition` with the BT-24 detection, `EN16931CodeLists` with the code list subsets, `EEN16931DateFormatCode` with the UNTDID 2379 date formats, and `ConversionHelper`. Do not add a local copy of any of that — put it there instead. The sibling checkout is `../en16931-basics`
 - **ph-commons** — Helger utilities, error handling, collection types (`ICommonsList`, etc.)
 - **ph-cii** — CII D16B and D25A JAXB models and marshalling
 - **ph-ubl** — UBL 2.1 and 2.5 JAXB models and marshalling

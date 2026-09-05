@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
@@ -29,19 +28,20 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.annotation.Nonempty;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.numeric.BigHelper;
 import com.helger.base.state.ETriState;
 import com.helger.base.string.StringHelper;
 import com.helger.base.string.StringImplode;
 import com.helger.base.trait.IGenericImplTrait;
-import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.diagnostics.error.IError;
 import com.helger.diagnostics.error.SingleError;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.diagnostics.error.list.IErrorList;
+import com.helger.en16931.basics.ConversionHelper;
+import com.helger.en16931.basics.EEN16931DateFormatCode;
+import com.helger.en16931.basics.codelist.EN16931CodeLists;
 
 /**
  * Base class for the conversion from CII to UBL, independent of the EN 16931 edition. It contains
@@ -60,39 +60,11 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
   public static final EUBLCreationMode DEFAULT_UBL_CREATION_MODE = EUBLCreationMode.AUTOMATIC;
   public static final String DEFAULT_VAT_SCHEME = "VAT";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
-  public static final String DEFAULT_DATE_TIME_FORMAT = "102";
-  /**
-   * UNTDID 2379 format "208" - CCYYMMDDHHMMSSZHHMM. Used by EN 16931:2026 when BT-166 (Invoice
-   * issue time) is present.
-   *
-   * @since 4.0.0
-   */
-  public static final String DATE_TIME_FORMAT_WITH_TIME = "208";
   public static final String DEFAULT_ORDER_REF_ID = "";
   public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
   public static final boolean DEFAULT_SWAP_PRICE_SIGN_IF_NEEDED = true;
 
-
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverterBase.class);
-
-  // BT-3 Invoice type code, UNTDID 1001, as a subset of 62 codes each classified as either an
-  // Invoice or a Credit Note. No code appears in both roles.
-  //
-  // Source of truth:
-  // https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931#RegistryofsupportingartefactstoimplementEN16931-CEN/TC434EN16931
-  //
-  // The values below are taken from "EN16931 code lists values v17b - used from 2026-05-15",
-  // sheet "1001". This code list is versioned by date and is not specific to an EN 16931 edition,
-  // so both editions share it. The seven codes 471, 472, 473, 500, 501, 502 and 503 were added in
-  // v15 (used from 2025-05-15).
-  //
-  // Note: the EN 16931 validation artefacts additionally accept "81" on an Invoice, whereas every
-  // version of the code list has it as a Credit Note only. The code list wins here.
-  protected static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                              "81 83 261 262 296 308 381 396 420 458 502 503 532");
-  protected static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                          "71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 527 553 575 623 633 751 780 817 870 875 876 877 935");
-
 
   private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
   private String m_sVATScheme = DEFAULT_VAT_SCHEME;
@@ -106,20 +78,18 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
   protected AbstractCIIToUBLConverterBase ()
   {}
 
+  // The two shorthands below only forward to ConversionHelper. They stay as protected members,
+  // because the mapping code uses them several hundred times and the unqualified call is what keeps
+  // it readable.
+
   protected static <T> boolean ifNotNull (@Nullable final T aObj, @NonNull final Consumer <? super T> aConsumer)
   {
-    if (aObj == null)
-      return false;
-    aConsumer.accept (aObj);
-    return true;
+    return ConversionHelper.ifNotNull (aObj, aConsumer);
   }
 
   protected static boolean ifNotEmpty (@Nullable final String s, @NonNull final Consumer <? super String> aConsumer)
   {
-    if (StringHelper.isEmpty (s))
-      return false;
-    aConsumer.accept (s);
-    return true;
+    return ConversionHelper.ifNotEmpty (s, aConsumer);
   }
 
   @NonNull
@@ -258,40 +228,9 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
   }
 
   /**
-   * Get the pattern based on https://service.unece.org/trade/untdid/d16b/tred/tred2379.htm
-   *
-   * @param sFormat
-   *        Format to use. May be <code>null</code>.
-   * @param aErrorList
-   *        The error list to be filled if an unsupported format is provided.
-   * @return <code>null</code> if the format is unknown.
-   */
-  @Nullable
-  protected static String getDatePattern (@NonNull @Nonempty final String sFormat, @NonNull final IErrorList aErrorList)
-  {
-    ValueEnforcer.notEmpty (sFormat, "Format");
-    ValueEnforcer.notNull (aErrorList, "ErrorList");
-
-    return switch (sFormat)
-    {
-      case "2" -> "ddMMuu";
-      case "3" -> "MMdduu";
-      case "4" -> "ddMMuuuu";
-      case "101" -> "uuMMdd";
-      case DEFAULT_DATE_TIME_FORMAT -> "uuuuMMdd";
-      case "103" -> "YYwwee";
-      case "105" -> "uuDDD";
-      default ->
-      {
-        aErrorList.add (buildError (null, "Unsupported date format '" + sFormat + "'"));
-        yield null;
-      }
-    };
-  }
-
-  /**
-   * Parse a UNTDID 2379 formatted date and time. Only format "208" (CCYYMMDDHHMMSSZHHMM) carries a
-   * time, which is what EN 16931:2026 uses when BT-166 is present.
+   * Parse a UNTDID 2379 formatted date and time. Only {@link EEN16931DateFormatCode#hasTime()}
+   * formats carry a time, and EN 16931 only uses "208" (CCYYMMDDHHMMSSZHHMM), which the 2026
+   * edition writes when BT-166 is present.
    *
    * @param sDateTime
    *        The value to parse. May be <code>null</code>.
@@ -307,16 +246,19 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
                                                     @Nullable final String sFormat,
                                                     @NonNull final IErrorList aErrorList)
   {
+    ValueEnforcer.notNull (aErrorList, "ErrorList");
+
     if (StringHelper.isEmpty (sDateTime))
       return null;
 
-    if (!DATE_TIME_FORMAT_WITH_TIME.equals (sFormat))
+    final EEN16931DateFormatCode eFormat = EEN16931DateFormatCode.getFromIDOrNull (sFormat);
+    if (eFormat == null || !eFormat.hasTime ())
     {
       aErrorList.add (buildError (null, "Unsupported date time format '" + sFormat + "'"));
       return null;
     }
 
-    final XMLOffsetDateTime aDateTime = PDTFromString.getXMLOffsetDateTimeFromString (sDateTime, "uuuuMMddHHmmssZ");
+    final XMLOffsetDateTime aDateTime = eFormat.parseDateTime (sDateTime);
     if (aDateTime == null)
       aErrorList.add (buildError (null,
                                   "Failed to parse the date time '" + sDateTime + "' using format '" + sFormat + "'"));
@@ -324,52 +266,54 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
     return aDateTime;
   }
 
+  /**
+   * Parse a UNTDID 2379 formatted date. An absent format means
+   * {@link EEN16931DateFormatCode#DEFAULT}, which is the only format EN 16931 writes for a plain
+   * date.
+   *
+   * @param sDate
+   *        The value to parse. May be <code>null</code>.
+   * @param sFormat
+   *        Format to use. May be <code>null</code>.
+   * @param aErrorList
+   *        The error list to be filled. May not be <code>null</code>.
+   * @return <code>null</code> if the value could not be parsed.
+   */
   @Nullable
   protected static LocalDate parseDate (@Nullable final String sDate,
                                         @Nullable final String sFormat,
                                         @NonNull final IErrorList aErrorList)
   {
+    ValueEnforcer.notNull (aErrorList, "ErrorList");
+
     if (StringHelper.isEmpty (sDate))
       return null;
 
-    // Default to 102
-    final String sRealFormat = StringHelper.getNotEmpty (sFormat, DEFAULT_DATE_TIME_FORMAT);
-    final String sPattern = getDatePattern (sRealFormat, aErrorList);
-    if (sPattern == null)
+    final EEN16931DateFormatCode eFormat = EEN16931DateFormatCode.getFromIDOrDefault (sFormat);
+    if (eFormat == null)
+    {
+      aErrorList.add (buildError (null, "Unsupported date format '" + sFormat + "'"));
       return null;
+    }
 
     // Try to parse it
-    final LocalDate aDate = PDTFromString.getLocalDateFromString (sDate, sPattern);
+    final LocalDate aDate = eFormat.parseLocalDate (sDate);
     if (aDate == null)
-      aErrorList.add (buildError (null, "Failed to parse the date '" + sDate + "' using format '" + sRealFormat + "'"));
+      aErrorList.add (buildError (null,
+                                  "Failed to parse the date '" + sDate + "' using format '" + eFormat.getID () + "'"));
 
     return aDate;
   }
 
-  protected static boolean isPaymentMeansCodeCreditTransfer (@Nullable final String s)
-  {
-    // the EN 16931 XSLT only checks for 30 and 58
-    // in ebinterface-ubl-mapping this is 30, 31, 42 and 58
-    // 30 = Credit transfer
-    // 31 = Debit transfer
-    // 42 = Payment to bank account
-    // 58 = SEPA credit transfer
-    return "30".equals (s) || "42".equals (s) || "58".equals (s);
-  }
-
-  protected static boolean isPaymentMeansCodePaymentCard (@Nullable final String s)
-  {
-    // 48 = Bank card
-    return "48".equals (s);
-  }
-
-  protected static boolean isPaymentMeansCodeDirectDebit (@Nullable final String s)
-  {
-    // 49 = Direct debit (non-SEPA)
-    // 59 = SEPA direct debit
-    return "49".equals (s) || "59".equals (s);
-  }
-
+  /**
+   * Check if the provided BT-81 value is one this converter maps to no specific UBL payment means
+   * group. Unlike the classifying helpers of {@link EN16931CodeLists} this is a decision of the
+   * converter and not a fact of the code list, which is why it lives here.
+   *
+   * @param s
+   *        The BT-81 Payment means type code to check. May be <code>null</code>.
+   * @return <code>true</code> for every code of UNTDID 4461.
+   */
   protected static boolean isPaymentMeansCodeOtherKnown (@Nullable final String s)
   {
     // Allow all other codes of UNTDID 4461 (for BT-81)
@@ -381,32 +325,6 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
     // 57 = Standing agreement
     // 68 = Online payment service
     return "1".equals (s) || "57".equals (s) || "68".equals (s);
-  }
-
-  protected static boolean isOriginatorDocumentReferenceTypeCode (@Nullable final String s)
-  {
-    // BT-17
-    return "50".equals (s);
-  }
-
-  protected static boolean isValidDocumentReferenceTypeCode (@Nullable final String s)
-  {
-    // BT-17 or BT-18
-    // Value 916 from BT-122 should not lead to a DocumentTypeCode
-    return isOriginatorDocumentReferenceTypeCode (s) || "130".equals (s);
-  }
-
-  @Nullable
-  protected static String mapDueDateTypeCode (@Nullable final String s)
-  {
-    // BT-8 mapping; see #29
-    if ("5".equals (s))
-      return "3";
-    if ("29".equals (s))
-      return "35";
-    if ("72".equals (s))
-      return "432";
-    return s;
   }
 
   /**
@@ -611,10 +529,10 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
 
     // First check TypeCode
     final String sRealTypeCode = StringHelper.trim (sTypeCode);
-    if (INVOICE_TYPE_CODES.contains (sRealTypeCode))
+    if (EN16931CodeLists.isInvoiceTypeCode (sRealTypeCode))
       eIsInvoice = ETriState.TRUE;
     else
-      if (CREDIT_NOTE_TYPE_CODES.contains (sRealTypeCode))
+      if (EN16931CodeLists.isCreditNoteTypeCode (sRealTypeCode))
         eIsInvoice = ETriState.FALSE;
 
     // Check total

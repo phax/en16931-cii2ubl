@@ -87,6 +87,12 @@
       
       <dependency>
         <groupId>com.helger</groupId>
+        <artifactId>en16931-basics</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.helger</groupId>
         <artifactId>en16931-cii2ubl</artifactId>
         <version>${project.version}</version>
       </dependency>

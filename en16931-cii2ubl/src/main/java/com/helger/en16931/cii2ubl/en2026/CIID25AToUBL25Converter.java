@@ -34,6 +34,9 @@ import com.helger.collection.CollectionFind;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.diagnostics.error.list.IErrorList;
+import com.helger.en16931.basics.EEN16931DateFormatCode;
+import com.helger.en16931.basics.EEN16931Edition;
+import com.helger.en16931.basics.codelist.EN16931CodeLists;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_25.*;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.*;
@@ -57,7 +60,8 @@ import un.unece.uncefact.data.standard.cii.d25a.udt.TextType;
  */
 public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID25AToUBL25Converter>
 {
-  private static final String UBL_VERSION = "2.5";
+  /** cbc:UBLVersionID - the UBL version this EN 16931 edition prescribes */
+  private static final String UBL_VERSION = EEN16931Edition.EN2026.getUBLSyntaxVersion ();
   /** BT-32-2 National tax code - a fixed value since EN 16931:2026 */
   public static final String NATIONAL_TAX_SCHEME = "LOC";
   /**
@@ -65,8 +69,6 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
    * that distinguishes BT-177 from BT-105 and BT-193 from BT-145.
    */
   public static final String NON_VAT_TAX_CODE_LIST_ID = "5153";
-  /** BT-122-1 Supporting document reference code - a fixed value since EN 16931:2026 */
-  public static final String SUPPORTING_DOCUMENT_TYPE_CODE = "916";
   /** BT-122-1-1 Supporting document reference document type list */
   public static final String SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID = "1001";
 
@@ -157,7 +159,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     ret.setID (sID).setSchemeID (aRD.getReferenceTypeCodeValue ());
 
     // BT-18-2/BT-128-2 Invoiced object identifier type code (fixed value "130")
-    if (isValidDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
+    if (EN16931CodeLists.isValidDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
       ret.setDocumentTypeCode (aRD.getTypeCodeValue ());
 
     // BT-26 Preceding Invoice issue date is optional
@@ -581,7 +583,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // CII D25A: PayeePartyCreditorFinancialAccount is a 0..n element
     final CreditorFinancialAccountType aPayeeCreditorAccount = aPaymentMeans.hasPayeePartyCreditorFinancialAccountEntries () ? aPaymentMeans.getPayeePartyCreditorFinancialAccountAtIndex (0)
                                                                                                                              : null;
-    final boolean bIsBG17 = isPaymentMeansCodeCreditTransfer (sTypeCode) && aPayeeCreditorAccount != null;
+    final boolean bIsBG17 = EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) && aPayeeCreditorAccount != null;
     if (bIsBG17)
     {
       final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
@@ -609,7 +611,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     }
 
     // BG-18 PAYMENT CARD INFORMATION
-    final boolean bIsBG18 = isPaymentMeansCodePaymentCard (sTypeCode);
+    final boolean bIsBG18 = EN16931CodeLists.isPaymentMeansCodePaymentCard (sTypeCode);
     if (bIsBG18)
     {
       final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
@@ -645,7 +647,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     }
 
     // BG-19 DIRECT DEBIT
-    final boolean bIsBG19 = isPaymentMeansCodeDirectDebit (sTypeCode);
+    final boolean bIsBG19 = EN16931CodeLists.isPaymentMeansCodeDirectDebit (sTypeCode);
     if (bIsBG19)
     {
       final PaymentMandateType aUBLPaymentMandate = new PaymentMandateType ();
@@ -743,7 +745,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
   /**
    * BT-122-1 Supporting document reference code and BT-122-1-1 its list identifier. Both are new in
    * EN 16931:2026, which requires cbc:DocumentTypeCode="916" on BG-24. The EN 16931:2017 binding
-   * had no such element, which is why isValidDocumentReferenceTypeCode does not accept "916".
+   * had no such element, which is why EN16931CodeLists.isValidDocumentReferenceTypeCode does not
+   * accept "916".
    *
    * @param aRD
    *        The CII source document reference. May not be <code>null</code>.
@@ -753,10 +756,10 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
   private static void _applySupportingDocumentTypeCode (@NonNull final ReferencedDocumentType aRD,
                                                         @NonNull final DocumentReferenceType aUBLDocRef)
   {
-    if (SUPPORTING_DOCUMENT_TYPE_CODE.equals (aRD.getTypeCodeValue ()))
+    if (EN16931CodeLists.DOCUMENT_TYPE_CODE_SUPPORTING_DOCUMENT.equals (aRD.getTypeCodeValue ()))
     {
       final DocumentTypeCodeType aUBLTypeCode = new DocumentTypeCodeType ();
-      aUBLTypeCode.setValue (SUPPORTING_DOCUMENT_TYPE_CODE);
+      aUBLTypeCode.setValue (EN16931CodeLists.DOCUMENT_TYPE_CODE_SUPPORTING_DOCUMENT);
       // BT-122-1-1
       aUBLTypeCode.setListID (SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID);
       aUBLDocRef.setDocumentTypeCode (aUBLTypeCode);
@@ -947,7 +950,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
                                                                                                                             : aED.getIssueDateTime ()
                                                                                                                                  .getDateTimeString ();
       if (aDTS != null)
-        if (DATE_TIME_FORMAT_WITH_TIME.equals (aDTS.getFormat ()))
+      {
+        final EEN16931DateFormatCode eFormat = EEN16931DateFormatCode.getFromIDOrDefault (aDTS.getFormat ());
+        if (eFormat != null && eFormat.hasTime ())
         {
           final XMLOffsetDateTime aIssueDateTime = parseDateTime (aDTS.getValue (), aDTS.getFormat (), aErrorList);
           if (aIssueDateTime != null)
@@ -963,6 +968,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           if (aIssueDate != null)
             aUBLInvoice.setIssueDate (aIssueDate);
         }
+      }
     }
 
     // BT-9 Payment due date
@@ -1073,7 +1079,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       {
         final TradeTaxType aTradeTax = aHeaderSettlement.getApplicableTradeTaxAtIndex (0);
         if (StringHelper.isNotEmpty (aTradeTax.getDueDateTypeCodeValue ()))
-          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (mapDueDateTypeCode (aTradeTax.getDueDateTypeCodeValue ())));
+          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (EN16931CodeLists.mapDueDateTypeCodeCIIToUBL (aTradeTax.getDueDateTypeCodeValue ())));
       }
 
       if (aUBLPeriod.getStartDate () != null ||
@@ -1136,7 +1142,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Use for "Tender or lot reference" with TypeCode "50" (BT-17)
-        if (isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
+        if (EN16931CodeLists.isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
@@ -1162,7 +1168,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Except OriginatorDocumentReference (BT-17/BT-17-1)
-        if (!isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
+        if (!EN16931CodeLists.isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
@@ -2154,7 +2160,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
                                                                                                                             : aED.getIssueDateTime ()
                                                                                                                                  .getDateTimeString ();
       if (aDTS != null)
-        if (DATE_TIME_FORMAT_WITH_TIME.equals (aDTS.getFormat ()))
+      {
+        final EEN16931DateFormatCode eFormat = EEN16931DateFormatCode.getFromIDOrDefault (aDTS.getFormat ());
+        if (eFormat != null && eFormat.hasTime ())
         {
           final XMLOffsetDateTime aIssueDateTime = parseDateTime (aDTS.getValue (), aDTS.getFormat (), aErrorList);
           if (aIssueDateTime != null)
@@ -2170,6 +2178,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           if (aIssueDate != null)
             aUBLCreditNote.setIssueDate (aIssueDate);
         }
+      }
     }
 
     // BT-9 Payment due date
@@ -2282,7 +2291,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       {
         final TradeTaxType aTradeTax = aHeaderSettlement.getApplicableTradeTaxAtIndex (0);
         if (StringHelper.isNotEmpty (aTradeTax.getDueDateTypeCodeValue ()))
-          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (mapDueDateTypeCode (aTradeTax.getDueDateTypeCodeValue ())));
+          aUBLPeriod.addDescriptionCode (new DescriptionCodeType (EN16931CodeLists.mapDueDateTypeCodeCIIToUBL (aTradeTax.getDueDateTypeCodeValue ())));
       }
 
       if (aUBLPeriod.getStartDate () != null ||
@@ -2346,7 +2355,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Use for "Tender or lot reference" with TypeCode "50" (BT-17)
-        if (isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
+        if (EN16931CodeLists.isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)
@@ -2372,7 +2381,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       for (final ReferencedDocumentType aRD : aHeaderAgreement.getAdditionalReferencedDocument ())
       {
         // Except OriginatorDocumentReference (BT-17/BT-17-1)
-        if (!isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
+        if (!EN16931CodeLists.isOriginatorDocumentReferenceTypeCode (aRD.getTypeCodeValue ()))
         {
           final DocumentReferenceType aUBLDocRef = _convertDocumentReference (aRD, aErrorList);
           if (aUBLDocRef != null)

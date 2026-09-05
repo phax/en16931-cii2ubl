@@ -255,7 +255,8 @@ sharing them would need generics over both models. Not attempted.
 
 ### 4.4i Code lists: the authoritative source and what it says
 
-**Source of truth**, recorded in `AbstractCIIToUBLConverterBase`:
+**Source of truth**, recorded in `EN16931CodeLists` of `en16931-basics` (in
+`AbstractCIIToUBLConverterBase` until A18):
 <https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931#RegistryofsupportingartefactstoimplementEN16931-CEN/TC434EN16931>
 
 **Current values** from `/Users/philip/svn-philip/Code Lists/EN 16931/EN16931 code lists values v17b - used from 2026-05-15.xlsx`,
@@ -288,8 +289,9 @@ EN 16931 edition — v13 … v17b are all present locally.
 2. There is **no 2017 → 2026 delta** in this list at all. The code list is not edition specific.
 
 **Both editions share one list.** Because the code list is versioned by date rather than by
-edition, `INVOICE_TYPE_CODES` and `CREDIT_NOTE_TYPE_CODES` live in `AbstractCIIToUBLConverterBase`
-again, as a single copy with the registry URL above it.
+edition, `INVOICE_TYPE_CODES` and `CREDIT_NOTE_TYPE_CODES` are a single copy for both editions. As
+of A18 that copy is `EN16931CodeLists` of `en16931-basics`, which derives both sets from
+`EEN16931InvoiceTypeCode`; before A18 they were two literal sets in `AbstractCIIToUBLConverterBase`.
 
 The one place this differs from the EN 16931 validation artefacts is code `81`: rule BR-CL-01
 accepts it on an Invoice as well, while every version of the code list has it as a Credit Note only.
@@ -322,6 +324,7 @@ com.helger.en16931.cii2ubl                    shared — no CII and no UBL types
   EUBLCreationMode                            (unchanged)
   CIIToUBLVersion                             (unchanged)
   EEN16931Edition                    NEW      { EN2017, EN2026 } + detect (File|Node|Document)
+                                              — moved to en16931-basics in A18
   CIIToUBLDispatcher                 NEW      parse -> detect -> route
   AbstractCIIToUBLConverterBase      NEW      ~350 lines lifted from today's base:
                                               settings API (IMPLTYPE fluent),
@@ -331,6 +334,8 @@ com.helger.en16931.cii2ubl                    shared — no CII and no UBL types
                                               isOriginatorDocumentReferenceTypeCode,
                                               mapDueDateTypeCode, isLT0Strict,
                                               CREDIT_NOTE_TYPE_CODES / INVOICE_TYPE_CODES
+                                              — everything in these last four lines moved to
+                                              en16931-basics in A18
 
 com.helger.en16931.cii2ubl.en2017             CII D16B -> UBL 2.1
   AbstractCIIToUBL2017Converter               ~430 D16B-typed lines: parseDate overloads,
@@ -506,6 +511,21 @@ now spelled out). **Six are real**, and all six are implemented in A6:
     CEN/TS 16931-3-3:2026 directly?), so the wording was left untouched rather than invented.
   - `README.md` News and noteworthy: `v4.0.0 - work in progress`.
 
+- [x] **A18 — Depend on `en16931-basics` 1.0.0 instead of holding own copies** · done
+  - `en16931-basics` was extracted after A17 as the artefact for the facts that change when the
+    *standard* changes, shared with `en16931-purifier` and `en16931-ubl2cii`. This item is the
+    cii2ubl half of that migration; the other two projects still hold their own copies.
+  - Taken from there: `EEN16931Edition` (deleting `com.helger.en16931.cii2ubl.EEN16931Edition`),
+    `EN16931CodeLists` for BT-3, BT-8, BT-17/BT-18, BT-81 and the BG-24 code `916`,
+    `EEN16931DateFormatCode` for UNTDID 2379, and `ConversionHelper` for `ifNotNull`/`ifNotEmpty`.
+  - `UBL_VERSION` of both converters is now `EEN16931Edition.EN20xx.getUBLSyntaxVersion ()`, and the
+    CLI derives the edition of the deprecated `--ubl` from the same method instead of a literal map.
+  - Kept local, because they are decisions of the converter and not facts of the standard:
+    `isPaymentMeansCodeOtherKnown`, `isUsableGlobalID`, `isLT0Strict`, `swapQuantityAndPriceIfNeeded`
+    and `DEFAULT_VAT_SCHEME` (a picocli `defaultValue` needs a compile time constant).
+  - **Done when:** `generated/toubl21/` and `generated/toubl25/` are byte-identical after a full
+    test run.
+
 ## 7. Estimate
 
 | Phase | Items | Sessions |
@@ -557,3 +577,4 @@ now spelled out). **Six are real**, and all six are implemented in A6:
 | A15 | 2026-09-05 | `[4.0.0 A15]` | `--ubl` kept as a deprecated alias (2.1/2.5), cross-checked against `--en-version`. **Fixed a pre-existing CLI NPE** — see 4.4f. |
 | A16 | 2026-09-05 | `[4.0.0 A16]` | Coverage guard added; it immediately found **BT-122-1/BT-122-1-1 unimplemented** and BT-91's missing ProprietaryID fallback — see 4.4g. |
 | A17 | 2026-09-05 | `[4.0.0 A17]` | README, CLAUDE.md and the News entry updated. `docs/00readme.txt` left untouched pending the correct citation. |
+| A18 | 2026-09-05 | `[4.0.0 A18]` | Migrated to `en16931-basics` 1.0.0. Two behaviour changes came with it, both intended: BT-24 is now read via SAX instead of a full DOM parse, and a date written with `@format='208'` parses instead of being rejected. `generated/toubl21/` and `generated/toubl25/` unchanged. |
