@@ -137,8 +137,8 @@ v4.0.0 - work in progress
 * Added `EEN16931Edition` to determine the EN 16931 edition of a CII document from BT-24, and `CIIToUBLDispatcher` to route to the matching converter. The edition can neither be determined from the XML namespaces, which are identical across CII releases, nor from the XML Schema, because a D16B instance also validates against the D25A XSD
 * The CLI determines the edition per file from BT-24 by default; the new option `--en-version 2017|2026` forces one instead. `--ubl` is deprecated and now only accepts `2.1` and `2.5`
 * Fixed a long standing CLI bug: without `--ubl-customizationid` and `--ubl-profileid` the conversion aborted with a `NullPointerException`
-* The BT-3 (Invoice type code) sets are now edition specific. EN 16931:2026 no longer lists the codes `471`, `472`, `473`, `500`, `501`, `502` and `503`, and classifies `81` as a Credit Note only, whereas the 2017 artefacts allow it on an Invoice as well
-* Fixed the BT-3 classification of the codes `502` and `503`: they were treated as Invoice codes although the EN 16931 validation artefacts list them as Credit Note codes
+* The BT-3 (Invoice type code) sets are now edition specific, so that the two editions can diverge. The EN 16931:2026 sets are currently identical to the 2017 ones, pending the official EN 16931:2026 code list
+* Fixed the BT-3 classification of the codes `502` and `503`: they were treated as Invoice codes although rule BR-CL-01 of the EN 16931 validation artefacts lists them as Credit Note codes
 * Added the dependencies to `ph-cii-d25a` and `ph-ubl25`
 * Added `docs/en16931-2026-syntax.md` with the three-way field mapping (UBL 2.5 invoice / UBL 2.5 credit note / CII D25A) of EN 16931:2026
 * Added `docs/plan-4.0.0.md` with the implementation plan for v4.0.0

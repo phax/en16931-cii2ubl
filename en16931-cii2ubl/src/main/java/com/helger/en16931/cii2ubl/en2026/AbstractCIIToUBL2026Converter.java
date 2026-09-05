@@ -62,14 +62,17 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
                                                     AbstractCIIToUBLConverterBase <IMPLTYPE>
 {
   // BT-3 Invoice type code, UNTDID 1001.
-  // Source: the CEN/TC 434 code list registry of EN 16931:2026, which classifies each of the 55
-  // applicable codes as either an Invoice or a Credit Note.
-  // Differences to EN 16931:2017: the seven codes 471, 472, 473, 500, 501, 502 and 503 are no
-  // longer applicable, and "81" is now unambiguously a Credit Note.
+  // PROVISIONAL: currently identical to the EN 16931:2017 set.
+  // The code list of EN 16931:2026 is not yet available from a reliable source. An earlier attempt
+  // used an extract that turned out to enumerate Annex A (2019) plus CEN/TC 434 ballot N313 (2021)
+  // rather than the 2026 code list, so the differences derived from it - seven codes dropped and
+  // "81" reclassified as a Credit Note - were never established. The normative source is the
+  // European Commission "Registry of supporting artefacts to implement EN 16931", reference [6] of
+  // CEN/TS 16931-3-2:2026 and CEN/TS 16931-3-3:2026. Replace both sets once it has been checked.
   private static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                                "81 83 261 262 296 308 381 396 420 458 532");
+                                                                                                "81 83 261 262 296 308 381 396 420 458 502 503 532");
   private static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                            "71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 527 553 575 623 633 751 780 817 870 875 876 877 935");
+                                                                                            "71 80 81 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 527 553 575 623 633 751 780 817 870 875 876 877 935");
 
   protected AbstractCIIToUBL2026Converter ()
   {}
