@@ -253,54 +253,57 @@ The 175 identical lines in the concrete converters (`_convertParty`, `_convertCo
 `_createUBLOrderRef`, …) are typed to edition-specific CII **and** UBL classes on both sides, so
 sharing them would need generics over both models. Not attempted.
 
-### 4.4i Code lists — status and one confirmed fix
+### 4.4i Code lists: BT-3 differs by authority, not by edition
 
-**Open: the EN 16931:2026 code list is not yet available from a reliable source.**
+`docs`-external source: the CEN/TC 434 code list overview of the EN 16931:2026 syntax bindings
+(`codelists.json` in the TC 434 tree). It lists 22 code lists; 8 carry a complete enumeration.
 
-A first attempt derived the 2026 BT-3 (UNTDID 1001) sets from a `codelists.json` extract, and
-concluded that seven codes had been dropped and that `81` had been reclassified as a Credit Note.
-**Both conclusions were unfounded** and have been reverted. The file's own provenance fields gave it
-away:
+**UNTDID 1001 (BT-3) — two authorities, two answers:**
 
-```
-codesSource : "Annex_A_codelists_20190425.docx + CEN/TC 434 ballot N313 (2021)"
-ANNEX-A     : "…the enumerated code values. The 2026 syntax bindings have no annexes"
-```
+| | codes | `81` |
+|---|---|---|
+| CEN/TC 434 published list (`codesComplete: true`) | **55** = 44 Invoice + 11 Credit Note | Credit Note |
+| EN 16931 validation artefacts 1.3.16, rule BR-CL-01 | **62** = 50 Invoice + 13 Credit Note | on **both** lists |
 
-43 codes from Annex A (2019) plus 12 from ballot N313 (2021) — so the enumeration predates 2026 and
-was being compared against the EN 16931 *validation artefacts*, not against the 2017 *edition*. The
-seven codes 471, 472, 473, 500, 501, 502 and 503 appear in the artefacts but in neither of those two
-documents, which is equally consistent with "the extract is incomplete". Likewise `81` is already a
-Credit Note in Annex A (2019), so the lenient side is the artefact, not the edition.
+The artefacts accept seven codes CEN/TC 434 never published for BT-3 — `471 472 473 500 501 502 503`
+— and additionally allow `81` on an Invoice. Nothing is published that the artefacts reject.
 
-The maintainer has confirmed the source was wrong and an updated file will follow.
+**This is not a 2017 → 2026 change.** The published list traces to Annex A (2019) plus ballot N313
+(2021), which both editions reference. An earlier analysis mistook the artefact-vs-list gap for an
+edition change and claimed "seven codes were dropped in 2026" — that claim is wrong and was
+withdrawn.
 
-**Current state:** the sets are per edition (a structural change that is correct regardless), but the
-2026 sets are **identical to the 2017 ones** and carry a comment saying so. Replace them once the
-official list is available. The normative source is the European Commission "Registry of supporting
-artefacts to implement EN 16931", reference [6] of CEN/TS 16931-3-2:2026 and -3-3:2026.
+**Why the converter still differs per edition — a difference of authority:**
 
-**Confirmed and kept — the 502/503 fix.** This comes from a single, independent source: rule
-**BR-CL-01** of `EN16931-UBL-validation.xslt` 1.3.16 in `phive-rules-en16931-4.5.5.jar`, which reads
+* the **2017** converter follows the validation artefacts, because this project validates its 2017
+  output against exactly those artefacts; using the shorter list would produce output our own test
+  suite rejects
+* the **2026** converter follows the published code list, because no 2026 artefacts exist yet and
+  the list is the only authority
+
+Consequence: a document with BT-3 = `81` becomes an Invoice under 2017 and a CreditNote under 2026.
+That is asserted by `testTypeCode81IsACreditNoteIn2026`. Revisit both sets once EN 16931:2026
+validation artefacts appear.
+
+**Confirmed fix — 502/503.** Rule BR-CL-01 lists both under `cbc:CreditNoteTypeCode` **only**:
 
 ```
 (self::cbc:InvoiceTypeCode    and contains(' 71 80 81 … [50 codes] ', …))
 or (self::cbc:CreditNoteTypeCode and contains(' 81 83 261 262 296 308 381 396 420 458 502 503 532 ', …))
 ```
 
-`502` and `503` are listed under `cbc:CreditNoteTypeCode` **only**, but the converter had them in
-`INVOICE_TYPE_CODES`, so such documents were converted to an Invoice. No test file uses those codes,
-so the generated output is unaffected.
+The converter had them in `INVOICE_TYPE_CODES`, so such documents were converted to an Invoice. No
+test file uses those codes, so the generated output is unaffected.
 
-**Other lists — checked, nothing to change.** These were verified against enumerations that do not
-depend on the questionable 2026 source:
+**Other lists — checked, no code change needed.**
 
 | List | Used for | Result |
 |------|----------|--------|
-| UNTDID 2005 / 2475 | BT-8, `mapDueDateTypeCode` | the mapping `5→3`, `29→35`, `72→432` matches |
-| UNTDID 4461 | BT-81 payment means | the list is explicitly not complete, so the extra `42` accepted for credit transfer stays valid |
-| UNTDID 5305, 5189, MIME | VAT category, allowance reason, attachments | enumerated, but the converter copies values through — no whitelist to align |
-| the remaining lists | various | not enumerated in the source at all |
+| UNTDID 2005 / 2475 | BT-8, `mapDueDateTypeCode` | the mapping `5→3`, `29→35`, `72→432` matches exactly |
+| UNTDID 4461 | BT-81 payment means | not a complete list, so the extra `42` accepted for credit transfer stays valid |
+| UNTDID 5305 (9), 5189 (19), MIME (6) | VAT category, allowance reason, attachments | enumerated, but the converter copies values through — no whitelist to align |
+| CEF EAS v16 (113), VATEX v5 (59) | BT-34-1/49-1, BT-121/174/176/195 | now fully enumerated in the source; the converter copies them through, so nothing to align — but they are available should value validation ever be wanted |
+| 5153, 1153, 7161, 4451, 6313, 7143, 6523, SEPA, SUPPLY, 4217, 3166-1, Rec20/21 | various | not enumerated; copied through |
 
 ### 4.5 The D25A JAXB model is a separate Java package
 

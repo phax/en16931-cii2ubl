@@ -667,4 +667,16 @@ public final class CIID25AToUBL25ConverterTest
                  "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification[cbc:ID/@schemeID='SEPA']/cbc:ID",
                  "SEPA-CRED-1");
   }
+
+  @Test
+  public void testTypeCode81IsACreditNoteIn2026 ()
+  {
+    // BT-3 = 81 "Credit note related to goods or services".
+    // The code list published by CEN/TC 434 classifies it as a Credit Note, and the 2026 converter
+    // follows that list. The 2017 converter follows the EN 16931 validation artefacts instead,
+    // which additionally allow "81" on an Invoice, so the same document converts differently.
+    final Element aCN = convertAndValidate ("d25a-typecode81-creditnote.xml", false);
+    assertXPath (aCN, "cbc:CreditNoteTypeCode", "81");
+    assertNoXPath (aCN, "cbc:InvoiceTypeCode");
+  }
 }

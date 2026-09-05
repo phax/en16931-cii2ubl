@@ -61,18 +61,23 @@ import un.unece.uncefact.data.standard.cii.d25a.udt.TextType;
 public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCIIToUBL2026Converter <IMPLTYPE>> extends
                                                     AbstractCIIToUBLConverterBase <IMPLTYPE>
 {
-  // BT-3 Invoice type code, UNTDID 1001.
-  // PROVISIONAL: currently identical to the EN 16931:2017 set.
-  // The code list of EN 16931:2026 is not yet available from a reliable source. An earlier attempt
-  // used an extract that turned out to enumerate Annex A (2019) plus CEN/TC 434 ballot N313 (2021)
-  // rather than the 2026 code list, so the differences derived from it - seven codes dropped and
-  // "81" reclassified as a Credit Note - were never established. The normative source is the
-  // European Commission "Registry of supporting artefacts to implement EN 16931", reference [6] of
-  // CEN/TS 16931-3-2:2026 and CEN/TS 16931-3-3:2026. Replace both sets once it has been checked.
+  // BT-3 Invoice type code, UNTDID 1001 - the subset published by CEN/TC 434, which classifies each
+  // of its 55 codes as either an Invoice or a Credit Note.
+  // Source: Annex A of the syntax bindings (2019) plus CEN/TC 434 ballot N313 (2021), as collected
+  // in the code list overview of the EN 16931:2026 syntax bindings.
+  //
+  // This differs from the EN 16931:2017 set in this project, but not because the standard changed
+  // between the editions - it is a difference of authority:
+  // * the 2017 converter follows the EN 16931 validation artefacts, because the 2017 output of this
+  //   project is validated against exactly those artefacts
+  // * for 2026 no validation artefacts exist yet, so the published code list is the only authority
+  // The artefacts accept seven codes that CEN/TC 434 never published for BT-3 - 471, 472, 473, 500,
+  // 501, 502 and 503 - and additionally allow "81" on an Invoice, whereas the published list has it
+  // as a Credit Note only. Revisit both sets once EN 16931:2026 validation artefacts are available.
   private static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                                "81 83 261 262 296 308 381 396 420 458 502 503 532");
+                                                                                                "81 83 261 262 296 308 381 396 420 458 532");
   private static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                            "71 80 81 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 527 553 575 623 633 751 780 817 870 875 876 877 935");
+                                                                                            "71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 527 553 575 623 633 751 780 817 870 875 876 877 935");
 
   protected AbstractCIIToUBL2026Converter ()
   {}
