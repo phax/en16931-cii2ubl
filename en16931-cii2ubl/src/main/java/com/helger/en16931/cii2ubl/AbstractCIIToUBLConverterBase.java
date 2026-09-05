@@ -72,14 +72,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
   public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
   public static final boolean DEFAULT_SWAP_PRICE_SIGN_IF_NEEDED = true;
 
-  // Source: EN 16931 validation artefacts
-  // Last update: 2026-02-04 from 1.3.15
-  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverterBase.class);
 
-  protected static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                              "81 83 261 262 296 308 381 396 420 458 532");
-  protected static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                          "71 80 81 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 502 503 527 553 575 623 633 751 780 817 870 875 876 877 935");
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverterBase.class);
 
   private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
   private String m_sVATScheme = DEFAULT_VAT_SCHEME;
@@ -573,8 +567,14 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
 
   /**
    * Determine whether a CII document is an Invoice or a Credit Note. The decision is based on BT-3
-   * (Invoice type code) and falls back to the sign of BT-115 (Amount due for payment).
+   * (Invoice type code) and falls back to the sign of BT-115 (Amount due for payment).<br>
+   * The BT-3 code sets differ between the EN 16931 editions, so they are passed in by the edition
+   * specific subclass rather than being fixed here.
    *
+   * @param aInvoiceTypeCodes
+   *        The BT-3 codes to be interpreted as an Invoice. May not be <code>null</code>.
+   * @param aCreditNoteTypeCodes
+   *        The BT-3 codes to be interpreted as a Credit Note. May not be <code>null</code>.
    * @param sTypeCode
    *        BT-3 Invoice type code. May be <code>null</code>.
    * @param aDuePayableAmount
@@ -589,7 +589,9 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
    * @since 4.0.0
    */
   @NonNull
-  protected static ETriState isInvoiceType (@Nullable final String sTypeCode,
+  protected static ETriState isInvoiceType (@NonNull final Set <String> aInvoiceTypeCodes,
+                                            @NonNull final Set <String> aCreditNoteTypeCodes,
+                                            @Nullable final String sTypeCode,
                                             @Nullable final BigDecimal aDuePayableAmount,
                                             @Nullable final Object aDuePayableSource,
                                             @NonNull final IErrorList aErrorList)
@@ -598,10 +600,10 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
 
     // First check TypeCode
     final String sRealTypeCode = StringHelper.trim (sTypeCode);
-    if (INVOICE_TYPE_CODES.contains (sRealTypeCode))
+    if (aInvoiceTypeCodes.contains (sRealTypeCode))
       eIsInvoice = ETriState.TRUE;
     else
-      if (CREDIT_NOTE_TYPE_CODES.contains (sRealTypeCode))
+      if (aCreditNoteTypeCodes.contains (sRealTypeCode))
         eIsInvoice = ETriState.FALSE;
 
     // Check total

@@ -20,6 +20,7 @@ package com.helger.en16931.cii2ubl.en2026;
 import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -60,6 +61,16 @@ import un.unece.uncefact.data.standard.cii.d25a.udt.TextType;
 public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCIIToUBL2026Converter <IMPLTYPE>> extends
                                                     AbstractCIIToUBLConverterBase <IMPLTYPE>
 {
+  // BT-3 Invoice type code, UNTDID 1001.
+  // Source: the CEN/TC 434 code list registry of EN 16931:2026, which classifies each of the 55
+  // applicable codes as either an Invoice or a Credit Note.
+  // Differences to EN 16931:2017: the seven codes 471, 472, 473, 500, 501, 502 and 503 are no
+  // longer applicable, and "81" is now unambiguously a Credit Note.
+  private static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                                "81 83 261 262 296 308 381 396 420 458 532");
+  private static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                            "71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 527 553 575 623 633 751 780 817 870 875 876 877 935");
+
   protected AbstractCIIToUBL2026Converter ()
   {}
 
@@ -244,7 +255,12 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
                                                                                             : aTotal.getDuePayableAmount ()
                                                                                                     .get (0);
 
-    return isInvoiceType (sTypeCode, aDuePayable == null ? null : aDuePayable.getValue (), aDuePayable, aErrorList);
+    return isInvoiceType (INVOICE_TYPE_CODES,
+                          CREDIT_NOTE_TYPE_CODES,
+                          sTypeCode,
+                          aDuePayable == null ? null : aDuePayable.getValue (),
+                          aDuePayable,
+                          aErrorList);
   }
 
   /**

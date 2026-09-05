@@ -253,6 +253,41 @@ The 175 identical lines in the concrete converters (`_convertParty`, `_convertCo
 `_createUBLOrderRef`, …) are typed to edition-specific CII **and** UBL classes on both sides, so
 sharing them would need generics over both models. Not attempted.
 
+### 4.4i Code lists: what actually differs between the editions
+
+Checked every code list the converter hard-codes against the CEN/TC 434 code list registry of
+EN 16931:2026 (22 lists, 6 of them enumerated) and against the EN 16931 validation artefacts 1.3.16
+for the 2017 side.
+
+**UNTDID 1001 (BT-3 Invoice type code) — genuinely different, now per edition:**
+
+| | EN 16931:2017 | EN 16931:2026 |
+|---|---|---|
+| Invoice codes | 50 | 44 |
+| Credit note codes | 13 | 11 |
+| `471 472 473 500 501 502 503` | applicable | **no longer applicable** |
+| `81` | on **both** lists — Invoice wins, because it is evaluated first | **Credit Note only** |
+
+The sets therefore moved from `AbstractCIIToUBLConverterBase` into the two edition base classes,
+and `isInvoiceType` takes them as parameters.
+
+**A pre-existing bug surfaced by the comparison:** the shared constants had `502` and `503` in
+`INVOICE_TYPE_CODES`, but the 2017 UBL artefacts list both as **credit note** codes only. A
+document with BT-3 = 502 or 503 was therefore converted to an Invoice. The 2017 sets are now taken
+verbatim from `EN16931-UBL-validation.xslt`, which fixes it. No test file uses those codes, so the
+golden output is unaffected.
+
+**Checked and unchanged:**
+
+| List | Used for | Result |
+|------|----------|--------|
+| UNTDID 2005 / 2475 | BT-8, `mapDueDateTypeCode` | 2026 enumerates exactly `5→3`, `29→35`, `72→432` — the existing mapping is correct |
+| UNTDID 4461 | BT-81 payment means | 2026 highlights `30 48 49 57 58 59`; the list is explicitly *not* complete, so the extra `42` the converter accepts for credit transfer stays valid |
+| UNTDID 5305 | BT-95/102/118/151 VAT category | 9 codes, but the converter copies the value through without a whitelist |
+| UNTDID 5189 | BT-98/140 allowance reason | 19 codes, copied through |
+| MIME | BT-125-1 | 6 types, copied through |
+| 5153, 1153, 7161, 4451, 6313, 7143, 6523, EAS, SEPA, SUPPLY, VATEX, 4217, 3166-1, Rec20/21 | various | not enumerated in the source; the converter copies values through, so nothing to align |
+
 ### 4.5 The D25A JAXB model is a separate Java package
 
 | Release | Package |
