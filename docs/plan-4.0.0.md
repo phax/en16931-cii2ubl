@@ -255,8 +255,9 @@ sharing them would need generics over both models. Not attempted.
 
 ### 4.4i Code lists: BT-3 differs by authority, not by edition
 
-`docs`-external source: the CEN/TC 434 code list overview of the EN 16931:2026 syntax bindings
-(`codelists.json` in the TC 434 tree). It lists 22 code lists; 8 carry a complete enumeration.
+**Source, normative for EN 16931:2026:** the CEN/TC 434 code list overview of the 2026 syntax
+bindings — `codelists.json` in the TC 434 tree, built on the European Commission registry lists
+(EAS v16, VATEX v5, …). It covers 22 code lists; 8 carry a complete enumeration.
 
 **UNTDID 1001 (BT-3) — two authorities, two answers:**
 
@@ -278,12 +279,11 @@ withdrawn.
 * the **2017** converter follows the validation artefacts, because this project validates its 2017
   output against exactly those artefacts; using the shorter list would produce output our own test
   suite rejects
-* the **2026** converter follows the published code list, because no 2026 artefacts exist yet and
-  the list is the only authority
+* the **2026** converter follows the published code list, which is normative for that edition
 
 Consequence: a document with BT-3 = `81` becomes an Invoice under 2017 and a CreditNote under 2026.
-That is asserted by `testTypeCode81IsACreditNoteIn2026`. Revisit both sets once EN 16931:2026
-validation artefacts appear.
+That is asserted by `testTypeCode81IsACreditNoteIn2026`. If EN 16931:2026 validation artefacts later
+disagree with the published list, it is the artefacts that need fixing, not these sets.
 
 **Confirmed fix — 502/503.** Rule BR-CL-01 lists both under `cbc:CreditNoteTypeCode` **only**:
 
