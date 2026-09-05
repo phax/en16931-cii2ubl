@@ -77,9 +77,9 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverterBase.class);
 
   protected static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                            "81 83 261 262 296 308 381 396 420 458 532");
+                                                                                              "81 83 261 262 296 308 381 396 420 458 532");
   protected static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                        "71 80 81 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 502 503 527 553 575 623 633 751 780 817 870 875 876 877 935");
+                                                                                          "71 80 81 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 502 503 527 553 575 623 633 751 780 817 870 875 876 877 935");
 
   private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
   private String m_sVATScheme = DEFAULT_VAT_SCHEME;
@@ -303,15 +303,10 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
       return null;
     }
 
-    final XMLOffsetDateTime aDateTime = PDTFromString.getXMLOffsetDateTimeFromString (sDateTime,
-                                                                                     "uuuuMMddHHmmssZ");
+    final XMLOffsetDateTime aDateTime = PDTFromString.getXMLOffsetDateTimeFromString (sDateTime, "uuuuMMddHHmmssZ");
     if (aDateTime == null)
       aErrorList.add (buildError (null,
-                                  "Failed to parse the date time '" +
-                                        sDateTime +
-                                        "' using format '" +
-                                        sFormat +
-                                        "'"));
+                                  "Failed to parse the date time '" + sDateTime + "' using format '" + sFormat + "'"));
 
     return aDateTime;
   }
@@ -497,7 +492,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
    *        The unit code list agency name. May be <code>null</code>.
    * @param ret
    *        The UBL object to fill. May not be <code>null</code>.
-   * @return <code>null</code> if the value is <code>null</code>, to avoid creating an empty element.
+   * @return <code>null</code> if the value is <code>null</code>, to avoid creating an empty
+   *         element.
    * @since 4.0.0
    */
   @Nullable
@@ -536,7 +532,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
    *        The UBL object to fill. May not be <code>null</code>.
    * @param sDefaultCurrencyCode
    *        The fallback currency code. May be <code>null</code>.
-   * @return <code>null</code> if the value is <code>null</code>, to avoid creating an empty element.
+   * @return <code>null</code> if the value is <code>null</code>, to avoid creating an empty
+   *         element.
    * @since 4.0.0
    */
   @Nullable
@@ -615,15 +612,15 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
     {
       aErrorList.add (buildWarn (null,
                                  "Could not determine, if the provided CII document is an Invoice or a CreditNote. TypeCode is '" +
-                                       sRealTypeCode +
-                                       "'; DuePayable is " +
-                                       aDuePayableSource));
+                                   sRealTypeCode +
+                                   "'; DuePayable is " +
+                                   aDuePayableSource));
     }
     else
     {
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Determined the provided CII document to be " +
-                      (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
+          (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
     }
     return eIsInvoice;
   }
@@ -675,10 +672,10 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
           // This looks like an inconsistency
           aErrorList.add (buildWarn (null,
                                      "A negative line extension amount with quantity " +
-                                           aQuantity +
-                                           " and price " +
-                                           aPriceAmount +
-                                           " looks interesting."));
+                                       aQuantity +
+                                       " and price " +
+                                       aPriceAmount +
+                                       " looks interesting."));
         }
         else
           if (bNegPrice)
@@ -710,8 +707,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
           // This looks like an inconsistency
           aErrorList.add (buildWarn (null,
                                      "A negative line extension amount with quantity " +
-                                           aQuantity +
-                                           " looks interesting."));
+                                       aQuantity +
+                                       " looks interesting."));
         }
       }
     }
@@ -744,10 +741,10 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
             // This looks like an inconsistency
             aErrorList.add (buildWarn (null,
                                        "A positive line extension amount with quantity " +
-                                             aQuantity +
-                                             " and price " +
-                                             aPriceAmount +
-                                             " looks interesting."));
+                                         aQuantity +
+                                         " and price " +
+                                         aPriceAmount +
+                                         " looks interesting."));
           }
         // If both values are positive, no action needed
       }
@@ -759,8 +756,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
           // This looks like an inconsistency
           aErrorList.add (buildWarn (null,
                                      "A positive line extension amount with quantity " +
-                                           aQuantity +
-                                           " looks interesting."));
+                                       aQuantity +
+                                       " looks interesting."));
         }
       }
     }

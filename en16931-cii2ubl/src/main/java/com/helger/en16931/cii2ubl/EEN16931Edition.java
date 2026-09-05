@@ -152,8 +152,8 @@ public enum EEN16931Edition
       return null;
 
     final Element aGuideline = XMLHelper.getFirstChildElementOfName (aContext,
-                                                                    RAM_NAMESPACE_URI,
-                                                                    "GuidelineSpecifiedDocumentContextParameter");
+                                                                     RAM_NAMESPACE_URI,
+                                                                     "GuidelineSpecifiedDocumentContextParameter");
     if (aGuideline == null)
       return null;
 

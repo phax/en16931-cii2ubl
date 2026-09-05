@@ -34,7 +34,6 @@ import com.helger.collection.CollectionFind;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.diagnostics.error.list.IErrorList;
-import com.helger.diagnostics.error.list.IErrorList;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_25.*;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.*;
@@ -62,8 +61,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
   /** BT-32-2 National tax code - a fixed value since EN 16931:2026 */
   public static final String NATIONAL_TAX_SCHEME = "LOC";
   /**
-   * BT-177-1 / BT-193-1 list identifier of the non-VAT tax code (UNTDID 5153). It is the only
-   * value that distinguishes BT-177 from BT-105 and BT-193 from BT-145.
+   * BT-177-1 / BT-193-1 list identifier of the non-VAT tax code (UNTDID 5153). It is the only value
+   * that distinguishes BT-177 from BT-105 and BT-193 from BT-145.
    */
   public static final String NON_VAT_TAX_CODE_LIST_ID = "5153";
   /** BT-122-1 Supporting document reference code - a fixed value since EN 16931:2026 */
@@ -136,8 +135,10 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
   }
 
   // BG-3/BG-24: Document reference conversion
-  // Used for BT-25/BT-26 (preceding invoice), BT-122/BT-123/BT-124/BT-125/BT-125-1/BT-125-2 (additional supporting docs),
-  // BT-15 (receiving advice), BT-16 (despatch advice), BT-12 (contract), BT-17 (tender/lot), BT-18/BT-18-1 (invoiced object),
+  // Used for BT-25/BT-26 (preceding invoice), BT-122/BT-123/BT-124/BT-125/BT-125-1/BT-125-2
+  // (additional supporting docs),
+  // BT-15 (receiving advice), BT-16 (despatch advice), BT-12 (contract), BT-17 (tender/lot),
+  // BT-18/BT-18-1 (invoiced object),
   // BT-128/BT-128-1 (line object)
   @Nullable
   private static DocumentReferenceType _convertDocumentReference (@Nullable final ReferencedDocumentType aRD,
@@ -236,7 +237,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       ret.addPostalZone (new PostalZoneType (aPostalAddress.getPostcodeCodeValue ()));
     // BT-39/BT-54/BT-68/BT-79/BT-208 Country subdivision
     if (aPostalAddress.hasCountrySubDivisionNameEntries ())
-      ret.addCountrySubentity (new CountrySubentityType (aPostalAddress.getCountrySubDivisionNameAtIndex (0).getValue ()));
+      ret.addCountrySubentity (new CountrySubentityType (aPostalAddress.getCountrySubDivisionNameAtIndex (0)
+                                                                       .getValue ()));
     // BT-40/BT-55/BT-69/BT-80/BT-209 Country code
     if (StringHelper.isNotEmpty (aPostalAddress.getCountryIDValue ()))
     {
@@ -411,7 +413,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       if (StringHelper.isNotEmpty (aDesc.getValue ()))
         aUBLPartyLegalEntity.addCompanyLegalForm (new CompanyLegalFormType (aDesc.getValue ()));
 
-    if (aUBLPartyLegalEntity.getRegistrationName () == null && !aUBLParty.hasPartyNameEntries () && StringHelper.isNotEmpty (aTradeParty.getNameValue ()))
+    if (aUBLPartyLegalEntity.getRegistrationName () == null &&
+        !aUBLParty.hasPartyNameEntries () &&
+        StringHelper.isNotEmpty (aTradeParty.getNameValue ()))
     {
       // Mandatory field according to Schematron (for Seller/Buyer only)
       // UBL-CR-275 forbids RegistrationName on PayeeParty
@@ -576,7 +580,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // BG-17 CREDIT TRANSFER
     // CII D25A: PayeePartyCreditorFinancialAccount is a 0..n element
     final CreditorFinancialAccountType aPayeeCreditorAccount = aPaymentMeans.hasPayeePartyCreditorFinancialAccountEntries () ? aPaymentMeans.getPayeePartyCreditorFinancialAccountAtIndex (0)
-                                                                                                                            : null;
+                                                                                                                             : null;
     final boolean bIsBG17 = isPaymentMeansCodeCreditTransfer (sTypeCode) && aPayeeCreditorAccount != null;
     if (bIsBG17)
     {
@@ -819,8 +823,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // BT-172 Discount amount
     ifNotNull (copyAmount (aDiscount.getActualDiscountAmount (),
                            new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.SettlementDiscountAmountType (),
-                           sDefaultCurrencyCode),
-               aUBLPaymentTerms::setSettlementDiscountAmount);
+                           sDefaultCurrencyCode), aUBLPaymentTerms::setSettlementDiscountAmount);
 
     if (aUBLPaymentTerms.getSettlementPeriod () == null &&
         aUBLPaymentTerms.getSettlementDiscountPercent () == null &&
@@ -864,8 +867,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // BT-183 Penalty amount
     ifNotNull (copyAmount (aPenalty.getActualPenaltyAmount (),
                            new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.PenaltyAmountType (),
-                           sDefaultCurrencyCode),
-               aUBLPaymentTerms::setPenaltyAmount);
+                           sDefaultCurrencyCode), aUBLPaymentTerms::setPenaltyAmount);
 
     if (aUBLPaymentTerms.getPenaltyPeriod () == null &&
         aUBLPaymentTerms.getPenaltyInterestRate () == null &&
@@ -1394,8 +1396,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         if (aAdjustment.hasActualAmountEntries ())
           ifNotNull (copyAmount (aAdjustment.getActualAmountAtIndex (0),
                                  new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.TaxInclusiveLineExtensionAmountType (),
-                                 sDefaultCurrencyCode),
-                     aUBLCollectionLine::setTaxInclusiveLineExtensionAmount);
+                                 sDefaultCurrencyCode), aUBLCollectionLine::setTaxInclusiveLineExtensionAmount);
 
         // BT-180 Charges specification. cac:Item is mandatory in UBL.
         final ItemType aUBLItem = new ItemType ();
@@ -1425,14 +1426,12 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         // BG-35 EARLY PAYMENT DISCOUNT
         ifNotNull (_convertEarlyPaymentDiscount (aPaymentTerms.getApplicableTradePaymentDiscountTerms (),
                                                  sDefaultCurrencyCode,
-                                                 aErrorList),
-                   aUBLInvoice::addPaymentTerms);
+                                                 aErrorList), aUBLInvoice::addPaymentTerms);
 
         // BG-36 LATE PAYMENT PENALTY
         ifNotNull (_convertLatePaymentPenalty (aPaymentTerms.getApplicableTradePaymentPenaltyTerms (),
                                                sDefaultCurrencyCode,
-                                               aErrorList),
-                   aUBLInvoice::addPaymentTerms);
+                                               aErrorList), aUBLInvoice::addPaymentTerms);
       }
     }
 
@@ -1676,8 +1675,10 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       {
         final ReferencedDocumentType aBuyerOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
         final ReferencedDocumentType aSellerOrderReference = aLineAgreement.getSellerOrderReferencedDocument ();
-        final String sBuyerOrderID = aBuyerOrderReference == null ? null : aBuyerOrderReference.getIssuerAssignedIDValue ();
-        final String sSellerOrderID = aSellerOrderReference == null ? null : aSellerOrderReference.getIssuerAssignedIDValue ();
+        final String sBuyerOrderID = aBuyerOrderReference == null ? null
+                                                                  : aBuyerOrderReference.getIssuerAssignedIDValue ();
+        final String sSellerOrderID = aSellerOrderReference == null ? null
+                                                                    : aSellerOrderReference.getIssuerAssignedIDValue ();
         final boolean bHasBuyerOrderRef = aBuyerOrderReference != null &&
                                           (StringHelper.isNotEmpty (aBuyerOrderReference.getLineIDValue ()) ||
                                            StringHelper.isNotEmpty (sBuyerOrderID));
@@ -1745,8 +1746,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
               aRefLineDelivery.getActualDeliverySupplyChainEvent ().getOccurrenceDateTime () != null)
             ifNotNull (parseDate (aRefLineDelivery.getActualDeliverySupplyChainEvent ()
                                                   .getOccurrenceDateTime ()
-                                                  .getDateTimeString (),
-                                  aErrorList),
+                                                  .getDateTimeString (), aErrorList),
                        aUBLDelivery::setActualDeliveryDate);
 
           final TradePartyType aLineShipTo = aRefLineDelivery.getShipToTradeParty ();
@@ -2611,8 +2611,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         if (aAdjustment.hasActualAmountEntries ())
           ifNotNull (copyAmount (aAdjustment.getActualAmountAtIndex (0),
                                  new oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.TaxInclusiveLineExtensionAmountType (),
-                                 sDefaultCurrencyCode),
-                     aUBLCollectionLine::setTaxInclusiveLineExtensionAmount);
+                                 sDefaultCurrencyCode), aUBLCollectionLine::setTaxInclusiveLineExtensionAmount);
 
         // BT-180 Charges specification. cac:Item is mandatory in UBL.
         final ItemType aUBLItem = new ItemType ();
@@ -2642,14 +2641,12 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         // BG-35 EARLY PAYMENT DISCOUNT
         ifNotNull (_convertEarlyPaymentDiscount (aPaymentTerms.getApplicableTradePaymentDiscountTerms (),
                                                  sDefaultCurrencyCode,
-                                                 aErrorList),
-                   aUBLCreditNote::addPaymentTerms);
+                                                 aErrorList), aUBLCreditNote::addPaymentTerms);
 
         // BG-36 LATE PAYMENT PENALTY
         ifNotNull (_convertLatePaymentPenalty (aPaymentTerms.getApplicableTradePaymentPenaltyTerms (),
                                                sDefaultCurrencyCode,
-                                               aErrorList),
-                   aUBLCreditNote::addPaymentTerms);
+                                               aErrorList), aUBLCreditNote::addPaymentTerms);
       }
     }
 
@@ -2892,8 +2889,10 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       {
         final ReferencedDocumentType aBuyerOrderReference = aLineAgreement.getBuyerOrderReferencedDocument ();
         final ReferencedDocumentType aSellerOrderReference = aLineAgreement.getSellerOrderReferencedDocument ();
-        final String sBuyerOrderID = aBuyerOrderReference == null ? null : aBuyerOrderReference.getIssuerAssignedIDValue ();
-        final String sSellerOrderID = aSellerOrderReference == null ? null : aSellerOrderReference.getIssuerAssignedIDValue ();
+        final String sBuyerOrderID = aBuyerOrderReference == null ? null
+                                                                  : aBuyerOrderReference.getIssuerAssignedIDValue ();
+        final String sSellerOrderID = aSellerOrderReference == null ? null
+                                                                    : aSellerOrderReference.getIssuerAssignedIDValue ();
         final boolean bHasBuyerOrderRef = aBuyerOrderReference != null &&
                                           (StringHelper.isNotEmpty (aBuyerOrderReference.getLineIDValue ()) ||
                                            StringHelper.isNotEmpty (sBuyerOrderID));
@@ -2961,8 +2960,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
               aRefLineDelivery.getActualDeliverySupplyChainEvent ().getOccurrenceDateTime () != null)
             ifNotNull (parseDate (aRefLineDelivery.getActualDeliverySupplyChainEvent ()
                                                   .getOccurrenceDateTime ()
-                                                  .getDateTimeString (),
-                                  aErrorList),
+                                                  .getDateTimeString (), aErrorList),
                        aUBLDelivery::setActualDeliveryDate);
 
           final TradePartyType aLineShipTo = aRefLineDelivery.getShipToTradeParty ();
@@ -3314,9 +3312,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       {
         final ETriState eIsInvoice = isInvoiceType (aCIIInvoice, aErrorList);
         // Default to invoice
-        yield eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList) : convertToCreditNote (
-                                                                                                                      aCIIInvoice,
-                                                                                                                      aErrorList);
+        yield eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList)
+                                                  : convertToCreditNote (aCIIInvoice, aErrorList);
       }
       case INVOICE -> convertToInvoice (aCIIInvoice, aErrorList);
       case CREDIT_NOTE -> convertToCreditNote (aCIIInvoice, aErrorList);

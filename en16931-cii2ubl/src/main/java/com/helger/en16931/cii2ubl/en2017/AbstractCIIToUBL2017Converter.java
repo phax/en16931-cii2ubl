@@ -23,10 +23,7 @@ import java.time.LocalDate;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.helger.base.numeric.BigHelper;
 import com.helger.base.state.ETriState;
 import com.helger.base.string.StringHelper;
 import com.helger.cii.d16b.CIID16BCrossIndustryInvoiceTypeMarshaller;
@@ -60,12 +57,9 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  *        The implementation type
  * @since 4.0.0
  */
-public abstract class AbstractCIIToUBL2017Converter <IMPLTYPE extends AbstractCIIToUBL2017Converter <IMPLTYPE>>
-                                                    extends
+public abstract class AbstractCIIToUBL2017Converter <IMPLTYPE extends AbstractCIIToUBL2017Converter <IMPLTYPE>> extends
                                                     AbstractCIIToUBLConverterBase <IMPLTYPE>
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBL2017Converter.class);
-
   protected AbstractCIIToUBL2017Converter ()
   {}
 
@@ -117,10 +111,10 @@ public abstract class AbstractCIIToUBL2017Converter <IMPLTYPE extends AbstractCI
    * Copy all ID parts from a CII ID to a CCTS/UBL ID.<br>
    * Unlike copyName, copyQuantity and copyAmount this is not delegated to
    * AbstractCIIToUBLConverterBase. It copies eight attributes and contains no logic, so a shared
-   * variant would need eight consecutive String parameters - and six of them
-   * (schemeName, schemeAgencyID, schemeAgencyName, schemeVersionID, schemeDataURI, schemeURI) never
-   * occur in the test corpus, so a transposed argument would go unnoticed. The same applies to
-   * copyCode below. The duplication is cheaper than that risk.
+   * variant would need eight consecutive String parameters - and six of them (schemeName,
+   * schemeAgencyID, schemeAgencyName, schemeVersionID, schemeDataURI, schemeURI) never occur in the
+   * test corpus, so a transposed argument would go unnoticed. The same applies to copyCode below.
+   * The duplication is cheaper than that risk.
    *
    * @param aCIIID
    *        CII ID
@@ -242,13 +236,13 @@ public abstract class AbstractCIIToUBL2017Converter <IMPLTYPE extends AbstractCI
 
     // BT-115 Amount due for payment
     final SupplyChainTradeTransactionType aTransaction = aCIIInvoice.getSupplyChainTradeTransaction ();
-    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null : aTransaction
-                                                                                            .getApplicableHeaderTradeSettlement ();
-    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null : aSettlement
-                                                                                                      .getSpecifiedTradeSettlementHeaderMonetarySummation ();
-    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null : aTotal
-                                                                                                           .getDuePayableAmount ()
-                                                                                                           .get (0);
+    final HeaderTradeSettlementType aSettlement = aTransaction == null ? null
+                                                                       : aTransaction.getApplicableHeaderTradeSettlement ();
+    final TradeSettlementHeaderMonetarySummationType aTotal = aSettlement == null ? null
+                                                                                  : aSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation ();
+    final AmountType aDuePayable = aTotal == null || aTotal.hasNoDuePayableAmountEntries () ? null
+                                                                                            : aTotal.getDuePayableAmount ()
+                                                                                                    .get (0);
 
     return isInvoiceType (sTypeCode, aDuePayable == null ? null : aDuePayable.getValue (), aDuePayable, aErrorList);
   }

@@ -96,8 +96,10 @@ public class CIID16BToUBL21Converter extends AbstractCIIToUBL2017Converter <CIID
   }
 
   // BG-3/BG-24: Document reference conversion
-  // Used for BT-25/BT-26 (preceding invoice), BT-122/BT-123/BT-124/BT-125/BT-125-1/BT-125-2 (additional supporting docs),
-  // BT-15 (receiving advice), BT-16 (despatch advice), BT-12 (contract), BT-17 (tender/lot), BT-18/BT-18-1 (invoiced object),
+  // Used for BT-25/BT-26 (preceding invoice), BT-122/BT-123/BT-124/BT-125/BT-125-1/BT-125-2
+  // (additional supporting docs),
+  // BT-15 (receiving advice), BT-16 (despatch advice), BT-12 (contract), BT-17 (tender/lot),
+  // BT-18/BT-18-1 (invoiced object),
   // BT-128/BT-128-1 (line object)
   @Nullable
   private static DocumentReferenceType _convertDocumentReference (@Nullable final ReferencedDocumentType aRD,
@@ -366,7 +368,9 @@ public class CIID16BToUBL21Converter extends AbstractCIIToUBL2017Converter <CIID
         break;
       }
 
-    if (aUBLPartyLegalEntity.getRegistrationName () == null && !aUBLParty.hasPartyNameEntries () && StringHelper.isNotEmpty (aTradeParty.getNameValue ()))
+    if (aUBLPartyLegalEntity.getRegistrationName () == null &&
+        !aUBLParty.hasPartyNameEntries () &&
+        StringHelper.isNotEmpty (aTradeParty.getNameValue ()))
     {
       // Mandatory field according to Schematron (for Seller/Buyer only)
       // UBL-CR-275 forbids RegistrationName on PayeeParty
@@ -2562,9 +2566,8 @@ public class CIID16BToUBL21Converter extends AbstractCIIToUBL2017Converter <CIID
       {
         final ETriState eIsInvoice = isInvoiceType (aCIIInvoice, aErrorList);
         // Default to invoice
-        yield eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList) : convertToCreditNote (
-                                                                                                                      aCIIInvoice,
-                                                                                                                      aErrorList);
+        yield eIsInvoice.getAsBooleanValue (true) ? convertToInvoice (aCIIInvoice, aErrorList)
+                                                  : convertToCreditNote (aCIIInvoice, aErrorList);
       }
       case INVOICE -> convertToInvoice (aCIIInvoice, aErrorList);
       case CREDIT_NOTE -> convertToCreditNote (aCIIInvoice, aErrorList);
