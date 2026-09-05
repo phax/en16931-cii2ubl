@@ -7,9 +7,16 @@
 > If this project saved you some time or made your day a little easier, a star would mean a lot — it helps others find it too.
 <!-- ph-badge-end -->
 
-Unidirectional converter for EN16931 invoices from CII D16B to UBL 2.1, 2.2, 2.3 or 2.4.
+Unidirectional converter for EN 16931 invoices from CII to UBL, supporting both editions of the standard:
 
-This is a Java 11+ library that converts a Cross Industry Invoice (CII) into a Universal Business Language (UBL) document following the rules of the European Norm (EN) 16931 that defines a common semantic data model for electronic invoices in Europe.
+| Edition | Input | Output | Specification identifier (BT-24) |
+|---------|-------|--------|----------------------------------|
+| EN 16931:2017 | CII D16B | UBL 2.1 | `urn:cen.eu:en16931:2017` |
+| EN 16931:2026 | CII D25A | UBL 2.5 | `urn:cen.eu:en16931:2026` |
+
+Since v4.0.0 the UBL versions 2.2, 2.3 and 2.4 are no longer supported, because the two editions of EN 16931 prescribe exactly UBL 2.1 and UBL 2.5.
+
+This is a Java 17+ library that converts a Cross Industry Invoice (CII) into a Universal Business Language (UBL) document following the rules of the European Norm (EN) 16931 that defines a common semantic data model for electronic invoices in Europe.
 
 Special care was given to XRechnung invoices - all the CII examples of them translate to UBL that is valid according to the EN 16931 validation rules.
 
@@ -22,17 +29,32 @@ The binary releases are available on Maven Central at https://repo1.maven.org/ma
 # Usage
 
 This is a pure Java library and not a self-contained conversion tool.
-You can convert CII D16B invoices following the EN 16931 rules to different UBL versions.
 The entrance classes are:
-* Create UBL 2.1: `com.helger.en16931.cii2ubl.CIIToUBL21Converter`
-* Create UBL 2.2: `com.helger.en16931.cii2ubl.CIIToUBL22Converter`
-* Create UBL 2.3: `com.helger.en16931.cii2ubl.CIIToUBL23Converter` (since v1.3.0)
-* Create UBL 2.4: `com.helger.en16931.cii2ubl.CIIToUBL24Converter` (since v2.1.0)
+* EN 16931:2017, CII D16B to UBL 2.1: `com.helger.en16931.cii2ubl.en2017.CIID16BToUBL21Converter`
+* EN 16931:2026, CII D25A to UBL 2.5: `com.helger.en16931.cii2ubl.en2026.CIID25AToUBL25Converter` (since v4.0.0)
 
-The main conversion method is called `convertCIItoUBL` and takes either a `File` as input or a pre-parsed `un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType` object (that reading is done with class `com.helger.cii.d16b.CIID16BCrossIndustryInvoiceTypeMarshaller` from [ph-cii](https://github.com/phax/ph-cii)).
+If you do not know the edition of a document up front, use `com.helger.en16931.cii2ubl.CIIToUBLDispatcher` (since v4.0.0).
+It determines the edition from BT-24 (Specification identifier) and routes to the matching converter:
+
+```java
+final ErrorList aErrorList = new ErrorList ();
+final Serializable aUBL = new CIIToUBLDispatcher ().convertCIItoUBL (aFile, aErrorList);
+```
+
+Note that the edition cannot be determined from the XML namespaces, because CII D16B, D22B and D25A all use identical namespace URIs, and it cannot be determined from the XML Schema either, because a D16B instance also validates against the D25A XSD.
+BT-24 is the only reliable discriminator.
+For documents that carry no EN 16931 identifier - for example legacy ZUGFeRD files - set the edition explicitly with `setEdition (EEN16931Edition.EN2017)`.
+`EEN16931Edition` lives in [en16931-basics](https://github.com/phax/en16931-basics), the artefact that holds the facts about EN 16931 that are shared between the conversion projects; since v4.0.0 it is a dependency of this library.
+
+The main conversion method is called `convertCIItoUBL` and takes either a `File` as input or a pre-parsed `CrossIndustryInvoiceType` object.
+Reading is done with `com.helger.cii.d16b.CIID16BCrossIndustryInvoiceTypeMarshaller` respectively `com.helger.cii.d25a.CIID25ACrossIndustryInvoiceTypeMarshaller` from [ph-cii](https://github.com/phax/ph-cii).
 Additionally an `ErrorList` object must be provided as a container for all the errors that occur.
 
 The conversion is deemed successful, if a non-`null` object is returned **and** if the error list contains no error (`errorList.containsNoError ()`).
+
+The field mapping of both editions is documented in the `docs` folder:
+* [`docs/en16931-2017-syntax.md`](docs/en16931-2017-syntax.md) - UBL 2.1 and CII D16B
+* [`docs/en16931-2026-syntax.md`](docs/en16931-2026-syntax.md) - UBL 2.5 and CII D25A
 
 ## Maven usage
 
@@ -50,20 +72,26 @@ Replace `x.y.z` with the effective version you want to use:
 
 Call it via `java -jar en16931-cii2ubl-cli-full.jar` followed by the options and parameters.
 
+Without `--en-version` the EN 16931 edition is determined from BT-24 of each source file.
+
 ```
-[INFO] CII to UBL Converter v3.1.7 (build 2026-04-22T11:56:27Z)
+[INFO] CII to UBL Converter v4.0.0-SNAPSHOT (build 2026-09-04T22:40:13Z)
 Missing required parameter: 'source files'
 Usage: CIItoUBLConverter [-hV] [--disable-wildcard-expansion]
                          [--swap-price-sign] [--swap-quantity-sign] [--verbose]
-                         [--mode mode] [--output-suffix filename part] [-t
-                         directory] [--ubl version] [--ubl-cardaccountnetworkid
-                         ID] [--ubl-customizationid ID]
-                         [--ubl-defaultorderrefid ID] [--ubl-profileid ID]
+                         [--en-version edition] [--mode mode] [--output-suffix
+                         filename part] [-t directory] [--ubl version]
+                         [--ubl-cardaccountnetworkid ID] [--ubl-customizationid
+                         ID] [--ubl-defaultorderrefid ID] [--ubl-profileid ID]
                          [--ubl-vatscheme vat scheme] source files...
 CII to UBL Converter for EN 16931 invoices
       source files...        One or more CII file(s)
       --disable-wildcard-expansion
                              Disable wildcard expansion of filenames
+      --en-version edition   The EN 16931 edition to use: '2017' (CII D16B to
+                               UBL 2.1) or '2026' (CII D25A to UBL 2.5). If
+                               omitted, the edition is determined from BT-24 of
+                               each source file.
   -h, --help                 Show this help message and exit.
       --mode mode            Allowed values: AUTOMATIC, INVOICE, CREDIT_NOTE
                                (default: 'AUTOMATIC')
@@ -76,8 +104,9 @@ CII to UBL Converter for EN 16931 invoices
                                (default: 'true')
   -t, --target directory     The target directory for result output (default:
                                '.')
-      --ubl version          Version of the target UBL Format: '2.1', '2.2',
-                               '2.3' or '2.4' (default: '2.1')
+      --ubl version          Deprecated alias for --en-version: '2.1' selects
+                               EN 16931:2017 and '2.5' selects EN 16931:2026.
+                               Prefer --en-version.
       --ubl-cardaccountnetworkid ID
                              The UBL CardAccount network ID to be used
                                (default: 'mapped-from-cii')
@@ -101,8 +130,20 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-v3.1.8 - work in progress
-* Added `docs/en16931-2026-syntax.md` with the three-way field mapping (UBL 2.5 invoice / UBL 2.5 credit note / CII D25A) of EN 16931:2026, extracted from the CEN/TS 16931-3-2:2026 and CEN/TS 16931-3-3:2026 Formal Vote drafts
+v4.0.0 - 2026-09-05
+* Added the **EN 16931:2026** syntax binding: `com.helger.en16931.cii2ubl.en2026.CIID25AToUBL25Converter` converts CII D25A to UBL 2.5, covering all 284 rows of the mapping table including the 70 business terms and groups that are new in 2026 (BG-33 to BG-39, BT-166 to BT-220)
+* Removed the support for creating UBL 2.2, 2.3 and 2.4 - the two editions of EN 16931 prescribe exactly UBL 2.1 and UBL 2.5
+* Moved the EN 16931:2017 conversion to the new package `com.helger.en16931.cii2ubl.en2017` and renamed `CIIToUBL21Converter` to `CIID16BToUBL21Converter`. The UBL 2.1 output is unchanged
+* Split `AbstractCIIToUBLConverter` into the edition independent `AbstractCIIToUBLConverterBase` and the CII release specific `AbstractCIIToUBL2017Converter` and `AbstractCIIToUBL2026Converter`
+* Added `CIIToUBLDispatcher` to determine the EN 16931 edition of a CII document from BT-24 and to route to the matching converter. The edition can neither be determined from the XML namespaces, which are identical across CII releases, nor from the XML Schema, because a D16B instance also validates against the D25A XSD
+* Added the dependency to `en16931-basics` 1.0.0 and took `EEN16931Edition`, the code list knowledge and the UNTDID 2379 date formats from there instead of holding own copies. `com.helger.en16931.cii2ubl.EEN16931Edition` was therefore replaced by `com.helger.en16931.basics.EEN16931Edition`, and the BT-3, BT-8, BT-17/BT-18 and BT-81 classification now comes from `com.helger.en16931.basics.codelist.EN16931CodeLists`. The `AbstractCIIToUBLConverterBase` constants `DEFAULT_DATE_TIME_FORMAT` and `DATE_TIME_FORMAT_WITH_TIME` were replaced by `com.helger.en16931.basics.EEN16931DateFormatCode`. The converted output is unchanged
+* The CLI determines the edition per file from BT-24 by default; the new option `--en-version 2017|2026` forces one instead. `--ubl` is deprecated and now only accepts `2.1` and `2.5`
+* Fixed a long standing CLI bug: without `--ubl-customizationid` and `--ubl-profileid` the conversion aborted with a `NullPointerException`
+* The BT-3 (Invoice type code) subset of UNTDID 1001 now follows the EN 16931 code list registry (the [CEN/TC 434 section](https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931) of the European Commission registry), with the values taken from "EN16931 code lists values v17b - used from 2026-05-15". The list is versioned by date and not by EN 16931 edition, so both editions share it
+* Fixed the BT-3 classification of `81`, `502` and `503`: all three were treated as Invoice codes, although the code list has them as Credit Note codes. `502` and `503` were added to the list in v15 (used from 2025-05-15)
+* Added the dependencies to `ph-cii-d25a` and `ph-ubl25`
+* Added `docs/en16931-2026-syntax.md` with the three-way field mapping (UBL 2.5 invoice / UBL 2.5 credit note / CII D25A) of EN 16931:2026
+* Added `docs/plan-4.0.0.md` with the implementation plan for v4.0.0
 
 v3.1.7 - 2026-04-22
 * Fixed BT-150 (Item price base quantity unit of measure): now falls back to the net price unitCode when no gross price is present, instead of losing it

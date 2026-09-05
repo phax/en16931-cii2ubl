@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Artificial EN 16931:2026 CII D25A test file - header level business terms (Credit Note).
+     Focuses on the carried-over BTs whose UBL path changed between the 2017 and 2026 bindings. -->
+<rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"
+                          xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
+                          xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100"
+                          xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">
+  <rsm:ExchangedDocumentContext>
+    <ram:BusinessProcessSpecifiedDocumentContextParameter>
+      <ram:ID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</ram:ID>
+    </ram:BusinessProcessSpecifiedDocumentContextParameter>
+    <ram:GuidelineSpecifiedDocumentContextParameter>
+      <ram:ID>urn:cen.eu:en16931:2026</ram:ID>
+    </ram:GuidelineSpecifiedDocumentContextParameter>
+  </rsm:ExchangedDocumentContext>
+  <rsm:ExchangedDocument>
+    <ram:ID>D25A-HDR-CN-1</ram:ID>
+    <ram:TypeCode>381</ram:TypeCode>
+    <ram:IssueDateTime>
+      <udt:DateTimeString format="102">20260115</udt:DateTimeString>
+    </ram:IssueDateTime>
+    <!-- BG-1 INVOICE NOTE: BT-21 subject code + BT-22 note -->
+    <ram:IncludedNote>
+      <ram:Content>Payment within 30 days</ram:Content>
+      <ram:SubjectCode>AAI</ram:SubjectCode>
+    </ram:IncludedNote>
+    <ram:IncludedNote>
+      <ram:Content>Second note without a subject code</ram:Content>
+    </ram:IncludedNote>
+  </rsm:ExchangedDocument>
+  <rsm:SupplyChainTradeTransaction>
+    <ram:IncludedSupplyChainTradeLineItem>
+      <ram:AssociatedDocumentLineDocument>
+        <ram:LineID>1</ram:LineID>
+        <!-- BT-127 Invoice line note - stays a plain cbc:Note -->
+        <ram:IncludedNote>
+          <ram:Content>Line level note</ram:Content>
+        </ram:IncludedNote>
+      </ram:AssociatedDocumentLineDocument>
+      <ram:SpecifiedTradeProduct>
+        <ram:Name>Test item</ram:Name>
+      </ram:SpecifiedTradeProduct>
+      <ram:SpecifiedLineTradeAgreement>
+        <ram:NetPriceProductTradePrice>
+          <ram:ChargeAmount>25.00</ram:ChargeAmount>
+        </ram:NetPriceProductTradePrice>
+      </ram:SpecifiedLineTradeAgreement>
+      <ram:SpecifiedLineTradeDelivery>
+        <ram:BilledQuantity unitCode="C62">4</ram:BilledQuantity>
+      </ram:SpecifiedLineTradeDelivery>
+      <ram:SpecifiedLineTradeSettlement>
+        <ram:ApplicableTradeTax>
+          <ram:TypeCode>VAT</ram:TypeCode>
+          <ram:CategoryCode>S</ram:CategoryCode>
+          <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
+        </ram:ApplicableTradeTax>
+        <ram:SpecifiedTradeSettlementLineMonetarySummation>
+          <ram:LineTotalAmount>100.00</ram:LineTotalAmount>
+        </ram:SpecifiedTradeSettlementLineMonetarySummation>
+      </ram:SpecifiedLineTradeSettlement>
+    </ram:IncludedSupplyChainTradeLineItem>
+    <ram:ApplicableHeaderTradeAgreement>
+      <!-- BT-10 + BT-10-1 Buyer reference, new element in CII D25A -->
+      <ram:BuyerReferenceID schemeID="ADE">BUYER-REF-4711</ram:BuyerReferenceID>
+      <ram:SellerTradeParty>
+        <!-- BT-29 + BT-29-1 Seller identifier -->
+        <ram:GlobalID schemeID="0088">4035811234567</ram:GlobalID>
+        <!-- BT-27 -->
+        <ram:Name>Seller Ltd</ram:Name>
+        <!-- BT-33 -->
+        <ram:Description>Registered in Vienna</ram:Description>
+        <ram:SpecifiedLegalOrganization>
+          <!-- BT-30 + BT-30-1 -->
+          <ram:ID schemeID="0198">FN123456x</ram:ID>
+          <!-- BT-28 -->
+          <ram:TradingBusinessName>Seller Trading Name</ram:TradingBusinessName>
+        </ram:SpecifiedLegalOrganization>
+        <ram:DefinedTradeContact>
+          <!-- BG-6 SELLER CONTACT -->
+          <ram:PersonName>Jane Doe</ram:PersonName>
+          <ram:TelephoneUniversalCommunication>
+            <ram:CompleteNumber>+43 1 1234567</ram:CompleteNumber>
+          </ram:TelephoneUniversalCommunication>
+          <ram:EmailURIUniversalCommunication>
+            <ram:URIID>jane@seller.example</ram:URIID>
+          </ram:EmailURIUniversalCommunication>
+        </ram:DefinedTradeContact>
+        <ram:PostalTradeAddress>
+          <!-- BG-5 SELLER POSTAL ADDRESS -->
+          <ram:PostcodeCode>1010</ram:PostcodeCode>
+          <ram:LineOne>Main Street 1</ram:LineOne>
+          <ram:LineTwo>Building A</ram:LineTwo>
+          <ram:LineThree>Floor 3</ram:LineThree>
+          <ram:CityName>Vienna</ram:CityName>
+          <ram:CountryID>AT</ram:CountryID>
+          <ram:CountrySubDivisionName>Wien</ram:CountrySubDivisionName>
+        </ram:PostalTradeAddress>
+        <!-- BT-34 + BT-34-1 -->
+        <ram:URIUniversalCommunication>
+          <ram:URIID schemeID="0088">4035811234567</ram:URIID>
+        </ram:URIUniversalCommunication>
+        <!-- BT-31 Seller VAT identifier -->
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID="VA">ATU12345678</ram:ID>
+        </ram:SpecifiedTaxRegistration>
+        <!-- BT-32 Seller tax registration identifier -> TaxScheme "LOC" since 2026 -->
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID="FC">FC-987654</ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:SellerTradeParty>
+      <ram:BuyerTradeParty>
+        <ram:GlobalID schemeID="0088">4035819876543</ram:GlobalID>
+        <ram:Name>Buyer Ltd</ram:Name>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode>5020</ram:PostcodeCode>
+          <ram:LineOne>Buyer Street 2</ram:LineOne>
+          <ram:CityName>Salzburg</ram:CityName>
+          <ram:CountryID>AT</ram:CountryID>
+        </ram:PostalTradeAddress>
+      </ram:BuyerTradeParty>
+      <!-- BT-13 Purchase order reference -->
+      <ram:BuyerOrderReferencedDocument>
+        <ram:IssuerAssignedID>PO-2026-0001</ram:IssuerAssignedID>
+      </ram:BuyerOrderReferencedDocument>
+      <!-- BT-12 Contract reference -->
+      <ram:ContractReferencedDocument>
+        <ram:IssuerAssignedID>CONTRACT-42</ram:IssuerAssignedID>
+      </ram:ContractReferencedDocument>
+      <!-- BT-11 Project reference + BT-11-1 Project name -->
+      <ram:SpecifiedProcuringProject>
+        <ram:ID>PROJECT-7</ram:ID>
+        <ram:Name>Test project</ram:Name>
+      </ram:SpecifiedProcuringProject>
+    </ram:ApplicableHeaderTradeAgreement>
+    <ram:ApplicableHeaderTradeDelivery />
+    <ram:ApplicableHeaderTradeSettlement>
+      <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+      <ram:ApplicableTradeTax>
+        <ram:CalculatedAmount>20.00</ram:CalculatedAmount>
+        <ram:TypeCode>VAT</ram:TypeCode>
+        <ram:BasisAmount>100.00</ram:BasisAmount>
+        <ram:CategoryCode>S</ram:CategoryCode>
+        <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
+      </ram:ApplicableTradeTax>
+      <!-- BG-14 INVOICING PERIOD -->
+      <ram:BillingSpecifiedPeriod>
+        <ram:StartDateTime>
+          <udt:DateTimeString format="102">20260101</udt:DateTimeString>
+        </ram:StartDateTime>
+        <ram:EndDateTime>
+          <udt:DateTimeString format="102">20260131</udt:DateTimeString>
+        </ram:EndDateTime>
+      </ram:BillingSpecifiedPeriod>
+      <ram:SpecifiedTradePaymentTerms>
+        <!-- BT-9 Payment due date -->
+        <ram:DueDateDateTime>
+          <udt:DateTimeString format="102">20260214</udt:DateTimeString>
+        </ram:DueDateDateTime>
+      </ram:SpecifiedTradePaymentTerms>
+      <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+        <ram:LineTotalAmount>100.00</ram:LineTotalAmount>
+        <ram:TaxBasisTotalAmount>100.00</ram:TaxBasisTotalAmount>
+        <ram:TaxTotalAmount currencyID="EUR">20.00</ram:TaxTotalAmount>
+        <ram:GrandTotalAmount>120.00</ram:GrandTotalAmount>
+        <ram:DuePayableAmount>120.00</ram:DuePayableAmount>
+      </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+    </ram:ApplicableHeaderTradeSettlement>
+  </rsm:SupplyChainTradeTransaction>
+</rsm:CrossIndustryInvoice>

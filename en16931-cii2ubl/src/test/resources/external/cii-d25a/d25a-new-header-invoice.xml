@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Artificial EN 16931:2026 CII D25A test file - the business terms that are NEW in EN 16931:2026
+     at header level: BT-166, BT-167, BT-197, BT-202, BT-215 and BT-216. -->
+<rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"
+                          xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
+                          xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100"
+                          xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">
+  <rsm:ExchangedDocumentContext>
+    <ram:BusinessProcessSpecifiedDocumentContextParameter>
+      <ram:ID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</ram:ID>
+    </ram:BusinessProcessSpecifiedDocumentContextParameter>
+    <ram:GuidelineSpecifiedDocumentContextParameter>
+      <ram:ID>urn:cen.eu:en16931:2026</ram:ID>
+    </ram:GuidelineSpecifiedDocumentContextParameter>
+  </rsm:ExchangedDocumentContext>
+  <rsm:ExchangedDocument>
+    <ram:ID>D25A-NEW-HDR-INV-1</ram:ID>
+    <ram:TypeCode>380</ram:TypeCode>
+    <ram:IssueDateTime>
+      <udt:DateTimeString format="208">20260115120503+0100</udt:DateTimeString>
+    </ram:IssueDateTime>
+    <ram:IncludedNote>
+      <ram:Content>Header note</ram:Content>
+      <ram:SubjectCode>AAI</ram:SubjectCode>
+    </ram:IncludedNote>
+  </rsm:ExchangedDocument>
+  <rsm:SupplyChainTradeTransaction>
+    <ram:IncludedSupplyChainTradeLineItem>
+      <ram:AssociatedDocumentLineDocument>
+        <ram:LineID>1</ram:LineID>
+        <ram:IncludedNote>
+          <ram:Content>Line one note</ram:Content>
+        </ram:IncludedNote>
+      </ram:AssociatedDocumentLineDocument>
+      <ram:SpecifiedTradeProduct>
+        <!-- BG-31 ITEM INFORMATION -->
+        <ram:GlobalID schemeID="0160">1234567890128</ram:GlobalID>
+        <ram:SellerAssignedID>SELLER-ART-1</ram:SellerAssignedID>
+        <ram:BuyerAssignedID>BUYER-ART-1</ram:BuyerAssignedID>
+        <ram:Name>Widget</ram:Name>
+        <ram:Description>A round widget</ram:Description>
+        <!-- BG-32 ITEM ATTRIBUTE -->
+        <ram:ApplicableProductCharacteristic>
+          <ram:Description>Colour</ram:Description>
+          <ram:Value>Blue</ram:Value>
+        </ram:ApplicableProductCharacteristic>
+        <ram:ApplicableProductCharacteristic>
+          <ram:Description>Weight</ram:Description>
+          <ram:Value>2 kg</ram:Value>
+        </ram:ApplicableProductCharacteristic>
+        <!-- BT-158 Item classification identifier -->
+        <ram:DesignatedProductClassification>
+          <ram:ClassCode listID="TST" listVersionID="1.0">CLASS-1</ram:ClassCode>
+        </ram:DesignatedProductClassification>
+        <!-- BT-159 Item country of origin -->
+        <ram:OriginTradeCountry>
+          <ram:ID>AT</ram:ID>
+        </ram:OriginTradeCountry>
+      </ram:SpecifiedTradeProduct>
+      <ram:SpecifiedLineTradeAgreement>
+        <!-- BG-29 PRICE DETAILS: BT-148 gross price, BT-147 discount, BT-146 net price -->
+        <ram:GrossPriceProductTradePrice>
+          <ram:ChargeAmount>30.00</ram:ChargeAmount>
+          <ram:BasisQuantity unitCode="C62">1</ram:BasisQuantity>
+          <ram:AppliedTradeAllowanceCharge>
+            <ram:ChargeIndicator>
+              <udt:Indicator>false</udt:Indicator>
+            </ram:ChargeIndicator>
+            <ram:ActualAmount>5.00</ram:ActualAmount>
+          </ram:AppliedTradeAllowanceCharge>
+        </ram:GrossPriceProductTradePrice>
+        <ram:NetPriceProductTradePrice>
+          <ram:ChargeAmount>25.00</ram:ChargeAmount>
+          <ram:BasisQuantity unitCode="C62">1</ram:BasisQuantity>
+        </ram:NetPriceProductTradePrice>
+      </ram:SpecifiedLineTradeAgreement>
+      <ram:SpecifiedLineTradeDelivery>
+        <ram:BilledQuantity unitCode="C62">4</ram:BilledQuantity>
+      </ram:SpecifiedLineTradeDelivery>
+      <ram:SpecifiedLineTradeSettlement>
+        <!-- BG-30 LINE VAT INFORMATION -->
+        <ram:ApplicableTradeTax>
+          <ram:TypeCode>VAT</ram:TypeCode>
+          <ram:CategoryCode>S</ram:CategoryCode>
+          <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
+        </ram:ApplicableTradeTax>
+        <!-- BG-26 INVOICE LINE PERIOD -->
+        <ram:BillingSpecifiedPeriod>
+          <ram:StartDateTime>
+            <udt:DateTimeString format="102">20260101</udt:DateTimeString>
+          </ram:StartDateTime>
+          <ram:EndDateTime>
+            <udt:DateTimeString format="102">20260131</udt:DateTimeString>
+          </ram:EndDateTime>
+        </ram:BillingSpecifiedPeriod>
+        <!-- BG-27 INVOICE LINE ALLOWANCES -->
+        <ram:SpecifiedTradeAllowanceCharge>
+          <ram:ChargeIndicator>
+            <udt:Indicator>false</udt:Indicator>
+          </ram:ChargeIndicator>
+          <ram:CalculationPercent>10.00</ram:CalculationPercent>
+          <ram:BasisAmount>100.00</ram:BasisAmount>
+          <ram:ActualAmount>10.00</ram:ActualAmount>
+          <ram:ReasonCode>95</ram:ReasonCode>
+          <ram:Reason>Line discount</ram:Reason>
+        </ram:SpecifiedTradeAllowanceCharge>
+        <!-- BG-28 INVOICE LINE CHARGES -->
+        <ram:SpecifiedTradeAllowanceCharge>
+          <ram:ChargeIndicator>
+            <udt:Indicator>true</udt:Indicator>
+          </ram:ChargeIndicator>
+          <ram:BasisAmount>100.00</ram:BasisAmount>
+          <ram:ActualAmount>10.00</ram:ActualAmount>
+          <ram:ReasonCode>FC</ram:ReasonCode>
+          <ram:Reason>Line freight</ram:Reason>
+        </ram:SpecifiedTradeAllowanceCharge>
+        <ram:SpecifiedTradeSettlementLineMonetarySummation>
+          <ram:LineTotalAmount>100.00</ram:LineTotalAmount>
+        </ram:SpecifiedTradeSettlementLineMonetarySummation>
+        <!-- BT-132 Referenced purchase order line reference -->
+        <ram:AdditionalReferencedDocument>
+          <ram:IssuerAssignedID>OBJ-1</ram:IssuerAssignedID>
+          <ram:TypeCode>130</ram:TypeCode>
+          <ram:ReferenceTypeCode>AVE</ram:ReferenceTypeCode>
+        </ram:AdditionalReferencedDocument>
+        <!-- BT-133 Invoice line Buyer accounting reference -->
+        <ram:ReceivableSpecifiedTradeAccountingAccount>
+          <ram:ID>LINE-COST-CENTRE</ram:ID>
+        </ram:ReceivableSpecifiedTradeAccountingAccount>
+      </ram:SpecifiedLineTradeSettlement>
+    </ram:IncludedSupplyChainTradeLineItem>
+    <ram:ApplicableHeaderTradeAgreement>
+      <ram:BuyerReferenceID schemeID="ADE">BUYER-REF-4711</ram:BuyerReferenceID>
+      <ram:SellerTradeParty>
+        <ram:GlobalID schemeID="0088">4035811234567</ram:GlobalID>
+        <ram:Name>Seller Ltd</ram:Name>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID="0198">FN123456x</ram:ID>
+          <ram:TradingBusinessName>Seller Trading Name</ram:TradingBusinessName>
+        </ram:SpecifiedLegalOrganization>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode>1010</ram:PostcodeCode>
+          <ram:LineOne>Main Street 1</ram:LineOne>
+          <ram:CityName>Vienna</ram:CityName>
+          <ram:CountryID>AT</ram:CountryID>
+        </ram:PostalTradeAddress>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID="VA">ATU12345678</ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:SellerTradeParty>
+      <ram:BuyerTradeParty>
+        <ram:Name>Buyer Ltd</ram:Name>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode>5020</ram:PostcodeCode>
+          <ram:LineOne>Buyer Street 2</ram:LineOne>
+          <ram:CityName>Salzburg</ram:CityName>
+          <ram:CountryID>AT</ram:CountryID>
+        </ram:PostalTradeAddress>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID="VA">ATU87654321</ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:BuyerTradeParty>
+      <!-- BG-11 SELLER TAX REPRESENTATIVE PARTY + BG-12 its postal address -->
+      <ram:SellerTaxRepresentativeTradeParty>
+        <ram:Name>Tax Rep GmbH</ram:Name>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode>1020</ram:PostcodeCode>
+          <ram:LineOne>Rep Street 3</ram:LineOne>
+          <ram:CityName>Vienna</ram:CityName>
+          <ram:CountryID>AT</ram:CountryID>
+        </ram:PostalTradeAddress>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID="VA">ATU11111111</ram:ID>
+        </ram:SpecifiedTaxRegistration>
+      </ram:SellerTaxRepresentativeTradeParty>
+      <!-- BT-14 Sales order reference -->
+      <ram:SellerOrderReferencedDocument>
+        <ram:IssuerAssignedID>SO-2026-9</ram:IssuerAssignedID>
+      </ram:SellerOrderReferencedDocument>
+      <ram:BuyerOrderReferencedDocument>
+        <ram:IssuerAssignedID>PO-2026-0001</ram:IssuerAssignedID>
+      </ram:BuyerOrderReferencedDocument>
+      <ram:ContractReferencedDocument>
+        <ram:IssuerAssignedID>CONTRACT-42</ram:IssuerAssignedID>
+      </ram:ContractReferencedDocument>
+      <!-- BT-17 Tender or lot reference (TypeCode 50) -->
+      <ram:AdditionalReferencedDocument>
+        <ram:IssuerAssignedID>TENDER-5</ram:IssuerAssignedID>
+        <ram:TypeCode>50</ram:TypeCode>
+      </ram:AdditionalReferencedDocument>
+      <!-- BT-18 Invoiced object identifier (TypeCode 130) -->
+      <ram:AdditionalReferencedDocument>
+        <ram:IssuerAssignedID>METER-9</ram:IssuerAssignedID>
+        <ram:TypeCode>130</ram:TypeCode>
+        <ram:ReferenceTypeCode>AVE</ram:ReferenceTypeCode>
+      </ram:AdditionalReferencedDocument>
+      <!-- BG-24 ADDITIONAL SUPPORTING DOCUMENTS (TypeCode 916) -->
+      <ram:AdditionalReferencedDocument>
+        <ram:IssuerAssignedID>DOC-916</ram:IssuerAssignedID>
+        <ram:URIID>https://example.org/doc</ram:URIID>
+        <ram:TypeCode>916</ram:TypeCode>
+        <ram:Name>Supporting document</ram:Name>
+      </ram:AdditionalReferencedDocument>
+      <ram:SpecifiedProcuringProject>
+        <ram:ID>PROJECT-7</ram:ID>
+        <ram:Name>Test project</ram:Name>
+      </ram:SpecifiedProcuringProject>
+    </ram:ApplicableHeaderTradeAgreement>
+    <ram:ApplicableHeaderTradeDelivery>
+      <!-- BG-13 DELIVERY INFORMATION + BG-15 DELIVER TO ADDRESS -->
+      <ram:ShipToTradeParty>
+        <ram:GlobalID schemeID="0088">4035811111111</ram:GlobalID>
+        <ram:Name>Delivery Site</ram:Name>
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode>4020</ram:PostcodeCode>
+          <ram:LineOne>Delivery Road 7</ram:LineOne>
+          <ram:CityName>Linz</ram:CityName>
+          <ram:CountryID>AT</ram:CountryID>
+        </ram:PostalTradeAddress>
+      </ram:ShipToTradeParty>
+      <!-- BT-72 Actual delivery date -->
+      <ram:ActualDeliverySupplyChainEvent>
+        <ram:OccurrenceDateTime>
+          <udt:DateTimeString format="102">20260112</udt:DateTimeString>
+        </ram:OccurrenceDateTime>
+      </ram:ActualDeliverySupplyChainEvent>
+      <!-- BT-16 Despatch advice reference -->
+      <ram:DespatchAdviceReferencedDocument>
+        <ram:IssuerAssignedID>DESPATCH-3</ram:IssuerAssignedID>
+      </ram:DespatchAdviceReferencedDocument>
+      <!-- BT-15 Receiving advice reference -->
+      <ram:ReceivingAdviceReferencedDocument>
+        <ram:IssuerAssignedID>RECEIPT-4</ram:IssuerAssignedID>
+      </ram:ReceivingAdviceReferencedDocument>
+      <!-- BT-197 Delivery note reference - new in 2026 -->
+      <ram:DeliveryNoteReferencedDocument>
+        <ram:IssuerAssignedID>DELNOTE-8</ram:IssuerAssignedID>
+      </ram:DeliveryNoteReferencedDocument>
+    </ram:ApplicableHeaderTradeDelivery>
+    <ram:ApplicableHeaderTradeSettlement>
+      <!-- BT-90 Bank assigned creditor identifier -->
+      <ram:CreditorReferenceID>SEPA-CRED-1</ram:CreditorReferenceID>
+      <!-- BT-83 Remittance information -->
+      <ram:PaymentReference>REMIT-1</ram:PaymentReference>
+      <!-- BT-6 VAT accounting currency code -->
+      <ram:TaxCurrencyCode>USD</ram:TaxCurrencyCode>
+      <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+      <!-- BG-10 PAYEE -->
+      <ram:PayeeTradeParty>
+        <ram:GlobalID schemeID="0088">4035822222222</ram:GlobalID>
+        <ram:Name>Payee Ltd</ram:Name>
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID="0198">FN999999z</ram:ID>
+        </ram:SpecifiedLegalOrganization>
+      </ram:PayeeTradeParty>
+      <!-- BT-167 + BT-167-1 + BT-167-2 VAT accounting currency exchange rate - new in 2026 -->
+      <ram:InvoiceApplicableTradeCurrencyExchange>
+        <ram:SourceCurrencyCode>USD</ram:SourceCurrencyCode>
+        <ram:TargetCurrencyCode>EUR</ram:TargetCurrencyCode>
+        <ram:ConversionRate>1.1000</ram:ConversionRate>
+      </ram:InvoiceApplicableTradeCurrencyExchange>
+      <!-- BG-16 PAYMENT INSTRUCTIONS + BG-17 CREDIT TRANSFER -->
+      <!-- BG-19 DIRECT DEBIT, with BT-215 and BT-216 new in 2026 -->
+      <ram:SpecifiedTradeSettlementPaymentMeans>
+        <ram:TypeCode>59</ram:TypeCode>
+        <ram:Information>SEPA direct debit</ram:Information>
+        <ram:PayerPartyDebtorFinancialAccount>
+          <!-- BT-91 -->
+          <ram:IBANID>AT022050302101023600</ram:IBANID>
+          <!-- BT-216 Debited account name -->
+          <ram:AccountName>Buyer Account</ram:AccountName>
+        </ram:PayerPartyDebtorFinancialAccount>
+        <ram:PayerSpecifiedDebtorFinancialInstitution>
+          <!-- BT-215 Debited account payment service provider identifier -->
+          <ram:BICID>SPSBAT2SXXX</ram:BICID>
+        </ram:PayerSpecifiedDebtorFinancialInstitution>
+      </ram:SpecifiedTradeSettlementPaymentMeans>
+      <!-- BG-23 VAT BREAKDOWN - two categories -->
+      <ram:ApplicableTradeTax>
+        <ram:CalculatedAmount>20.00</ram:CalculatedAmount>
+        <ram:TypeCode>VAT</ram:TypeCode>
+        <ram:BasisAmount>100.00</ram:BasisAmount>
+        <ram:CategoryCode>S</ram:CategoryCode>
+        <!-- BT-7 Value added tax point date -->
+        <ram:TaxPointDate>
+          <udt:DateString format="102">20260110</udt:DateString>
+        </ram:TaxPointDate>
+        <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
+      </ram:ApplicableTradeTax>
+      <ram:ApplicableTradeTax>
+        <ram:CalculatedAmount>0.00</ram:CalculatedAmount>
+        <ram:TypeCode>VAT</ram:TypeCode>
+        <ram:ExemptionReason>Reverse charge</ram:ExemptionReason>
+        <ram:BasisAmount>50.00</ram:BasisAmount>
+        <ram:CategoryCode>AE</ram:CategoryCode>
+        <ram:ExemptionReasonCode>VATEX-EU-AE</ram:ExemptionReasonCode>
+        <ram:RateApplicablePercent>0.00</ram:RateApplicablePercent>
+      </ram:ApplicableTradeTax>
+      <ram:BillingSpecifiedPeriod>
+        <ram:StartDateTime>
+          <udt:DateTimeString format="102">20260101</udt:DateTimeString>
+        </ram:StartDateTime>
+        <ram:EndDateTime>
+          <udt:DateTimeString format="102">20260131</udt:DateTimeString>
+        </ram:EndDateTime>
+      </ram:BillingSpecifiedPeriod>
+      <!-- BG-20 DOCUMENT LEVEL ALLOWANCES -->
+      <ram:SpecifiedTradeAllowanceCharge>
+        <ram:ChargeIndicator>
+          <udt:Indicator>false</udt:Indicator>
+        </ram:ChargeIndicator>
+        <ram:CalculationPercent>5.00</ram:CalculationPercent>
+        <ram:BasisAmount>100.00</ram:BasisAmount>
+        <ram:ActualAmount>5.00</ram:ActualAmount>
+        <ram:ReasonCode>95</ram:ReasonCode>
+        <ram:Reason>Volume discount</ram:Reason>
+        <ram:CategoryTradeTax>
+          <ram:TypeCode>VAT</ram:TypeCode>
+          <ram:CategoryCode>S</ram:CategoryCode>
+          <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
+        </ram:CategoryTradeTax>
+      </ram:SpecifiedTradeAllowanceCharge>
+      <!-- BG-21 DOCUMENT LEVEL CHARGES -->
+      <ram:SpecifiedTradeAllowanceCharge>
+        <ram:ChargeIndicator>
+          <udt:Indicator>true</udt:Indicator>
+        </ram:ChargeIndicator>
+        <ram:BasisAmount>100.00</ram:BasisAmount>
+        <ram:ActualAmount>15.00</ram:ActualAmount>
+        <ram:ReasonCode>FC</ram:ReasonCode>
+        <ram:Reason>Freight</ram:Reason>
+        <ram:CategoryTradeTax>
+          <ram:TypeCode>VAT</ram:TypeCode>
+          <ram:CategoryCode>S</ram:CategoryCode>
+          <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
+        </ram:CategoryTradeTax>
+      </ram:SpecifiedTradeAllowanceCharge>
+      <ram:SpecifiedTradePaymentTerms>
+        <!-- BT-20 Payment terms -->
+        <ram:Description>Net 30 days</ram:Description>
+        <ram:DueDateDateTime>
+          <udt:DateTimeString format="102">20260214</udt:DateTimeString>
+        </ram:DueDateDateTime>
+        <!-- BT-89 Mandate reference identifier -->
+        <ram:DirectDebitMandateID>MANDATE-1</ram:DirectDebitMandateID>
+      </ram:SpecifiedTradePaymentTerms>
+      <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+        <ram:LineTotalAmount>100.00</ram:LineTotalAmount>
+        <ram:ChargeTotalAmount>15.00</ram:ChargeTotalAmount>
+        <ram:AllowanceTotalAmount>5.00</ram:AllowanceTotalAmount>
+        <ram:TaxBasisTotalAmount>110.00</ram:TaxBasisTotalAmount>
+        <ram:TaxTotalAmount currencyID="EUR">22.00</ram:TaxTotalAmount>
+        <ram:TaxTotalAmount currencyID="USD">24.20</ram:TaxTotalAmount>
+        <ram:RoundingAmount>0.00</ram:RoundingAmount>
+        <ram:GrandTotalAmount>132.00</ram:GrandTotalAmount>
+        <ram:TotalPrepaidAmount>32.00</ram:TotalPrepaidAmount>
+        <ram:DuePayableAmount>100.00</ram:DuePayableAmount>
+      </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+      <!-- BG-3 PRECEDING INVOICE REFERENCE - 0..n since D25A -->
+      <ram:InvoiceReferencedDocument>
+        <ram:IssuerAssignedID>PREV-INV-1</ram:IssuerAssignedID>
+        <ram:TypeCode>380</ram:TypeCode>
+        <ram:FormattedIssueDateTime>
+          <qdt:DateTimeString format="102">20251215</qdt:DateTimeString>
+        </ram:FormattedIssueDateTime>
+      </ram:InvoiceReferencedDocument>
+      <ram:InvoiceReferencedDocument>
+        <ram:IssuerAssignedID>PREV-INV-2</ram:IssuerAssignedID>
+      </ram:InvoiceReferencedDocument>
+      <!-- BT-19 Buyer accounting reference -->
+      <ram:ReceivableSpecifiedTradeAccountingAccount>
+        <ram:ID>COST-CENTRE-1</ram:ID>
+      </ram:ReceivableSpecifiedTradeAccountingAccount>
+    </ram:ApplicableHeaderTradeSettlement>
+  </rsm:SupplyChainTradeTransaction>
+</rsm:CrossIndustryInvoice>

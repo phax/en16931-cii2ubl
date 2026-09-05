@@ -31,6 +31,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,20 +40,17 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.diagnostics.error.IError;
 import com.helger.diagnostics.error.list.ErrorList;
-import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverter;
-import com.helger.en16931.cii2ubl.CIIToUBL21Converter;
-import com.helger.en16931.cii2ubl.CIIToUBL22Converter;
-import com.helger.en16931.cii2ubl.CIIToUBL23Converter;
-import com.helger.en16931.cii2ubl.CIIToUBL24Converter;
+import com.helger.base.string.StringHelper;
+import com.helger.en16931.basics.EEN16931Edition;
+import com.helger.en16931.cii2ubl.AbstractCIIToUBLConverterBase;
+import com.helger.en16931.cii2ubl.CIIToUBLDispatcher;
 import com.helger.en16931.cii2ubl.CIIToUBLVersion;
 import com.helger.en16931.cii2ubl.EUBLCreationMode;
 import com.helger.io.file.FileSystemIterator;
 import com.helger.io.file.FileSystemRecursiveIterator;
 import com.helger.io.file.FilenameHelper;
 import com.helger.ubl21.UBL21Marshaller;
-import com.helger.ubl22.UBL22Marshaller;
-import com.helger.ubl23.UBL23Marshaller;
-import com.helger.ubl24.UBL24Marshaller;
+import com.helger.ubl25.UBL25Marshaller;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -72,10 +70,17 @@ public class CIIToUBLConverter implements Callable <Integer>
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (CIIToUBLConverter.class);
 
+  @Option (names = "--en-version",
+           paramLabel = "edition",
+           description = "The EN 16931 edition to use: '2017' (CII D16B to UBL 2.1) or '2026' " +
+                         "(CII D25A to UBL 2.5). If omitted, the edition is determined from BT-24 " +
+                         "of each source file.")
+  private String m_sENVersion;
+
   @Option (names = "--ubl",
            paramLabel = "version",
-           defaultValue = "2.1",
-           description = "Version of the target UBL Format: '2.1', '2.2', '2.3' or '2.4' (default: '${DEFAULT-VALUE}')")
+           description = "Deprecated alias for --en-version: '2.1' selects EN 16931:2017 and '2.5' " +
+                         "selects EN 16931:2026. Prefer --en-version.")
   private String m_sUBLVersion;
 
   @Option (names = "--mode",
@@ -98,7 +103,7 @@ public class CIIToUBLConverter implements Callable <Integer>
 
   @Option (names = "--ubl-vatscheme",
            paramLabel = "vat scheme",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_VAT_SCHEME,
+           defaultValue = AbstractCIIToUBLConverterBase.DEFAULT_VAT_SCHEME,
            description = "The UBL VAT scheme to be used (default: '${DEFAULT-VALUE}')")
   private String m_sVATScheme;
 
@@ -110,13 +115,13 @@ public class CIIToUBLConverter implements Callable <Integer>
 
   @Option (names = "--ubl-cardaccountnetworkid",
            paramLabel = "ID",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_CARD_ACCOUNT_NETWORK_ID,
+           defaultValue = AbstractCIIToUBLConverterBase.DEFAULT_CARD_ACCOUNT_NETWORK_ID,
            description = "The UBL CardAccount network ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sCardAccountNetworkID;
 
   @Option (names = "--ubl-defaultorderrefid",
            paramLabel = "ID",
-           defaultValue = AbstractCIIToUBLConverter.DEFAULT_ORDER_REF_ID,
+           defaultValue = AbstractCIIToUBLConverterBase.DEFAULT_ORDER_REF_ID,
            description = "The UBL default order reference ID to be used (default: '${DEFAULT-VALUE}')")
   private String m_sDefaultOrderRefID;
 
@@ -261,6 +266,52 @@ public class CIIToUBLConverter implements Callable <Integer>
         LOGGER.info (sMsg);
   }
 
+  /**
+   * Determine the EN 16931 edition to force, from --en-version and the deprecated --ubl alias.
+   *
+   * @return <code>null</code> if neither option was given, meaning the edition is detected per
+   *         source file.
+   */
+  @Nullable
+  private EEN16931Edition _determineForcedEdition ()
+  {
+    EEN16931Edition eFromENVersion = null;
+    if (StringHelper.isNotEmpty (m_sENVersion))
+    {
+      eFromENVersion = EEN16931Edition.getFromIDOrNull (m_sENVersion);
+      if (eFromENVersion == null)
+        throw new IllegalStateException ("Unsupported EN 16931 edition '" +
+                                         m_sENVersion +
+                                         "' provided. Use '2017' or '2026'.");
+    }
+
+    EEN16931Edition eFromUBLVersion = null;
+    if (StringHelper.isNotEmpty (m_sUBLVersion))
+    {
+      // Each edition prescribes exactly one UBL version, so the edition can be derived from it
+      for (final EEN16931Edition e : EEN16931Edition.values ())
+        if (e.getUBLSyntaxVersion ().equals (m_sUBLVersion))
+        {
+          eFromUBLVersion = e;
+          break;
+        }
+      if (eFromUBLVersion == null)
+        throw new IllegalStateException ("Unsupported UBL version '" +
+                                         m_sUBLVersion +
+                                         "' provided. Use '2.1' or '2.5', or better use --en-version.");
+      LOGGER.warn ("The option --ubl is deprecated - use --en-version " + eFromUBLVersion.getID () + " instead");
+    }
+
+    if (eFromENVersion != null && eFromUBLVersion != null && eFromENVersion != eFromUBLVersion)
+      throw new IllegalStateException ("The options --en-version " +
+                                       m_sENVersion +
+                                       " and --ubl " +
+                                       m_sUBLVersion +
+                                       " are inconsistent. EN 16931:2017 uses UBL 2.1 and EN 16931:2026 uses UBL 2.5.");
+
+    return eFromENVersion != null ? eFromENVersion : eFromUBLVersion;
+  }
+
   // doing the business
   public Integer call () throws Exception
   {
@@ -270,29 +321,26 @@ public class CIIToUBLConverter implements Callable <Integer>
     m_sOutputDir = _normalizeOutputDirectory (m_sOutputDir);
     final List <File> m_aSourceFiles = _normalizeInputFiles (m_aSourceFilenames);
 
-    final AbstractCIIToUBLConverter <?> aConverter;
-    if ("2.1".equals (m_sUBLVersion))
-      aConverter = new CIIToUBL21Converter ();
-    else
-      if ("2.2".equals (m_sUBLVersion))
-        aConverter = new CIIToUBL22Converter ();
-      else
-        if ("2.3".equals (m_sUBLVersion))
-          aConverter = new CIIToUBL23Converter ();
-        else
-          if ("2.4".equals (m_sUBLVersion))
-            aConverter = new CIIToUBL24Converter ();
-          else
-            throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "' provided.");
+    final EEN16931Edition eForcedEdition = _determineForcedEdition ();
 
-    aConverter.setUBLCreationMode (m_eMode)
+    final CIIToUBLDispatcher aConverter = new CIIToUBLDispatcher ();
+    aConverter.setEdition (eForcedEdition)
+              .setUBLCreationMode (m_eMode)
               .setVATScheme (m_sVATScheme)
-              .setCustomizationID (m_sCustomizationID)
-              .setProfileID (m_sProfileID)
               .setCardAccountNetworkID (m_sCardAccountNetworkID)
               .setDefaultOrderRefID (m_sDefaultOrderRefID)
               .setSwapQuantitySignIfNeeded (m_bSwapQuantitySign)
               .setSwapPriceSignIfNeeded (m_bSwapPriceSign);
+    // These two have no default value, and the setters reject null
+    if (StringHelper.isNotEmpty (m_sCustomizationID))
+      aConverter.setCustomizationID (m_sCustomizationID);
+    if (StringHelper.isNotEmpty (m_sProfileID))
+      aConverter.setProfileID (m_sProfileID);
+
+    if (eForcedEdition == null)
+      LOGGER.info ("Determining the EN 16931 edition per source file from BT-24");
+    else
+      LOGGER.info ("Using the EN 16931 edition " + eForcedEdition.getID () + " for all source files");
 
     for (final File f : m_aSourceFiles)
     {
@@ -332,55 +380,23 @@ public class CIIToUBLConverter implements Callable <Integer>
                                               aDestFile);
           }
           else
-            if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType)
+            if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_25.InvoiceType)
             {
-              eSuccess = UBL22Marshaller.invoice ()
+              eSuccess = UBL25Marshaller.invoice ()
                                         .setFormattedOutput (bFormattedOutput)
-                                        .write ((oasis.names.specification.ubl.schema.xsd.invoice_22.InvoiceType) aUBL,
+                                        .write ((oasis.names.specification.ubl.schema.xsd.invoice_25.InvoiceType) aUBL,
                                                 aDestFile);
             }
             else
-              if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType)
+              if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_25.CreditNoteType)
               {
-                eSuccess = UBL22Marshaller.creditNote ()
+                eSuccess = UBL25Marshaller.creditNote ()
                                           .setFormattedOutput (bFormattedOutput)
-                                          .write ((oasis.names.specification.ubl.schema.xsd.creditnote_22.CreditNoteType) aUBL,
+                                          .write ((oasis.names.specification.ubl.schema.xsd.creditnote_25.CreditNoteType) aUBL,
                                                   aDestFile);
               }
               else
-                if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType)
-                {
-                  eSuccess = UBL23Marshaller.invoice ()
-                                            .setFormattedOutput (bFormattedOutput)
-                                            .write ((oasis.names.specification.ubl.schema.xsd.invoice_23.InvoiceType) aUBL,
-                                                    aDestFile);
-                }
-                else
-                  if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType)
-                  {
-                    eSuccess = UBL23Marshaller.creditNote ()
-                                              .setFormattedOutput (bFormattedOutput)
-                                              .write ((oasis.names.specification.ubl.schema.xsd.creditnote_23.CreditNoteType) aUBL,
-                                                      aDestFile);
-                  }
-                  else
-                    if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.invoice_24.InvoiceType)
-                    {
-                      eSuccess = UBL24Marshaller.invoice ()
-                                                .setFormattedOutput (bFormattedOutput)
-                                                .write ((oasis.names.specification.ubl.schema.xsd.invoice_24.InvoiceType) aUBL,
-                                                        aDestFile);
-                    }
-                    else
-                      if (aUBL instanceof oasis.names.specification.ubl.schema.xsd.creditnote_24.CreditNoteType)
-                      {
-                        eSuccess = UBL24Marshaller.creditNote ()
-                                                  .setFormattedOutput (bFormattedOutput)
-                                                  .write ((oasis.names.specification.ubl.schema.xsd.creditnote_24.CreditNoteType) aUBL,
-                                                          aDestFile);
-                      }
-                      else
-                        throw new IllegalStateException ("Unsupported UBL version '" + m_sUBLVersion + "'");
+                throw new IllegalStateException ("Unsupported UBL document type " + aUBL.getClass ().getName ());
 
         if (eSuccess.isSuccess ())
           LOGGER.info ("Successfully wrote UBL file '" + aDestFile.getAbsolutePath () + "'");

@@ -23,7 +23,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>en16931-cii2ubl-parent-pom</artifactId>
-    <version>3.1.8-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>en16931-cii2ubl</artifactId>
   <packaging>jar</packaging>
@@ -50,6 +50,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>en16931-basics</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.helger.commons</groupId>
       <artifactId>ph-jaxb</artifactId>
     </dependency>
@@ -66,20 +70,16 @@
       <artifactId>ph-cii-d16b</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.helger.cii</groupId>
+      <artifactId>ph-cii-d25a</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.helger.ubl</groupId>
       <artifactId>ph-ubl21</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger.ubl</groupId>
-      <artifactId>ph-ubl22</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger.ubl</groupId>
-      <artifactId>ph-ubl23</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger.ubl</groupId>
-      <artifactId>ph-ubl24</artifactId>
+      <artifactId>ph-ubl25</artifactId>
     </dependency>
 
     <dependency>

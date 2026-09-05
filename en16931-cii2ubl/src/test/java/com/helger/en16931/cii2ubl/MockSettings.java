@@ -30,7 +30,7 @@ import com.helger.phive.api.executorset.ValidationExecutorSetRegistry;
 import com.helger.phive.en16931.EN16931Validation;
 import com.helger.phive.xml.source.IValidationSourceXML;
 
-final class MockSettings
+public final class MockSettings
 {
   public static final String BASE_TEST_DIR = "src/test/resources/external/cii/";
   private static final String [] TEST_FILES_EN16931 = { "CII_business_example_01.xml",
@@ -137,10 +137,10 @@ final class MockSettings
                                                                     "01.05_minimal_test_uncefact.xml",
                                                                     "01.06_minimal_test_uncefact.xml" };
 
-  static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1316.getWithVersionLatestRelease ();
-  static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1316.getWithVersionLatestRelease ();
+  public static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1316.getWithVersionLatestRelease ();
+  public static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1316.getWithVersionLatestRelease ();
 
-  static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
+  public static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
   static
   {
     EN16931Validation.initEN16931 (VES_REGISTRY);
