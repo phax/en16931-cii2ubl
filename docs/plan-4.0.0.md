@@ -253,57 +253,52 @@ The 175 identical lines in the concrete converters (`_convertParty`, `_convertCo
 `_createUBLOrderRef`, …) are typed to edition-specific CII **and** UBL classes on both sides, so
 sharing them would need generics over both models. Not attempted.
 
-### 4.4i Code lists: BT-3 differs by authority, not by edition
+### 4.4i Code lists: the authoritative source and what it says
 
-**Source, normative for EN 16931:2026:** the CEN/TC 434 code list overview of the 2026 syntax
-bindings — `codelists.json` in the TC 434 tree, built on the European Commission registry lists
-(EAS v16, VATEX v5, …). It covers 22 code lists; 8 carry a complete enumeration.
+**Source of record:** `/Users/philip/svn-philip/Code Lists/EN 16931/EN16931 code lists values v17b - used from 2026-05-15.xlsx`,
+one sheet per code list. **Use nothing else for BT-3.** This workbook is versioned by date, not by
+EN 16931 edition — v13 … v17b are all present locally.
 
-**UNTDID 1001 (BT-3) — two authorities, two answers:**
+**UNTDID 1001 (BT-3), sheet `1001` of v17b — 62 codes, no code in both roles:**
 
-| | codes | `81` |
-|---|---|---|
-| CEN/TC 434 published list (`codesComplete: true`) | **55** = 44 Invoice + 11 Credit Note | Credit Note |
-| EN 16931 validation artefacts 1.3.16, rule BR-CL-01 | **62** = 50 Invoice + 13 Credit Note | on **both** lists |
+| | codes |
+|---|---|
+| Invoice (49) | `71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 527 553 575 623 633 751 780 817 870 875 876 877 935` |
+| Credit Note (13) | `81 83 261 262 296 308 381 396 420 458 502 503 532` |
 
-The artefacts accept seven codes CEN/TC 434 never published for BT-3 — `471 472 473 500 501 502 503`
-— and additionally allow `81` on an Invoice. Nothing is published that the artefacts reject.
+**Version history of that sheet, measured across the five local workbooks:**
 
-**This is not a 2017 → 2026 change.** The published list traces to Annex A (2019) plus ballot N313
-(2021), which both editions reference. An earlier analysis mistook the artefact-vs-list gap for an
-edition change and claimed "seven codes were dropped in 2026" — that claim is wrong and was
-withdrawn.
+| version | used from | codes | change |
+|---------|-----------|-------|--------|
+| v13 | 2024-05-15 | 55 (44 / 11) | — |
+| v14 | 2024-11-15 | 55 | none |
+| v15 | 2025-05-15 | 62 (49 / 13) | **+`471 472 473 500 501`** (Invoice), **+`502 503`** (Credit Note) |
+| v16 | 2025-11-15 | 62 | none |
+| v17b | 2026-05-15 | 62 | none |
 
-**Why the converter still differs per edition — a difference of authority:**
+`81` is a **Credit Note in every version** — it was never on both lists.
 
-* the **2017** converter follows the validation artefacts, because this project validates its 2017
-  output against exactly those artefacts; using the shorter list would produce output our own test
-  suite rejects
-* the **2026** converter follows the published code list, which is normative for that edition
+**Two earlier analyses were wrong; this table supersedes both.**
 
-Consequence: a document with BT-3 = `81` becomes an Invoice under 2017 and a CreditNote under 2026.
-That is asserted by `testTypeCode81IsACreditNoteIn2026`. If EN 16931:2026 validation artefacts later
-disagree with the published list, it is the artefacts that need fixing, not these sets.
+1. The seven codes were **added in v15 (May 2025)**, not dropped in 2026. The `codelists.json`
+   extract that suggested otherwise matches v13/v14 exactly — it is a 2024 snapshot.
+2. There is **no 2017 → 2026 delta** in this list at all. The code list is not edition specific.
 
-**Confirmed fix — 502/503.** Rule BR-CL-01 lists both under `cbc:CreditNoteTypeCode` **only**:
+**Why the two editions still hold different sets — one code, `81`:** the EN 16931 validation
+artefacts 1.3.16 (rule BR-CL-01) accept `81` on an Invoice as well. The 2017 converter follows the
+artefacts, because this project validates its UBL 2.1 output against exactly them; the 2026
+converter follows v17b. Apart from `81` the two sets are now identical. A document with BT-3 = `81`
+therefore becomes an Invoice under 2017 and a CreditNote under 2026 —
+`testTypeCode81IsACreditNoteIn2026`.
 
-```
-(self::cbc:InvoiceTypeCode    and contains(' 71 80 81 … [50 codes] ', …))
-or (self::cbc:CreditNoteTypeCode and contains(' 81 83 261 262 296 308 381 396 420 458 502 503 532 ', …))
-```
+**Other lists, re-verified against v17b — no code change needed.**
 
-The converter had them in `INVOICE_TYPE_CODES`, so such documents were converted to an Invoice. No
-test file uses those codes, so the generated output is unaffected.
-
-**Other lists — checked, no code change needed.**
-
-| List | Used for | Result |
-|------|----------|--------|
-| UNTDID 2005 / 2475 | BT-8, `mapDueDateTypeCode` | the mapping `5→3`, `29→35`, `72→432` matches exactly |
-| UNTDID 4461 | BT-81 payment means | not a complete list, so the extra `42` accepted for credit transfer stays valid |
-| UNTDID 5305 (9), 5189 (19), MIME (6) | VAT category, allowance reason, attachments | enumerated, but the converter copies values through — no whitelist to align |
-| CEF EAS v16 (113), VATEX v5 (59) | BT-34-1/49-1, BT-121/174/176/195 | now fully enumerated in the source; the converter copies them through, so nothing to align — but they are available should value validation ever be wanted |
-| 5153, 1153, 7161, 4451, 6313, 7143, 6523, SEPA, SUPPLY, 4217, 3166-1, Rec20/21 | various | not enumerated; copied through |
+| Sheet | Used for | Result |
+|-------|----------|--------|
+| `Time` | BT-8, `mapDueDateTypeCode` | pairs `3↔5`, `35↔29`, `432↔72` — the mapping matches exactly |
+| `Payment` (4461) | BT-81 | 83 codes, full list. Only 30, 31, 48, 57, 58, 59 carry an EN 16931 usage note; `42` "Payment to bank account", which the converter also accepts for credit transfer, is a valid code with no note |
+| `5305` (9), `Allowance` (5189), `MIME` (6) | VAT category, allowance reason, attachments | enumerated, but the converter copies values through — no whitelist to align |
+| `EAS` (v16), `VATEX` (v8) | BT-34-1/49-1, BT-121/174/176/195 | copied through; available should value validation ever be wanted |
 
 ### 4.5 The D25A JAXB model is a separate Java package
 

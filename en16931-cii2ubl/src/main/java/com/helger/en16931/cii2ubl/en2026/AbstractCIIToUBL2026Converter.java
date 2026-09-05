@@ -61,23 +61,20 @@ import un.unece.uncefact.data.standard.cii.d25a.udt.TextType;
 public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCIIToUBL2026Converter <IMPLTYPE>> extends
                                                     AbstractCIIToUBLConverterBase <IMPLTYPE>
 {
-  // BT-3 Invoice type code, UNTDID 1001 - the subset published by CEN/TC 434, which classifies each
-  // of its 55 codes as either an Invoice or a Credit Note.
-  // This list is normative for EN 16931:2026. It is collected in the code list overview of the
-  // EN 16931:2026 syntax bindings and traces to Annex A of the syntax bindings (2019) plus
-  // CEN/TC 434 ballot N313 (2021).
+  // BT-3 Invoice type code, UNTDID 1001, as a subset of 62 codes each classified as either an
+  // Invoice or a Credit Note. No code appears in both.
+  // Source: "EN16931 code lists values v17b - used from 2026-05-15", sheet "1001". This is the
+  // normative code list of EN 16931 and it is not edition specific - it is versioned by date. The
+  // seven codes 471, 472, 473, 500, 501, 502 and 503 were added in v15 (used from 2025-05-15).
   //
-  // The EN 16931:2017 set in this project differs, but not because the standard changed between the
-  // editions - it is a difference of authority. The 2017 converter follows the EN 16931 validation
-  // artefacts, because the UBL 2.1 output of this project is validated against exactly those
-  // artefacts. Those artefacts accept seven codes that CEN/TC 434 never published for BT-3 - 471,
-  // 472, 473, 500, 501, 502 and 503 - and additionally allow "81" on an Invoice, whereas the
-  // published list has it as a Credit Note only. A document with BT-3 = "81" therefore becomes an
-  // Invoice under EN 16931:2017 and a CreditNote under EN 16931:2026.
+  // The EN 16931:2017 set in this project deliberately differs in exactly one place: the validation
+  // artefacts additionally accept "81" on an Invoice, whereas every version of the code list has it
+  // as a Credit Note only. The 2017 converter follows the artefacts, because this project validates
+  // its UBL 2.1 output against them.
   private static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                            "81 83 261 262 296 308 381 396 420 458 532");
+                                                                                            "81 83 261 262 296 308 381 396 420 458 502 503 532");
   private static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                        "71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 527 553 575 623 633 751 780 817 870 875 876 877 935");
+                                                                                        "71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 527 553 575 623 633 751 780 817 870 875 876 877 935");
 
   protected AbstractCIIToUBL2026Converter ()
   {}
