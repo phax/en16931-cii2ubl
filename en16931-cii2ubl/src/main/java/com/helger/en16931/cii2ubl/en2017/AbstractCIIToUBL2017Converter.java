@@ -20,7 +20,6 @@ package com.helger.en16931.cii2ubl.en2017;
 import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -61,16 +60,6 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 public abstract class AbstractCIIToUBL2017Converter <IMPLTYPE extends AbstractCIIToUBL2017Converter <IMPLTYPE>> extends
                                                     AbstractCIIToUBLConverterBase <IMPLTYPE>
 {
-  // BT-3 Invoice type code, UNTDID 1001.
-  // Source: EN 16931 validation artefacts 1.3.16, EN16931-UBL-validation.xslt.
-  // Note that "81" is deliberately in both lists - the 2017 artefacts allow it on an Invoice as
-  // well as on a Credit Note, and the Invoice list is evaluated first. EN 16931:2026 resolved this
-  // and lists "81" as a Credit Note only.
-  private static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                            "81 83 261 262 296 308 381 396 420 458 502 503 532");
-  private static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                        "71 80 81 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 527 553 575 623 633 751 780 817 870 875 876 877 935");
-
   protected AbstractCIIToUBL2017Converter ()
   {}
 
@@ -255,12 +244,7 @@ public abstract class AbstractCIIToUBL2017Converter <IMPLTYPE extends AbstractCI
                                                                                             : aTotal.getDuePayableAmount ()
                                                                                                     .get (0);
 
-    return isInvoiceType (INVOICE_TYPE_CODES,
-                          CREDIT_NOTE_TYPE_CODES,
-                          sTypeCode,
-                          aDuePayable == null ? null : aDuePayable.getValue (),
-                          aDuePayable,
-                          aErrorList);
+    return isInvoiceType (sTypeCode, aDuePayable == null ? null : aDuePayable.getValue (), aDuePayable, aErrorList);
   }
 
   /**

@@ -25,7 +25,6 @@ import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Set;
 import java.time.LocalDate;
 import java.time.Month;
 
@@ -33,7 +32,6 @@ import org.junit.Test;
 
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.base.state.ETriState;
-import com.helger.collection.commons.CommonsHashSet;
 import com.helger.diagnostics.error.list.ErrorList;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.InvoicedQuantityType;
@@ -172,35 +170,32 @@ public final class AbstractCIIToUBLConverterBaseTest
     }
   }
 
-  private static final Set <String> INV = new CommonsHashSet <> ("380", "384");
-  private static final Set <String> CN = new CommonsHashSet <> ("381", "381");
-
   @Test
   public void testIsInvoiceType ()
   {
     final ErrorList aList = new ErrorList ();
-    // BT-3 decides
-    assertEquals (ETriState.TRUE, AbstractCIIToUBLConverterBase.isInvoiceType (INV, CN, "380", null, null, aList));
-    assertEquals (ETriState.FALSE, AbstractCIIToUBLConverterBase.isInvoiceType (INV, CN, "381", null, null, aList));
+    // BT-3 decides, using the shared UNTDID 1001 subset
+    assertEquals (ETriState.TRUE, AbstractCIIToUBLConverterBase.isInvoiceType ("380", null, null, aList));
+    assertEquals (ETriState.FALSE, AbstractCIIToUBLConverterBase.isInvoiceType ("381", null, null, aList));
     // Surrounding whitespace is tolerated
-    assertEquals (ETriState.TRUE, AbstractCIIToUBLConverterBase.isInvoiceType (INV, CN, " 380 ", null, null, aList));
+    assertEquals (ETriState.TRUE, AbstractCIIToUBLConverterBase.isInvoiceType (" 380 ", null, null, aList));
+    // "81" is a Credit Note in every version of the code list, even though the EN 16931 validation
+    // artefacts additionally accept it on an Invoice
+    assertEquals (ETriState.FALSE, AbstractCIIToUBLConverterBase.isInvoiceType ("81", null, null, aList));
+    // Added in v15 of the code list: 471 as an Invoice, 502 and 503 as Credit Notes
+    assertEquals (ETriState.TRUE, AbstractCIIToUBLConverterBase.isInvoiceType ("471", null, null, aList));
+    assertEquals (ETriState.FALSE, AbstractCIIToUBLConverterBase.isInvoiceType ("502", null, null, aList));
+    assertEquals (ETriState.FALSE, AbstractCIIToUBLConverterBase.isInvoiceType ("503", null, null, aList));
     assertTrue (aList.isEmpty ());
 
     // Unknown BT-3 falls back to the sign of BT-115
-    assertEquals (ETriState.TRUE,
-                  AbstractCIIToUBLConverterBase.isInvoiceType (INV, CN, "999", BigDecimal.ONE, "src", aList));
+    assertEquals (ETriState.TRUE, AbstractCIIToUBLConverterBase.isInvoiceType ("999", BigDecimal.ONE, "src", aList));
     assertEquals (ETriState.FALSE,
-                  AbstractCIIToUBLConverterBase.isInvoiceType (INV,
-                                                               CN,
-                                                               "999",
-                                                               BigDecimal.valueOf (-1),
-                                                               "src",
-                                                               aList));
+                  AbstractCIIToUBLConverterBase.isInvoiceType ("999", BigDecimal.valueOf (-1), "src", aList));
     assertTrue (aList.isEmpty ());
 
     // Neither is conclusive - a warning, not an error
-    assertEquals (ETriState.UNDEFINED,
-                  AbstractCIIToUBLConverterBase.isInvoiceType (INV, CN, "999", null, null, aList));
+    assertEquals (ETriState.UNDEFINED, AbstractCIIToUBLConverterBase.isInvoiceType ("999", null, null, aList));
     assertTrue (aList.containsNoError ());
     assertFalse (aList.isEmpty ());
   }

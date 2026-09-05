@@ -669,12 +669,11 @@ public final class CIID25AToUBL25ConverterTest
   }
 
   @Test
-  public void testTypeCode81IsACreditNoteIn2026 ()
+  public void testTypeCode81IsACreditNote ()
   {
     // BT-3 = 81 "Credit note related to goods or services".
-    // The code list published by CEN/TC 434 classifies it as a Credit Note, and the 2026 converter
-    // follows that list. The 2017 converter follows the EN 16931 validation artefacts instead,
-    // which additionally allow "81" on an Invoice, so the same document converts differently.
+    // Every version of the EN 16931 code list classifies it as a Credit Note. The EN 16931
+    // validation artefacts additionally accept it on an Invoice; the code list wins.
     final Element aCN = convertAndValidate ("d25a-typecode81-creditnote.xml", false);
     assertXPath (aCN, "cbc:CreditNoteTypeCode", "81");
     assertNoXPath (aCN, "cbc:InvoiceTypeCode");

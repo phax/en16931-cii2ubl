@@ -75,6 +75,25 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
 
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractCIIToUBLConverterBase.class);
 
+  // BT-3 Invoice type code, UNTDID 1001, as a subset of 62 codes each classified as either an
+  // Invoice or a Credit Note. No code appears in both roles.
+  //
+  // Source of truth:
+  // https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931#RegistryofsupportingartefactstoimplementEN16931-CEN/TC434EN16931
+  //
+  // The values below are taken from "EN16931 code lists values v17b - used from 2026-05-15",
+  // sheet "1001". This code list is versioned by date and is not specific to an EN 16931 edition,
+  // so both editions share it. The seven codes 471, 472, 473, 500, 501, 502 and 503 were added in
+  // v15 (used from 2025-05-15).
+  //
+  // Note: the EN 16931 validation artefacts additionally accept "81" on an Invoice, whereas every
+  // version of the code list has it as a Credit Note only. The code list wins here.
+  protected static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                              "81 83 261 262 296 308 381 396 420 458 502 503 532");
+  protected static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
+                                                                                          "71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 527 553 575 623 633 751 780 817 870 875 876 877 935");
+
+
   private EUBLCreationMode m_eCreationMode = DEFAULT_UBL_CREATION_MODE;
   private String m_sVATScheme = DEFAULT_VAT_SCHEME;
   private String m_sCustomizationID;
@@ -567,14 +586,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
 
   /**
    * Determine whether a CII document is an Invoice or a Credit Note. The decision is based on BT-3
-   * (Invoice type code) and falls back to the sign of BT-115 (Amount due for payment).<br>
-   * The BT-3 code sets differ between the EN 16931 editions, so they are passed in by the edition
-   * specific subclass rather than being fixed here.
+   * (Invoice type code) and falls back to the sign of BT-115 (Amount due for payment).
    *
-   * @param aInvoiceTypeCodes
-   *        The BT-3 codes to be interpreted as an Invoice. May not be <code>null</code>.
-   * @param aCreditNoteTypeCodes
-   *        The BT-3 codes to be interpreted as a Credit Note. May not be <code>null</code>.
    * @param sTypeCode
    *        BT-3 Invoice type code. May be <code>null</code>.
    * @param aDuePayableAmount
@@ -589,9 +602,7 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
    * @since 4.0.0
    */
   @NonNull
-  protected static ETriState isInvoiceType (@NonNull final Set <String> aInvoiceTypeCodes,
-                                            @NonNull final Set <String> aCreditNoteTypeCodes,
-                                            @Nullable final String sTypeCode,
+  protected static ETriState isInvoiceType (@Nullable final String sTypeCode,
                                             @Nullable final BigDecimal aDuePayableAmount,
                                             @Nullable final Object aDuePayableSource,
                                             @NonNull final IErrorList aErrorList)
@@ -600,10 +611,10 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
 
     // First check TypeCode
     final String sRealTypeCode = StringHelper.trim (sTypeCode);
-    if (aInvoiceTypeCodes.contains (sRealTypeCode))
+    if (INVOICE_TYPE_CODES.contains (sRealTypeCode))
       eIsInvoice = ETriState.TRUE;
     else
-      if (aCreditNoteTypeCodes.contains (sRealTypeCode))
+      if (CREDIT_NOTE_TYPE_CODES.contains (sRealTypeCode))
         eIsInvoice = ETriState.FALSE;
 
     // Check total

@@ -255,7 +255,10 @@ sharing them would need generics over both models. Not attempted.
 
 ### 4.4i Code lists: the authoritative source and what it says
 
-**Source of record:** `/Users/philip/svn-philip/Code Lists/EN 16931/EN16931 code lists values v17b - used from 2026-05-15.xlsx`,
+**Source of truth**, recorded in `AbstractCIIToUBLConverterBase`:
+<https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931#RegistryofsupportingartefactstoimplementEN16931-CEN/TC434EN16931>
+
+**Current values** from `/Users/philip/svn-philip/Code Lists/EN 16931/EN16931 code lists values v17b - used from 2026-05-15.xlsx`,
 one sheet per code list. **Use nothing else for BT-3.** This workbook is versioned by date, not by
 EN 16931 edition — v13 … v17b are all present locally.
 
@@ -284,12 +287,14 @@ EN 16931 edition — v13 … v17b are all present locally.
    extract that suggested otherwise matches v13/v14 exactly — it is a 2024 snapshot.
 2. There is **no 2017 → 2026 delta** in this list at all. The code list is not edition specific.
 
-**Why the two editions still hold different sets — one code, `81`:** the EN 16931 validation
-artefacts 1.3.16 (rule BR-CL-01) accept `81` on an Invoice as well. The 2017 converter follows the
-artefacts, because this project validates its UBL 2.1 output against exactly them; the 2026
-converter follows v17b. Apart from `81` the two sets are now identical. A document with BT-3 = `81`
-therefore becomes an Invoice under 2017 and a CreditNote under 2026 —
-`testTypeCode81IsACreditNoteIn2026`.
+**Both editions share one list.** Because the code list is versioned by date rather than by
+edition, `INVOICE_TYPE_CODES` and `CREDIT_NOTE_TYPE_CODES` live in `AbstractCIIToUBLConverterBase`
+again, as a single copy with the registry URL above it.
+
+The one place this differs from the EN 16931 validation artefacts is code `81`: rule BR-CL-01
+accepts it on an Invoice as well, while every version of the code list has it as a Credit Note only.
+**The code list wins.** That changes the 2017 behaviour for BT-3 = `81`, `502` and `503`, but no test
+file uses any of them, so `generated/toubl21/` is unchanged.
 
 **Other lists, re-verified against v17b — no code change needed.**
 

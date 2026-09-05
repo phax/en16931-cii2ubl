@@ -20,7 +20,6 @@ package com.helger.en16931.cii2ubl.en2026;
 import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -61,21 +60,6 @@ import un.unece.uncefact.data.standard.cii.d25a.udt.TextType;
 public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCIIToUBL2026Converter <IMPLTYPE>> extends
                                                     AbstractCIIToUBLConverterBase <IMPLTYPE>
 {
-  // BT-3 Invoice type code, UNTDID 1001, as a subset of 62 codes each classified as either an
-  // Invoice or a Credit Note. No code appears in both.
-  // Source: "EN16931 code lists values v17b - used from 2026-05-15", sheet "1001". This is the
-  // normative code list of EN 16931 and it is not edition specific - it is versioned by date. The
-  // seven codes 471, 472, 473, 500, 501, 502 and 503 were added in v15 (used from 2025-05-15).
-  //
-  // The EN 16931:2017 set in this project deliberately differs in exactly one place: the validation
-  // artefacts additionally accept "81" on an Invoice, whereas every version of the code list has it
-  // as a Credit Note only. The 2017 converter follows the artefacts, because this project validates
-  // its UBL 2.1 output against them.
-  private static final Set <String> CREDIT_NOTE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                            "81 83 261 262 296 308 381 396 420 458 502 503 532");
-  private static final Set <String> INVOICE_TYPE_CODES = StringHelper.getExplodedToSet (" ",
-                                                                                        "71 80 82 84 102 130 202 203 204 211 218 219 295 325 326 331 380 382 383 384 385 386 387 388 389 390 393 394 395 456 457 471 472 473 500 501 527 553 575 623 633 751 780 817 870 875 876 877 935");
-
   protected AbstractCIIToUBL2026Converter ()
   {}
 
@@ -260,12 +244,7 @@ public abstract class AbstractCIIToUBL2026Converter <IMPLTYPE extends AbstractCI
                                                                                             : aTotal.getDuePayableAmount ()
                                                                                                     .get (0);
 
-    return isInvoiceType (INVOICE_TYPE_CODES,
-                          CREDIT_NOTE_TYPE_CODES,
-                          sTypeCode,
-                          aDuePayable == null ? null : aDuePayable.getValue (),
-                          aDuePayable,
-                          aErrorList);
+    return isInvoiceType (sTypeCode, aDuePayable == null ? null : aDuePayable.getValue (), aDuePayable, aErrorList);
   }
 
   /**
