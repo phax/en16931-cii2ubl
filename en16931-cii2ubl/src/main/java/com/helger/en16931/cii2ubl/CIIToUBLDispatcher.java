@@ -114,7 +114,7 @@ public class CIIToUBLDispatcher extends AbstractCIIToUBLConverterBase <CIIToUBLD
     if (eEdition == null)
     {
       // Peek at BT-24 - the correct JAXB model is exactly what is not known yet
-      final String sSpecID = EEN16931Edition.getSpecificationIdentifier (aFile);
+      final String sSpecID = EEN16931Edition.getSpecificationIdentifierCII (aFile);
       eEdition = EEN16931Edition.getFromSpecificationIdentifierOrNull (sSpecID);
       if (eEdition == null)
       {

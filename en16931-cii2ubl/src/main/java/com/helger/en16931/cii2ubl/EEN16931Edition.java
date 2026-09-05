@@ -134,7 +134,7 @@ public enum EEN16931Edition
    * @return <code>null</code> if BT-24 is not present.
    */
   @Nullable
-  public static String getSpecificationIdentifier (@Nullable final Node aNode)
+  public static String getSpecificationIdentifierCII (@Nullable final Node aNode)
   {
     if (aNode == null)
       return null;
@@ -172,7 +172,7 @@ public enum EEN16931Edition
   @Nullable
   public static EEN16931Edition detect (@Nullable final Node aNode)
   {
-    return getFromSpecificationIdentifierOrNull (getSpecificationIdentifier (aNode));
+    return getFromSpecificationIdentifierOrNull (getSpecificationIdentifierCII (aNode));
   }
 
   /**
@@ -186,7 +186,7 @@ public enum EEN16931Edition
   @Nullable
   public static EEN16931Edition detect (@Nullable final File aFile)
   {
-    return getFromSpecificationIdentifierOrNull (getSpecificationIdentifier (aFile));
+    return getFromSpecificationIdentifierOrNull (getSpecificationIdentifierCII (aFile));
   }
 
   /**
@@ -197,13 +197,13 @@ public enum EEN16931Edition
    * @return <code>null</code> if the file cannot be read, is not well formed XML, or has no BT-24.
    */
   @Nullable
-  public static String getSpecificationIdentifier (@Nullable final File aFile)
+  public static String getSpecificationIdentifierCII (@Nullable final File aFile)
   {
     if (aFile == null || !aFile.isFile ())
       return null;
 
     // Only a DOM peek - the correct JAXB model is exactly what is not known yet
     final Document aDoc = DOMReader.readXMLDOM (aFile);
-    return aDoc == null ? null : getSpecificationIdentifier (aDoc);
+    return aDoc == null ? null : getSpecificationIdentifierCII (aDoc);
   }
 }
