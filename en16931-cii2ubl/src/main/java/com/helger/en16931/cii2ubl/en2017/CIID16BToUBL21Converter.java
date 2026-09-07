@@ -599,7 +599,7 @@ public class CIID16BToUBL21Converter extends AbstractCIIToUBL2017Converter <CIID
         final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType aSellerID = _copyID (aCreditorRefID);
         if (aSellerID != null)
         {
-          aSellerID.setSchemeID ("SEPA");
+          aSellerID.setSchemeID (EN16931CodeLists.CREDITOR_REFERENCE_SCHEME_ID);
           aSellerIDHandler.accept (aSellerID);
         }
       }

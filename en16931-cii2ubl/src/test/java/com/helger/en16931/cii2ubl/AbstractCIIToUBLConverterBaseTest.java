@@ -33,6 +33,7 @@ import org.junit.Test;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.base.state.ETriState;
 import com.helger.diagnostics.error.list.ErrorList;
+import com.helger.en16931.basics.codelist.EN16931CodeLists;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.InvoicedQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.NameType;
@@ -207,5 +208,11 @@ public final class AbstractCIIToUBLConverterBaseTest
     assertFalse (AbstractCIIToUBLConverterBase.isUsableGlobalID ("v", null));
     assertFalse (AbstractCIIToUBLConverterBase.isUsableGlobalID (null, "s"));
     assertFalse (AbstractCIIToUBLConverterBase.isUsableGlobalID ("", "s"));
+
+    // BT-90 owns this scheme identifier in UBL, so a GlobalID carrying it must not become a party
+    // identifier - it would compete with the BT-90 written from ram:CreditorReferenceID and it is
+    // not an ISO 6523 ICD code, which BR-CL-10 requires
+    assertFalse (AbstractCIIToUBLConverterBase.isUsableGlobalID ("DE98ZZZ09999999999",
+                                                                 EN16931CodeLists.CREDITOR_REFERENCE_SCHEME_ID));
   }
 }

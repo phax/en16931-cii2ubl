@@ -130,6 +130,11 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v4.0.1 - work in progress
+* Fixed a CII `ram:GlobalID` with `@schemeID="SEPA"` being written as a party identifier BT-29/BT-46/BT-60/BT-71. In UBL that scheme identifier is reserved for BT-90, so the result carried two competing bank assigned creditor identifiers, and the scheme identifier is not an ISO 6523 ICD code either, which BR-CL-10 requires. Affects both editions
+* Now using `EEN16931TaxSchemeCode.LOC` and the new discriminator constants of [en16931-basics](https://github.com/phax/en16931-basics) 1.0.1 instead of local copies. `NATIONAL_TAX_SCHEME`, `NON_VAT_TAX_CODE_LIST_ID` and `SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID` of `CIID25AToUBL25Converter` are deprecated and now delegate there
+* BT-32-2 is derived from `EN16931CodeLists.mapTaxSchemeCodeCIIToUBL` rather than a hard coded `"FC"` to `"LOC"` special case
+
 v4.0.0 - 2026-09-05
 * Added the **EN 16931:2026** syntax binding: `com.helger.en16931.cii2ubl.en2026.CIID25AToUBL25Converter` converts CII D25A to UBL 2.5, covering all 284 rows of the mapping table including the 70 business terms and groups that are new in 2026 (BG-33 to BG-39, BT-166 to BT-220)
 * Removed the support for creating UBL 2.2, 2.3 and 2.4 - the two editions of EN 16931 prescribe exactly UBL 2.1 and UBL 2.5

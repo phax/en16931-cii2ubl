@@ -36,6 +36,7 @@ import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.diagnostics.error.list.IErrorList;
 import com.helger.en16931.basics.EEN16931DateFormatCode;
 import com.helger.en16931.basics.EEN16931Edition;
+import com.helger.en16931.basics.codelist.EEN16931TaxSchemeCode;
 import com.helger.en16931.basics.codelist.EN16931CodeLists;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_25.*;
@@ -62,15 +63,32 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
 {
   /** cbc:UBLVersionID - the UBL version this EN 16931 edition prescribes */
   private static final String UBL_VERSION = EEN16931Edition.EN2026.getUBLSyntaxVersion ();
-  /** BT-32-2 National tax code - a fixed value since EN 16931:2026 */
-  public static final String NATIONAL_TAX_SCHEME = "LOC";
+  /**
+   * BT-32-2 National tax code - a fixed value since EN 16931:2026
+   *
+   * @deprecated Since 4.0.1 - use {@link EEN16931TaxSchemeCode#LOC} of en16931-basics, or
+   *             {@link EN16931CodeLists#mapTaxSchemeCodeCIIToUBL(String)} to derive it from the CII
+   *             scheme identifier.
+   */
+  @Deprecated (forRemoval = true, since = "4.0.1")
+  public static final String NATIONAL_TAX_SCHEME = EEN16931TaxSchemeCode.LOC.getUBLCode ();
   /**
    * BT-177-1 / BT-193-1 list identifier of the non-VAT tax code (UNTDID 5153). It is the only value
    * that distinguishes BT-177 from BT-105 and BT-193 from BT-145.
+   *
+   * @deprecated Since 4.0.1 - use {@link EN16931CodeLists#NON_VAT_TAX_CODE_LIST_ID} of
+   *             en16931-basics.
    */
-  public static final String NON_VAT_TAX_CODE_LIST_ID = "5153";
-  /** BT-122-1-1 Supporting document reference document type list */
-  public static final String SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID = "1001";
+  @Deprecated (forRemoval = true, since = "4.0.1")
+  public static final String NON_VAT_TAX_CODE_LIST_ID = EN16931CodeLists.NON_VAT_TAX_CODE_LIST_ID;
+  /**
+   * BT-122-1-1 Supporting document reference document type list
+   *
+   * @deprecated Since 4.0.1 - use {@link EN16931CodeLists#DOCUMENT_TYPE_CODE_LIST_ID} of
+   *             en16931-basics.
+   */
+  @Deprecated (forRemoval = true, since = "4.0.1")
+  public static final String SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID = EN16931CodeLists.DOCUMENT_TYPE_CODE_LIST_ID;
 
   public CIID25AToUBL25Converter ()
   {}
@@ -358,15 +376,15 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       sSchemeID = getVATScheme ();
     else
     {
-      // BT-31-2: CII "VA" is the VAT identifier
-      // Special case CII validation artefacts 1.0.0 and 1.2.0
-      if ("VA".equals (sSchemeID))
+      // BT-31-2: CII "VA" is the VAT identifier. It is not taken from the code list, because the
+      // UBL value is configurable - special case CII validation artefacts 1.0.0 and 1.2.0
+      if (EEN16931TaxSchemeCode.VAT.getCIICode ().equals (sSchemeID))
         sSchemeID = getVATScheme ();
       else
-        // BT-32-2: since EN 16931:2026 the national tax code is the fixed value "LOC".
-        // EN 16931:2017 used "any value except VAT" instead.
-        if ("FC".equals (sSchemeID))
-          sSchemeID = NATIONAL_TAX_SCHEME;
+        // BT-32-2: since EN 16931:2026 the national tax code is the fixed value "LOC", which the
+        // code list derives from the CII scheme identifier "FC". EN 16931:2017 used "any value
+        // except VAT" instead, and an unknown code is passed through unchanged.
+        sSchemeID = EN16931CodeLists.mapTaxSchemeCodeCIIToUBL (sSchemeID);
     }
 
     // BT-31-2/BT-48-2/BT-63-2 VAT tax code respectively BT-32-2 national tax code
@@ -493,9 +511,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       final AllowanceChargeReasonCodeType aUBLReasonCode = new AllowanceChargeReasonCodeType ();
       aUBLReasonCode.setValue (aAllowanceCharge.getReasonCodeValue ());
       if (aAllowanceCharge.getReasonCode () != null &&
-          NON_VAT_TAX_CODE_LIST_ID.equals (aAllowanceCharge.getReasonCode ().getListID ()))
+          EN16931CodeLists.NON_VAT_TAX_CODE_LIST_ID.equals (aAllowanceCharge.getReasonCode ().getListID ()))
       {
-        aUBLReasonCode.setListID (NON_VAT_TAX_CODE_LIST_ID);
+        aUBLReasonCode.setListID (EN16931CodeLists.NON_VAT_TAX_CODE_LIST_ID);
         aUBLReasonCode.setListAgencyID (aAllowanceCharge.getReasonCode ().getListAgencyID ());
       }
       aUBLAllowanceCharge.setAllowanceChargeReasonCode (aUBLReasonCode);
@@ -673,7 +691,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
         final oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_25.IDType aSellerID = _copyID (aCreditorRefID);
         if (aSellerID != null)
         {
-          aSellerID.setSchemeID ("SEPA");
+          aSellerID.setSchemeID (EN16931CodeLists.CREDITOR_REFERENCE_SCHEME_ID);
           aSellerIDHandler.accept (aSellerID);
         }
       }
@@ -761,7 +779,7 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       final DocumentTypeCodeType aUBLTypeCode = new DocumentTypeCodeType ();
       aUBLTypeCode.setValue (EN16931CodeLists.DOCUMENT_TYPE_CODE_SUPPORTING_DOCUMENT);
       // BT-122-1-1
-      aUBLTypeCode.setListID (SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID);
+      aUBLTypeCode.setListID (EN16931CodeLists.DOCUMENT_TYPE_CODE_LIST_ID);
       aUBLDocRef.setDocumentTypeCode (aUBLTypeCode);
     }
   }

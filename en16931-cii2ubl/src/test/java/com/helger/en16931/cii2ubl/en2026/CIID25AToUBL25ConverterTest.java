@@ -22,8 +22,22 @@ import static com.helger.en16931.cii2ubl.en2026.MockD25ASettings.assertXPath;
 import static com.helger.en16931.cii2ubl.en2026.MockD25ASettings.assertXPathCount;
 import static com.helger.en16931.cii2ubl.en2026.MockD25ASettings.convertAndValidate;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+
 import org.junit.Test;
 import org.w3c.dom.Element;
+
+import com.helger.cii.d25a.CIID25ACrossIndustryInvoiceTypeMarshaller;
+import com.helger.diagnostics.error.list.ErrorList;
+import com.helger.en16931.basics.codelist.EN16931CodeLists;
+import com.helger.ubl25.UBL25Marshaller;
+
+import oasis.names.specification.ubl.schema.xsd.invoice_25.InvoiceType;
+import un.unece.uncefact.data.standard.cii.d25a.CrossIndustryInvoiceType;
+import un.unece.uncefact.data.standard.cii.d25a.udt.IDType;
 
 /**
  * Test class for class {@link CIID25AToUBL25Converter}.<br>
@@ -34,6 +48,44 @@ import org.w3c.dom.Element;
  */
 public final class CIID25AToUBL25ConverterTest
 {
+  /**
+   * BT-90 and the party identifiers BT-29/BT-46/BT-60 share the UBL element
+   * <code>cac:PartyIdentification/cbc:ID</code> and are told apart by the scheme identifier
+   * <code>SEPA</code> alone. A CII GlobalID carrying that scheme identifier - which
+   * en16931-ubl2cii up to 3.0.0 wrote in addition to <code>ram:CreditorReferenceID</code> - must
+   * therefore not become a party identifier, or the resulting UBL would carry two competing BT-90.
+   */
+  @Test
+  public void testSepaGlobalIDIsNotAPartyIdentifier ()
+  {
+    final CrossIndustryInvoiceType aCII = new CIID25ACrossIndustryInvoiceTypeMarshaller ().read (new File (MockD25ASettings.BASE_TEST_DIR +
+                                                                                                          "d25a-edge-directdebit-invoice.xml"));
+    assertNotNull (aCII);
+
+    final IDType aSepaGlobalID = new IDType ();
+    aSepaGlobalID.setSchemeID (EN16931CodeLists.CREDITOR_REFERENCE_SCHEME_ID);
+    aSepaGlobalID.setValue ("NOT-A-PARTY-IDENTIFIER");
+    aCII.getSupplyChainTradeTransaction ()
+        .getApplicableHeaderTradeAgreement ()
+        .getSellerTradeParty ()
+        .addGlobalID (aSepaGlobalID);
+
+    final ErrorList aErrorList = new ErrorList ();
+    final InvoiceType aUBL = new CIID25AToUBL25Converter ().convertToInvoice (aCII, aErrorList);
+    assertTrue (aErrorList.toString (), aErrorList.containsNoError ());
+    assertNotNull (aUBL);
+
+    final Element aInv = UBL25Marshaller.invoice ().getAsDocument (aUBL).getDocumentElement ();
+
+    // Exactly one BT-90, and it is the one from ram:CreditorReferenceID
+    assertXPathCount (aInv,
+                      "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='SEPA']",
+                      1);
+    assertXPath (aInv,
+                 "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='SEPA']",
+                 "SEPA-CRED-1");
+  }
+
   @Test
   public void testConvertMinimalInvoice ()
   {

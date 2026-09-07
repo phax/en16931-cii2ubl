@@ -488,7 +488,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
 
   /**
    * BT-29/BT-46/BT-60/BT-71: a CII GlobalID is only usable as a UBL party identification if it has
-   * both a value and a scheme identifier.
+   * both a value and a scheme identifier, and if that scheme identifier is not the one reserved for
+   * BT-90.
    *
    * @param sValue
    *        The identifier value. May be <code>null</code>.
@@ -499,7 +500,14 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
    */
   protected static boolean isUsableGlobalID (@Nullable final String sValue, @Nullable final String sSchemeID)
   {
-    return StringHelper.isNotEmpty (sValue) && StringHelper.isNotEmpty (sSchemeID);
+    if (StringHelper.isEmpty (sValue) || StringHelper.isEmpty (sSchemeID))
+      return false;
+
+    // BT-90 shares cac:PartyIdentification/cbc:ID with the party identifiers and is told apart by
+    // this scheme identifier alone. It is written from ram:CreditorReferenceID instead, so a
+    // GlobalID carrying it would become a second, competing BT-90 - and it is not an ISO 6523 ICD
+    // code either, which BT-29-1 requires.
+    return !EN16931CodeLists.CREDITOR_REFERENCE_SCHEME_ID.equals (sSchemeID);
   }
 
   /**
