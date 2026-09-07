@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.junit.Test;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.helger.cii.d25a.CIID25ACrossIndustryInvoiceTypeMarshaller;
@@ -84,6 +85,39 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aInv,
                  "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='SEPA']",
                  "SEPA-CRED-1");
+  }
+
+  /**
+   * <code>cbc:LineID</code> is mandatory in <code>cac:OrderLineReference</code>, so a line that
+   * carries only a sales order reference - BT-200 and BT-201 without BT-132 - must still get the
+   * placeholder the UBL binding prescribes, or the result is schema invalid.
+   */
+  @Test
+  public void testMandatoryLineIDPlaceholder ()
+  {
+    final CrossIndustryInvoiceType aCII = new CIID25ACrossIndustryInvoiceTypeMarshaller ().read (new File (MockD25ASettings.BASE_TEST_DIR +
+                                                                                                          "d25a-new-lineref-invoice.xml"));
+    assertNotNull (aCII);
+    aCII.getSupplyChainTradeTransaction ()
+        .getIncludedSupplyChainTradeLineItemAtIndex (0)
+        .getSpecifiedLineTradeAgreement ()
+        .setBuyerOrderReferencedDocument (null);
+
+    final ErrorList aErrorList = new ErrorList ();
+    final InvoiceType aUBL = new CIID25AToUBL25Converter ().convertToInvoice (aCII, aErrorList);
+    assertTrue (aErrorList.toString (), aErrorList.containsNoError ());
+    assertNotNull (aUBL);
+
+    // The UBL 2.5 XSD is what really decides this - the marshaller validates on write
+    final ErrorList aWriteErrors = new ErrorList ();
+    final Document aDoc = UBL25Marshaller.invoice ().setCollectErrors (aWriteErrors).getAsDocument (aUBL);
+    assertTrue (aWriteErrors.toString (), aWriteErrors.containsNoError ());
+    assertNotNull (aDoc);
+
+    final Element aInv = aDoc.getDocumentElement ();
+    final String sLine = "cac:InvoiceLine[cbc:ID='1']/";
+    assertXPath (aInv, sLine + "cac:OrderLineReference/cbc:LineID", EN16931CodeLists.MISSING_VALUE_PLACEHOLDER);
+    assertXPath (aInv, sLine + "cac:OrderLineReference/cbc:SalesOrderLineID", "SO-LINE-9");
   }
 
   @Test

@@ -809,8 +809,9 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
       return null;
 
     final LineReferenceType ret = new LineReferenceType ();
-    // cbc:LineID is mandatory in UBL
-    ret.setLineID (StringHelper.isNotEmpty (sLineID) ? sLineID : "1");
+    // cbc:LineID is mandatory in UBL, so a reference that has only the document identifier still
+    // needs the placeholder the binding prescribes for it
+    ret.setLineID (StringHelper.isNotEmpty (sLineID) ? sLineID : EN16931CodeLists.MISSING_VALUE_PLACEHOLDER);
     ret.setDocumentReference (aUBLDocRef);
     return ret;
   }
@@ -1715,6 +1716,11 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           // BT-132
           if (aBuyerOrderReference != null)
             aUBLOrderLineReference.setLineID (copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
+          // cbc:LineID is mandatory in UBL. A line that carries only a sales order reference -
+          // BT-200 and BT-201 without BT-132 - would otherwise produce a schema invalid
+          // cac:OrderLineReference that starts with cbc:SalesOrderLineID.
+          if (StringHelper.isEmpty (aUBLOrderLineReference.getLineIDValue ()))
+            aUBLOrderLineReference.setLineID (EN16931CodeLists.MISSING_VALUE_PLACEHOLDER);
           // BT-201 Invoice line sales order line reference - new in EN 16931:2026
           if (aSellerOrderReference != null)
             ifNotEmpty (aSellerOrderReference.getLineIDValue (), aUBLOrderLineReference::setSalesOrderLineID);
@@ -2932,6 +2938,11 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
           // BT-132
           if (aBuyerOrderReference != null)
             aUBLOrderLineReference.setLineID (copyID (aBuyerOrderReference.getLineID (), new LineIDType ()));
+          // cbc:LineID is mandatory in UBL. A line that carries only a sales order reference -
+          // BT-200 and BT-201 without BT-132 - would otherwise produce a schema invalid
+          // cac:OrderLineReference that starts with cbc:SalesOrderLineID.
+          if (StringHelper.isEmpty (aUBLOrderLineReference.getLineIDValue ()))
+            aUBLOrderLineReference.setLineID (EN16931CodeLists.MISSING_VALUE_PLACEHOLDER);
           // BT-201 Invoice line sales order line reference - new in EN 16931:2026
           if (aSellerOrderReference != null)
             ifNotEmpty (aSellerOrderReference.getLineIDValue (), aUBLOrderLineReference::setSalesOrderLineID);

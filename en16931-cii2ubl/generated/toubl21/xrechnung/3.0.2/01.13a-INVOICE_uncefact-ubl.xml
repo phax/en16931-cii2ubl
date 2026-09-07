@@ -10,7 +10,7 @@
   <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
   <cbc:BuyerReference>04011000-12354-73</cbc:BuyerReference>
   <cac:OrderReference>
-    <cbc:ID></cbc:ID>
+    <cbc:ID>None</cbc:ID>
     <cbc:SalesOrderID>Auftragsnummer</cbc:SalesOrderID>
   </cac:OrderReference>
   <cac:ProjectReference>

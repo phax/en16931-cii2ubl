@@ -60,7 +60,13 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
   public static final EUBLCreationMode DEFAULT_UBL_CREATION_MODE = EUBLCreationMode.AUTOMATIC;
   public static final String DEFAULT_VAT_SCHEME = "VAT";
   public static final String DEFAULT_CARD_ACCOUNT_NETWORK_ID = "mapped-from-cii";
-  public static final String DEFAULT_ORDER_REF_ID = "";
+  /**
+   * BT-13 Purchase order reference. <code>cac:OrderReference/cbc:ID</code> is mandatory in UBL as
+   * soon as the element exists, which BT-14 and BT-188 can force without BT-13 being present, so a
+   * placeholder is needed. Up to 4.0.0 that placeholder was the empty string, which produced a
+   * mandatory element with no content.
+   */
+  public static final String DEFAULT_ORDER_REF_ID = EN16931CodeLists.MISSING_VALUE_PLACEHOLDER;
   public static final boolean DEFAULT_SWAP_QUANTITY_SIGN_IF_NEEDED = true;
   public static final boolean DEFAULT_SWAP_PRICE_SIGN_IF_NEEDED = true;
 
