@@ -512,7 +512,8 @@ public class CIID16BToUBL21Converter extends AbstractCIIToUBL2017Converter <CIID
 
     // BG-17 CREDIT TRANSFER
     final CreditorFinancialAccountType aPayeeCreditorAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
-    final boolean bIsBG17 = EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) && aPayeeCreditorAccount != null;
+    final boolean bIsBG17 = EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) &&
+                            aPayeeCreditorAccount != null;
     if (bIsBG17)
     {
       final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();

@@ -68,9 +68,9 @@ public final class CIIToUBLDispatcherTest
     // Forcing the edition converts them anyway
     final ErrorList aErrorList = new ErrorList ();
     final Serializable aUBL = new CIIToUBLDispatcher ().setEdition (EEN16931Edition.EN2017)
-                                                      .convertCIItoUBL (new File (MockSettings.BASE_TEST_DIR,
-                                                                                  "CII_business_example_01.xml"),
-                                                                        aErrorList);
+                                                       .convertCIItoUBL (new File (MockSettings.BASE_TEST_DIR,
+                                                                                   "CII_business_example_01.xml"),
+                                                                         aErrorList);
     assertTrue (aErrorList.toString (), aErrorList.containsNoError ());
     assertNotNull (aUBL);
   }
@@ -95,8 +95,7 @@ public final class CIIToUBLDispatcherTest
     // 2017 source yields a UBL 2.1 Invoice
     final ErrorList aErrorList = new ErrorList ();
     final Serializable aUBL = new CIIToUBLDispatcher ().convertCIItoUBL (new File (MockSettings.BASE_TEST_DIR,
-                                                                                  "CII_example1.xml"),
-                                                                        aErrorList);
+                                                                                   "CII_example1.xml"), aErrorList);
     assertTrue (aErrorList.toString (), aErrorList.containsNoError ());
     assertNotNull (aUBL);
     assertTrue ("Expected a UBL 2.1 Invoice but got " + aUBL.getClass ().getName (), aUBL instanceof InvoiceType);
@@ -104,8 +103,8 @@ public final class CIIToUBLDispatcherTest
     // 2026 source yields a UBL 2.5 Invoice
     final ErrorList aErrorList2 = new ErrorList ();
     final Serializable aUBL2 = new CIIToUBLDispatcher ().convertCIItoUBL (new File (D25A_TEST_DIR,
-                                                                                   "d25a-minimal-invoice.xml"),
-                                                                         aErrorList2);
+                                                                                    "d25a-minimal-invoice.xml"),
+                                                                          aErrorList2);
     assertTrue (aErrorList2.toString (), aErrorList2.containsNoError ());
     assertNotNull (aUBL2);
     assertTrue ("Expected a UBL 2.5 Invoice but got " + aUBL2.getClass ().getName (),
@@ -125,9 +124,9 @@ public final class CIIToUBLDispatcherTest
     // Forcing 2026 on a 2026 file works
     final ErrorList aErrorList2 = new ErrorList ();
     final Serializable aUBL2 = new CIIToUBLDispatcher ().setEdition (EEN16931Edition.EN2026)
-                                                       .convertCIItoUBL (new File (D25A_TEST_DIR,
-                                                                                   "d25a-minimal-invoice.xml"),
-                                                                         aErrorList2);
+                                                        .convertCIItoUBL (new File (D25A_TEST_DIR,
+                                                                                    "d25a-minimal-invoice.xml"),
+                                                                          aErrorList2);
     assertTrue (aErrorList2.toString (), aErrorList2.containsNoError ());
     assertNotNull (aUBL2);
   }
@@ -147,13 +146,13 @@ public final class CIIToUBLDispatcherTest
   public void testDispatcherPassesSettingsOn ()
   {
     final CIIToUBLDispatcher aDispatcher = new CIIToUBLDispatcher ().setUBLCreationMode (EUBLCreationMode.CREDIT_NOTE)
-                                                                   .setVATScheme ("MYVAT")
-                                                                   .setCustomizationID ("my-cust")
-                                                                   .setProfileID ("my-prof")
-                                                                   .setCardAccountNetworkID ("my-card")
-                                                                   .setDefaultOrderRefID ("my-order")
-                                                                   .setSwapQuantitySignIfNeeded (false)
-                                                                   .setSwapPriceSignIfNeeded (false);
+                                                                    .setVATScheme ("MYVAT")
+                                                                    .setCustomizationID ("my-cust")
+                                                                    .setProfileID ("my-prof")
+                                                                    .setCardAccountNetworkID ("my-card")
+                                                                    .setDefaultOrderRefID ("my-order")
+                                                                    .setSwapQuantitySignIfNeeded (false)
+                                                                    .setSwapPriceSignIfNeeded (false);
     for (final EEN16931Edition e : EEN16931Edition.values ())
     {
       final AbstractCIIToUBLConverterBase <?> aConverter = aDispatcher.createConverter (e);

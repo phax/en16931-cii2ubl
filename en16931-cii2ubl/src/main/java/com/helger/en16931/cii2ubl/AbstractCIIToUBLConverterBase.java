@@ -557,15 +557,15 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
     {
       aErrorList.add (buildWarn (null,
                                  "Could not determine, if the provided CII document is an Invoice or a CreditNote. TypeCode is '" +
-                                   sRealTypeCode +
-                                   "'; DuePayable is " +
-                                   aDuePayableSource));
+                                       sRealTypeCode +
+                                       "'; DuePayable is " +
+                                       aDuePayableSource));
     }
     else
     {
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Determined the provided CII document to be " +
-          (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
+                      (eIsInvoice.isTrue () ? "an Invoice" : "a CreditNote"));
     }
     return eIsInvoice;
   }
@@ -617,10 +617,10 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
           // This looks like an inconsistency
           aErrorList.add (buildWarn (null,
                                      "A negative line extension amount with quantity " +
-                                       aQuantity +
-                                       " and price " +
-                                       aPriceAmount +
-                                       " looks interesting."));
+                                           aQuantity +
+                                           " and price " +
+                                           aPriceAmount +
+                                           " looks interesting."));
         }
         else
           if (bNegPrice)
@@ -652,8 +652,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
           // This looks like an inconsistency
           aErrorList.add (buildWarn (null,
                                      "A negative line extension amount with quantity " +
-                                       aQuantity +
-                                       " looks interesting."));
+                                           aQuantity +
+                                           " looks interesting."));
         }
       }
     }
@@ -686,10 +686,10 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
             // This looks like an inconsistency
             aErrorList.add (buildWarn (null,
                                        "A positive line extension amount with quantity " +
-                                         aQuantity +
-                                         " and price " +
-                                         aPriceAmount +
-                                         " looks interesting."));
+                                             aQuantity +
+                                             " and price " +
+                                             aPriceAmount +
+                                             " looks interesting."));
           }
         // If both values are positive, no action needed
       }
@@ -701,8 +701,8 @@ public abstract class AbstractCIIToUBLConverterBase <IMPLTYPE extends AbstractCI
           // This looks like an inconsistency
           aErrorList.add (buildWarn (null,
                                      "A positive line extension amount with quantity " +
-                                       aQuantity +
-                                       " looks interesting."));
+                                           aQuantity +
+                                           " looks interesting."));
         }
       }
     }

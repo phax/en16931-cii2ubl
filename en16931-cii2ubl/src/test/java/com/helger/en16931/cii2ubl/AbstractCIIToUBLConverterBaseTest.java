@@ -144,7 +144,8 @@ public final class AbstractCIIToUBLConverterBaseTest
   {
     final ErrorList aList = new ErrorList ();
     // The boolean branch of the choice wins
-    assertEquals (ETriState.TRUE, AbstractCIIToUBLConverterBase.parseIndicator (Boolean.TRUE, false, null, null, aList));
+    assertEquals (ETriState.TRUE,
+                  AbstractCIIToUBLConverterBase.parseIndicator (Boolean.TRUE, false, null, null, aList));
     assertEquals (ETriState.FALSE,
                   AbstractCIIToUBLConverterBase.parseIndicator (Boolean.FALSE, true, "true", null, aList));
     assertTrue (aList.isEmpty ());

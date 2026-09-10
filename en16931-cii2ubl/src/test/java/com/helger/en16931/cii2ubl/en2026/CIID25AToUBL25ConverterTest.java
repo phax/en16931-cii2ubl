@@ -52,15 +52,15 @@ public final class CIID25AToUBL25ConverterTest
   /**
    * BT-90 and the party identifiers BT-29/BT-46/BT-60 share the UBL element
    * <code>cac:PartyIdentification/cbc:ID</code> and are told apart by the scheme identifier
-   * <code>SEPA</code> alone. A CII GlobalID carrying that scheme identifier - which
-   * en16931-ubl2cii up to 3.0.0 wrote in addition to <code>ram:CreditorReferenceID</code> - must
-   * therefore not become a party identifier, or the resulting UBL would carry two competing BT-90.
+   * <code>SEPA</code> alone. A CII GlobalID carrying that scheme identifier - which en16931-ubl2cii
+   * up to 3.0.0 wrote in addition to <code>ram:CreditorReferenceID</code> - must therefore not
+   * become a party identifier, or the resulting UBL would carry two competing BT-90.
    */
   @Test
   public void testSepaGlobalIDIsNotAPartyIdentifier ()
   {
     final CrossIndustryInvoiceType aCII = new CIID25ACrossIndustryInvoiceTypeMarshaller ().read (new File (MockD25ASettings.BASE_TEST_DIR +
-                                                                                                          "d25a-edge-directdebit-invoice.xml"));
+                                                                                                           "d25a-edge-directdebit-invoice.xml"));
     assertNotNull (aCII);
 
     final IDType aSepaGlobalID = new IDType ();
@@ -96,7 +96,7 @@ public final class CIID25AToUBL25ConverterTest
   public void testMandatoryLineIDPlaceholder ()
   {
     final CrossIndustryInvoiceType aCII = new CIID25ACrossIndustryInvoiceTypeMarshaller ().read (new File (MockD25ASettings.BASE_TEST_DIR +
-                                                                                                          "d25a-new-lineref-invoice.xml"));
+                                                                                                           "d25a-new-lineref-invoice.xml"));
     assertNotNull (aCII);
     aCII.getSupplyChainTradeTransaction ()
         .getIncludedSupplyChainTradeLineItemAtIndex (0)
@@ -324,7 +324,9 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aInv, "cac:AdditionalDocumentReference[cbc:DocumentTypeCode='130']/cbc:ID", "METER-9");
     assertXPath (aInv, "cac:AdditionalDocumentReference[cbc:DocumentTypeCode='130']/cbc:ID/@schemeID", "AVE");
     // BG-24 ADDITIONAL SUPPORTING DOCUMENTS
-    assertXPath (aInv, "cac:AdditionalDocumentReference[cbc:ID='DOC-916']/cbc:DocumentDescription", "Supporting document");
+    assertXPath (aInv,
+                 "cac:AdditionalDocumentReference[cbc:ID='DOC-916']/cbc:DocumentDescription",
+                 "Supporting document");
     assertXPath (aInv,
                  "cac:AdditionalDocumentReference[cbc:ID='DOC-916']/cac:Attachment/cac:ExternalReference/cbc:URI",
                  "https://example.org/doc");
@@ -419,8 +421,12 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aInv, sLine + "cac:InvoicePeriod/cbc:EndDate", "2026-01-31");
     // BG-27 INVOICE LINE ALLOWANCES + BG-28 INVOICE LINE CHARGES
     assertXPath (aInv, sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:Amount", "10");
-    assertXPath (aInv, sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:AllowanceChargeReason", "Line discount");
-    assertXPath (aInv, sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='true']/cbc:AllowanceChargeReason", "Line freight");
+    assertXPath (aInv,
+                 sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:AllowanceChargeReason",
+                 "Line discount");
+    assertXPath (aInv,
+                 sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='true']/cbc:AllowanceChargeReason",
+                 "Line freight");
     // BG-31 ITEM INFORMATION
     final String sItem = sLine + "cac:Item/";
     assertXPath (aInv, sItem + "cbc:Name", "Widget");
@@ -635,7 +641,8 @@ public final class CIID25AToUBL25ConverterTest
     final Element aInv = convertAndValidate ("d25a-new-lineref-invoice.xml", true);
     final String sLine = "cac:InvoiceLine/";
 
-    // BT-132 Referenced purchase order line reference + BT-188 Invoice line purchase order reference
+    // BT-132 Referenced purchase order line reference + BT-188 Invoice line purchase order
+    // reference
     assertXPath (aInv, sLine + "cac:OrderLineReference/cbc:LineID", "PO-LINE-5");
     assertXPath (aInv, sLine + "cac:OrderLineReference/cac:OrderReference/cbc:ID", "LINE-PO-1");
     // BT-200 + BT-201 Invoice line sales order reference
@@ -704,7 +711,8 @@ public final class CIID25AToUBL25ConverterTest
     assertXPath (aInv, sLineCharge + "cbc:AllowanceChargeReasonCode", "ENV");
     assertXPath (aInv, sLineCharge + "cbc:AllowanceChargeReasonCode/@listID", "5153");
     // BT-145 keeps no list identifier
-    assertNoXPath (aInv, sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:AllowanceChargeReasonCode/@listID");
+    assertNoXPath (aInv,
+                   sLine + "cac:AllowanceCharge[cbc:ChargeIndicator='false']/cbc:AllowanceChargeReasonCode/@listID");
 
     // BG-32 ITEM ATTRIBUTE
     final String sProp = sLine + "cac:Item/cac:AdditionalItemProperty";
@@ -732,8 +740,7 @@ public final class CIID25AToUBL25ConverterTest
 
     // BT-90 belongs to BG-19 DIRECT DEBIT, so a credit transfer must not emit it even though the
     // source has a ram:CreditorReferenceID. The Seller keeps only its BT-29 identifier.
-    assertNoXPath (aInv,
-                   "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification[cbc:ID/@schemeID='SEPA']");
+    assertNoXPath (aInv, "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification[cbc:ID/@schemeID='SEPA']");
     assertXPath (aInv, "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID", "4035811234567");
   }
 

@@ -86,8 +86,7 @@ public final class MappingCoverageTest
     // Only real mapping rows have a cardinality column like "1..1" or "0..n"
     final ICommonsOrderedSet <String> ret = new CommonsLinkedHashSet <> ();
     final Matcher aMatcher = Pattern.compile ("^\\|\\s*(B[TG]-[0-9a-z\\-]+)\\s*\\|[^|]*\\|\\s*[0-9]\\.\\.[0-9n]\\s*\\|",
-                                              Pattern.MULTILINE)
-                                    .matcher (sMapping);
+                                              Pattern.MULTILINE).matcher (sMapping);
     while (aMatcher.find ())
       ret.add (aMatcher.group (1));
     return ret;

@@ -601,7 +601,8 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // CII D25A: PayeePartyCreditorFinancialAccount is a 0..n element
     final CreditorFinancialAccountType aPayeeCreditorAccount = aPaymentMeans.hasPayeePartyCreditorFinancialAccountEntries () ? aPaymentMeans.getPayeePartyCreditorFinancialAccountAtIndex (0)
                                                                                                                              : null;
-    final boolean bIsBG17 = EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) && aPayeeCreditorAccount != null;
+    final boolean bIsBG17 = EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) &&
+                            aPayeeCreditorAccount != null;
     if (bIsBG17)
     {
       final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
