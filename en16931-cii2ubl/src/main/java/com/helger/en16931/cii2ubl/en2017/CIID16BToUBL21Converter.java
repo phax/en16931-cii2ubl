@@ -512,8 +512,14 @@ public class CIID16BToUBL21Converter extends AbstractCIIToUBL2017Converter <CIID
 
     // BG-17 CREDIT TRANSFER
     final CreditorFinancialAccountType aPayeeCreditorAccount = aPaymentMeans.getPayeePartyCreditorFinancialAccount ();
-    final boolean bIsBG17 = EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) &&
-                            aPayeeCreditorAccount != null;
+    // The account of the payee is BT-84 whatever BT-81 says - XRechnung e.g. uses it with "1"
+    // (Instrument not defined). For the other codes it is only taken if it has an identifier, as BT-84
+    // is mandatory in BG-17. CII keeps it apart from the account of the payer (BT-91), so this does not
+    // mix up the two (#7)
+    final boolean bIsBG17 = aPayeeCreditorAccount != null &&
+                            (EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) ||
+                             StringHelper.isNotEmpty (aPayeeCreditorAccount.getIBANIDValue ()) ||
+                             StringHelper.isNotEmpty (aPayeeCreditorAccount.getProprietaryIDValue ()));
     if (bIsBG17)
     {
       final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();

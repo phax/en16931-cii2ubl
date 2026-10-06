@@ -17,6 +17,7 @@
  */
 package com.helger.en16931.cii2ubl.en2017;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.cii.d16b.CIID16BCrossIndustryInvoiceTypeMarshaller;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.en16931.cii2ubl.MockSettings;
 import com.helger.io.file.FilenameHelper;
@@ -42,13 +44,16 @@ import com.helger.phive.api.validity.IValidityDeterminator;
 import com.helger.phive.xml.source.ValidationSourceXML;
 import com.helger.ubl21.UBL21Marshaller;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_21.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_21.InvoiceType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 
 /**
  * Test class for class {@link CIID16BToUBL21Converter}.
@@ -142,5 +147,39 @@ public final class CIID16BToUBL21ConverterTest
     aSCTTT.setApplicableHeaderTradeSettlement (aHeaderSettlement);
     // First version working
     assertNotNull (_convert (aInvoice));
+  }
+
+  @Test
+  public void testPayeeAccountWithOtherPaymentMeansCode ()
+  {
+    // The KoSIT XRechnung test suite has BT-84 to BT-86 with BT-81 "1" (Instrument not defined)
+    final CrossIndustryInvoiceType aCII = new CIID16BCrossIndustryInvoiceTypeMarshaller ().read (new File ("src/test/resources/external/cii/xrechnung/3.0.2/01.21a-INVOICE_uncefact.xml"));
+    assertNotNull (aCII);
+    final CreditorFinancialAccountType aCIIAccount = aCII.getSupplyChainTradeTransaction ()
+                                                         .getApplicableHeaderTradeSettlement ()
+                                                         .getSpecifiedTradeSettlementPaymentMeansAtIndex (0)
+                                                         .getPayeePartyCreditorFinancialAccount ();
+    assertNotNull (aCIIAccount);
+
+    ErrorList aErrorList = new ErrorList ();
+    InvoiceType aUBL = new CIID16BToUBL21Converter ().convertToInvoice (aCII, aErrorList);
+    assertNotNull (aUBL);
+    assertTrue (aErrorList.toString (), aErrorList.containsNoError ());
+
+    PaymentMeansType aPM = aUBL.getPaymentMeansAtIndex (0);
+    assertEquals ("1", aPM.getPaymentMeansCodeValue ());
+    assertNotNull (aPM.getPayeeFinancialAccount ());
+    assertEquals ("DE54500800000192632400", aPM.getPayeeFinancialAccount ().getIDValue ());
+    assertEquals ("Mustermann GmbH", aPM.getPayeeFinancialAccount ().getNameValue ());
+    assertEquals ("DRESDEFFXXX", aPM.getPayeeFinancialAccount ().getFinancialInstitutionBranch ().getIDValue ());
+
+    // Without an identifier it is no BT-84 - only required for the credit transfer codes
+    aCIIAccount.setIBANID ((IDType) null);
+    aErrorList = new ErrorList ();
+    aUBL = new CIID16BToUBL21Converter ().convertToInvoice (aCII, aErrorList);
+    assertNotNull (aUBL);
+    aPM = aUBL.getPaymentMeansAtIndex (0);
+    assertEquals ("1", aPM.getPaymentMeansCodeValue ());
+    assertNull (aPM.getPayeeFinancialAccount ());
   }
 }

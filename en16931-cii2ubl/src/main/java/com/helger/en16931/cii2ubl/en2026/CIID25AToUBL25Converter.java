@@ -601,8 +601,14 @@ public class CIID25AToUBL25Converter extends AbstractCIIToUBL2026Converter <CIID
     // CII D25A: PayeePartyCreditorFinancialAccount is a 0..n element
     final CreditorFinancialAccountType aPayeeCreditorAccount = aPaymentMeans.hasPayeePartyCreditorFinancialAccountEntries () ? aPaymentMeans.getPayeePartyCreditorFinancialAccountAtIndex (0)
                                                                                                                              : null;
-    final boolean bIsBG17 = EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) &&
-                            aPayeeCreditorAccount != null;
+    // The account of the payee is BT-84 whatever BT-81 says - XRechnung e.g. uses it with "1"
+    // (Instrument not defined). For the other codes it is only taken if it has an identifier, as BT-84
+    // is mandatory in BG-17. CII keeps it apart from the account of the payer (BT-91), so this does not
+    // mix up the two (#7)
+    final boolean bIsBG17 = aPayeeCreditorAccount != null &&
+                            (EN16931CodeLists.isPaymentMeansCodeCreditTransfer (sTypeCode) ||
+                             StringHelper.isNotEmpty (aPayeeCreditorAccount.getIBANIDValue ()) ||
+                             StringHelper.isNotEmpty (aPayeeCreditorAccount.getProprietaryIDValue ()));
     if (bIsBG17)
     {
       final FinancialAccountType aUBLFinancialAccount = new FinancialAccountType ();
