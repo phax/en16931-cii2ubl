@@ -130,24 +130,42 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v4.0.2 - 2026-10-07
+* Fixed BG-17 (BT-84 to BT-86) being silently dropped if BT-81 is not one of the credit transfer codes `30`, `42` or `58` - e.g. the KoSIT XRechnung test suite uses `1` (Instrument not defined) with an IBAN.
+  For the other codes the payee account is now mapped too, provided it has an identifier (IBAN or proprietary ID), as BT-84 is mandatory in BG-17.
+  Note that a creditor account given next to direct debit or payment card information (BG-19, BG-18) is now also passed through instead of being removed.
+  Affects both editions.
+  See [PR #49](https://github.com/phax/en16931-cii2ubl/pull/49) - thanks to @janwytze
+
 v4.0.1 - 2026-09-07
-* Fixed a CII `ram:GlobalID` with `@schemeID="SEPA"` being written as a party identifier BT-29/BT-46/BT-60/BT-71. In UBL that scheme identifier is reserved for BT-90, so the result carried two competing bank assigned creditor identifiers, and the scheme identifier is not an ISO 6523 ICD code either, which BR-CL-10 requires. Affects both editions
-* Now using `EEN16931TaxSchemeCode.LOC` and the new discriminator constants of [en16931-basics](https://github.com/phax/en16931-basics) 1.0.1 instead of local copies. `NATIONAL_TAX_SCHEME`, `NON_VAT_TAX_CODE_LIST_ID` and `SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID` of `CIID25AToUBL25Converter` are deprecated and now delegate there
+* Fixed a CII `ram:GlobalID` with `@schemeID="SEPA"` being written as a party identifier BT-29/BT-46/BT-60/BT-71.
+  In UBL that scheme identifier is reserved for BT-90, so the result carried two competing bank assigned creditor identifiers, and the scheme identifier is not an ISO 6523 ICD code either, which BR-CL-10 requires.
+  Affects both editions
+* Now using `EEN16931TaxSchemeCode.LOC` and the new discriminator constants of [en16931-basics](https://github.com/phax/en16931-basics) 1.0.1 instead of local copies.
+  `NATIONAL_TAX_SCHEME`, `NON_VAT_TAX_CODE_LIST_ID` and `SUPPORTING_DOCUMENT_TYPE_CODE_LIST_ID` of `CIID25AToUBL25Converter` are deprecated and now delegate there
 * BT-32-2 is derived from `EN16931CodeLists.mapTaxSchemeCodeCIIToUBL` rather than a hard coded `"FC"` to `"LOC"` special case
 * Fixed a schema invalid `cac:OrderLineReference` for an invoice line that has a sales order reference (BT-200/BT-201) but no purchase order line reference (BT-132) - the mandatory `cbc:LineID` was left out entirely
-* The placeholder for a mandatory `cbc:LineID` without a business term value is now the `None` prescribed by the UBL binding instead of `1`, which is what en16931-ubl2cii reads back. Affects BT-132, BT-190, BT-192 and BT-199
+* The placeholder for a mandatory `cbc:LineID` without a business term value is now the `None` prescribed by the UBL binding instead of `1`, which is what en16931-ubl2cii reads back.
+  Affects BT-132, BT-190, BT-192 and BT-199
 
 v4.0.0 - 2026-09-05
 * Added the **EN 16931:2026** syntax binding: `com.helger.en16931.cii2ubl.en2026.CIID25AToUBL25Converter` converts CII D25A to UBL 2.5, covering all 284 rows of the mapping table including the 70 business terms and groups that are new in 2026 (BG-33 to BG-39, BT-166 to BT-220)
 * Removed the support for creating UBL 2.2, 2.3 and 2.4 - the two editions of EN 16931 prescribe exactly UBL 2.1 and UBL 2.5
-* Moved the EN 16931:2017 conversion to the new package `com.helger.en16931.cii2ubl.en2017` and renamed `CIIToUBL21Converter` to `CIID16BToUBL21Converter`. The UBL 2.1 output is unchanged
+* Moved the EN 16931:2017 conversion to the new package `com.helger.en16931.cii2ubl.en2017` and renamed `CIIToUBL21Converter` to `CIID16BToUBL21Converter`.
+  The UBL 2.1 output is unchanged
 * Split `AbstractCIIToUBLConverter` into the edition independent `AbstractCIIToUBLConverterBase` and the CII release specific `AbstractCIIToUBL2017Converter` and `AbstractCIIToUBL2026Converter`
-* Added `CIIToUBLDispatcher` to determine the EN 16931 edition of a CII document from BT-24 and to route to the matching converter. The edition can neither be determined from the XML namespaces, which are identical across CII releases, nor from the XML Schema, because a D16B instance also validates against the D25A XSD
-* Added the dependency to `en16931-basics` 1.0.0 and took `EEN16931Edition`, the code list knowledge and the UNTDID 2379 date formats from there instead of holding own copies. `com.helger.en16931.cii2ubl.EEN16931Edition` was therefore replaced by `com.helger.en16931.basics.EEN16931Edition`, and the BT-3, BT-8, BT-17/BT-18 and BT-81 classification now comes from `com.helger.en16931.basics.codelist.EN16931CodeLists`. The `AbstractCIIToUBLConverterBase` constants `DEFAULT_DATE_TIME_FORMAT` and `DATE_TIME_FORMAT_WITH_TIME` were replaced by `com.helger.en16931.basics.EEN16931DateFormatCode`. The converted output is unchanged
-* The CLI determines the edition per file from BT-24 by default; the new option `--en-version 2017|2026` forces one instead. `--ubl` is deprecated and now only accepts `2.1` and `2.5`
+* Added `CIIToUBLDispatcher` to determine the EN 16931 edition of a CII document from BT-24 and to route to the matching converter.
+  The edition can neither be determined from the XML namespaces, which are identical across CII releases, nor from the XML Schema, because a D16B instance also validates against the D25A XSD
+* Added the dependency to `en16931-basics` 1.0.0 and took `EEN16931Edition`, the code list knowledge and the UNTDID 2379 date formats from there instead of holding own copies.
+  `com.helger.en16931.cii2ubl.EEN16931Edition` was therefore replaced by `com.helger.en16931.basics.EEN16931Edition`, and the BT-3, BT-8, BT-17/BT-18 and BT-81 classification now comes from `com.helger.en16931.basics.codelist.EN16931CodeLists`.
+  The `AbstractCIIToUBLConverterBase` constants `DEFAULT_DATE_TIME_FORMAT` and `DATE_TIME_FORMAT_WITH_TIME` were replaced by `com.helger.en16931.basics.EEN16931DateFormatCode`.
+  The converted output is unchanged
+* The CLI determines the edition per file from BT-24 by default; the new option `--en-version 2017|2026` forces one instead.
+  `--ubl` is deprecated and now only accepts `2.1` and `2.5`
 * Fixed a long standing CLI bug: without `--ubl-customizationid` and `--ubl-profileid` the conversion aborted with a `NullPointerException`
 * The BT-3 (Invoice type code) subset of UNTDID 1001 now follows the EN 16931 code list registry (the [CEN/TC 434 section](https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931) of the European Commission registry), with the values taken from "EN16931 code lists values v17b - used from 2026-05-15". The list is versioned by date and not by EN 16931 edition, so both editions share it
-* Fixed the BT-3 classification of `81`, `502` and `503`: all three were treated as Invoice codes, although the code list has them as Credit Note codes. `502` and `503` were added to the list in v15 (used from 2025-05-15)
+* Fixed the BT-3 classification of `81`, `502` and `503`: all three were treated as Invoice codes, although the code list has them as Credit Note codes.
+  `502` and `503` were added to the list in v15 (used from 2025-05-15)
 * Added the dependencies to `ph-cii-d25a` and `ph-ubl25`
 * Added `docs/en16931-2026-syntax.md` with the three-way field mapping (UBL 2.5 invoice / UBL 2.5 credit note / CII D25A) of EN 16931:2026
 * Added `docs/plan-4.0.0.md` with the implementation plan for v4.0.0
