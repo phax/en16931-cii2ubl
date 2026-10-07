@@ -83,6 +83,13 @@
   </cac:Delivery>
   <cac:PaymentMeans>
     <cbc:PaymentMeansCode name="Rechnung">1</cbc:PaymentMeansCode>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>DE54500800000192632400</cbc:ID>
+      <cbc:Name>Mustermann GmbH</cbc:Name>
+      <cac:FinancialInstitutionBranch>
+        <cbc:ID>DRESDEFFXXX</cbc:ID>
+      </cac:FinancialInstitutionBranch>
+    </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
   <cac:PaymentTerms>
     <cbc:Note>10 Tage 3% Skonto, 30 Tage netto</cbc:Note>
