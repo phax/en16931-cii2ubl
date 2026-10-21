@@ -552,8 +552,8 @@ public class CIID16BToUBL21Converter extends AbstractCIIToUBL2017Converter <CIID
     {
       final TradeSettlementFinancialCardType aCard = aPaymentMeans.getApplicableTradeSettlementFinancialCard ();
       if (aCard == null)
-        aErrorList.add (buildError (null,
-                                    "The element 'ApplicableTradeSettlementFinancialCard' is missing for Payment Card Information"));
+        aErrorList.add (buildWarn (null,
+                                    "The element 'ApplicableTradeSettlementFinancialCard' is missing for Payment Card Information - skipping BG-18 in the UBL output"));
       else
       {
         final CardAccountType aUBLCardAccount = new CardAccountType ();
