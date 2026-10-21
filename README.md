@@ -130,6 +130,13 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v4.0.3 - work in progress
+* A missing BG-18 (payment card information) for BT-81 `48` (payment card) is no longer a conversion error but only a warning.
+  The CII is valid without `ram:ApplicableTradeSettlementFinancialCard`, and the resulting UBL without `cac:CardAccount` is EN 16931 conformant.
+  The BG-18 mapping is skipped in that case, in line with the existing BG-17 behaviour.
+  Affects both editions.
+  See [PR #50](https://github.com/phax/en16931-cii2ubl/pull/50) - thanks to @TryAnixx
+
 v4.0.2 - 2026-10-07
 * Fixed BG-17 (BT-84 to BT-86) being silently dropped if BT-81 is not one of the credit transfer codes `30`, `42` or `58` - e.g. the KoSIT XRechnung test suite uses `1` (Instrument not defined) with an IBAN.
   For the other codes the payee account is now mapped too, provided it has an identifier (IBAN or proprietary ID), as BT-84 is mandatory in BG-17.
