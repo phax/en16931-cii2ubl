@@ -130,7 +130,7 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
-v4.0.3 - work in progress
+v4.0.3 - 2026-10-21
 * A missing BG-18 (payment card information) for BT-81 `48` (payment card) is no longer a conversion error but only a warning.
   The CII is valid without `ram:ApplicableTradeSettlementFinancialCard`, and the resulting UBL without `cac:CardAccount` is EN 16931 conformant.
   The BG-18 mapping is skipped in that case, in line with the existing BG-17 behaviour.
