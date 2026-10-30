@@ -137,8 +137,8 @@ public final class MockSettings
                                                                     "01.05_minimal_test_uncefact.xml",
                                                                     "01.06_minimal_test_uncefact.xml" };
 
-  public static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1316.getWithVersionLatestRelease ();
-  public static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1316.getWithVersionLatestRelease ();
+  public static final DVRCoordinate VID_INVOICE = EN16931Validation.VID_UBL_INVOICE_1317.getWithVersionLatestRelease ();
+  public static final DVRCoordinate VID_CREDIT_NOTE = EN16931Validation.VID_UBL_CREDIT_NOTE_1317.getWithVersionLatestRelease ();
 
   public static final ValidationExecutorSetRegistry <IValidationSourceXML> VES_REGISTRY = new ValidationExecutorSetRegistry <> ();
   static
