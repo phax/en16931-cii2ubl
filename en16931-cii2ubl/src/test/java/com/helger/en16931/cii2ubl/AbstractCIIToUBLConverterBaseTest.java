@@ -19,10 +19,11 @@ package com.helger.en16931.cii2ubl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,8 +31,8 @@ import java.time.Month;
 
 import org.junit.Test;
 
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.base.state.ETriState;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.diagnostics.error.list.ErrorList;
 import com.helger.en16931.basics.codelist.EN16931CodeLists;
 
@@ -70,7 +71,8 @@ public final class AbstractCIIToUBLConverterBaseTest
                   AbstractCIIToUBLConverterBase.parseDate ("20050706", "102", aList));
     assertTrue (aList.isEmpty ());
 
-    final LocalDate aLD = AbstractCIIToUBLConverterBase.parseDate ("050101", "103", aList);
+    final LocalDate aLD = AbstractCIIToUBLConverterBase.parseDate ("05011", "103", aList);
+    assertNotNull (aLD);
     // Windows: 2005, Linux: 2004
     assertTrue (aLD.equals (PDTFactory.createLocalDate (2005, Month.JANUARY, 3)) ||
                 aLD.equals (PDTFactory.createLocalDate (2004, Month.DECEMBER, 26)));
