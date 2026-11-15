@@ -130,6 +130,11 @@ CII to UBL Converter for EN 16931 invoices
 
 # News and noteworthy
 
+v4.0.4 - work in progress
+* Updated to ph-commons 12.7.1, ph-ubl 10.3.0 and ph-cii 4.1.4
+* The parent POM now imports the new BOMs of ph-commons, ph-ubl and ph-cii instead of their parent POMs
+* The parent POM now imports the BOM of the JAXB runtime (`org.glassfish.jaxb:jaxb-bom`)
+
 v4.0.3 - 2026-10-21
 * A missing BG-18 (payment card information) for BT-81 `48` (payment card) is no longer a conversion error but only a warning.
   The CII is valid without `ram:ApplicableTradeSettlementFinancialCard`, and the resulting UBL without `cac:CardAccount` is EN 16931 conformant.
